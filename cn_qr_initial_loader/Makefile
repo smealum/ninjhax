@@ -4,7 +4,7 @@ all: sploit_map.bin.png
 
 %.bin.png: %.bin
 	@python $(SCRIPTS)/crypt.py $< $(SCRIPTS)
-	@../scripts/qrcode.exe -8 -o $@ < tmp
+	@$(SCRIPTS)/qrcode.exe -8 -o $@ < tmp
 	@rm tmp
 
 clean:

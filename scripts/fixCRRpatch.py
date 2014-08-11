@@ -11,8 +11,7 @@ crofn=sys.argv[1]
 crrpatchfn=sys.argv[2]
 
 crodata=bytearray(open(crofn,"rb").read())
-
-crrdata=bytearray(open(crrpatchfn,"rb").read())
+crrdata=bytearray(b'\x00'*0x40)
 crrdata[0x00:0x20]=getHash(crodata,0x00,0x80)
 crrdata[0x20:0x40]=getHash(crodata,0x00,0x80)
 
