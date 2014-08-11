@@ -192,7 +192,85 @@ thread0rop:
 			.word 0xDEADBABE ; r8 (garbage)
 			.word 0xDEADBABE ; r9 (garbage)
 
-	;patch cro
+	;patch cro (0x0 patch) (hashes)
+		.word 0x0010b5b4 ; pop {r0, r1, r2, r3, r4, pc}
+			.word CROLOCATION+0x0 ; r0 (dst)
+			.word ROPLOCATION+croPatch0 ; r1 (src)
+			.word croPatch0_end-croPatch0  ; r2 (size)
+			.word 0xDEADBABE ; r3 (garbage)
+			.word 0xDEADBABE ; r4 (garbage)
+		.word 0x00240B54 ; memcpy (ends in LDMFD   SP!, {R4-R10,LR})
+			.word 0xDEADBABE ; r4 (garbage)
+			.word 0xDEADBABE ; r5 (garbage)
+			.word 0xDEADBABE ; r6 (garbage)
+			.word 0xDEADBABE ; r7 (garbage)
+			.word 0xDEADBABE ; r8 (garbage)
+			.word 0xDEADBABE ; r9 (garbage)
+			.word 0xDEADBABE ; r10 (garbage)
+
+	;patch cro (0x700 patch) (ro code)
+		.word 0x0010b5b4 ; pop {r0, r1, r2, r3, r4, pc}
+			.word CROLOCATION+0x700 ; r0 (dst)
+			.word ROPLOCATION+croPatch700 ; r1 (src)
+			.word croPatch700_end-croPatch700  ; r2 (size)
+			.word 0xDEADBABE ; r3 (garbage)
+			.word 0xDEADBABE ; r4 (garbage)
+		.word 0x00240B54 ; memcpy (ends in LDMFD   SP!, {R4-R10,LR})
+			.word 0xDEADBABE ; r4 (garbage)
+			.word 0xDEADBABE ; r5 (garbage)
+			.word 0xDEADBABE ; r6 (garbage)
+			.word 0xDEADBABE ; r7 (garbage)
+			.word 0xDEADBABE ; r8 (garbage)
+			.word 0xDEADBABE ; r9 (garbage)
+			.word 0xDEADBABE ; r10 (garbage)
+
+	;patch cro (0x2000 patch) (spider code)
+		.word 0x0010b5b4 ; pop {r0, r1, r2, r3, r4, pc}
+			.word CROLOCATION+0x2000 ; r0 (dst)
+			.word ROPLOCATION+croPatch2000 ; r1 (src)
+			.word croPatch2000_end-croPatch2000  ; r2 (size)
+			.word 0xDEADBABE ; r3 (garbage)
+			.word 0xDEADBABE ; r4 (garbage)
+		.word 0x00240B54 ; memcpy (ends in LDMFD   SP!, {R4-R10,LR})
+			.word 0xDEADBABE ; r4 (garbage)
+			.word 0xDEADBABE ; r5 (garbage)
+			.word 0xDEADBABE ; r6 (garbage)
+			.word 0xDEADBABE ; r7 (garbage)
+			.word 0xDEADBABE ; r8 (garbage)
+			.word 0xDEADBABE ; r9 (garbage)
+			.word 0xDEADBABE ; r10 (garbage)
+
+	;patch cro (0x1D9020 patch) (rohax stuff)
+		.word 0x0010b5b4 ; pop {r0, r1, r2, r3, r4, pc}
+			.word CROLOCATION+0x1D9020 ; r0 (dst)
+			.word ROPLOCATION+croPatch1D9020 ; r1 (src)
+			.word croPatch1D9020_end-croPatch1D9020  ; r2 (size)
+			.word 0xDEADBABE ; r3 (garbage)
+			.word 0xDEADBABE ; r4 (garbage)
+		.word 0x00240B54 ; memcpy (ends in LDMFD   SP!, {R4-R10,LR})
+			.word 0xDEADBABE ; r4 (garbage)
+			.word 0xDEADBABE ; r5 (garbage)
+			.word 0xDEADBABE ; r6 (garbage)
+			.word 0xDEADBABE ; r7 (garbage)
+			.word 0xDEADBABE ; r8 (garbage)
+			.word 0xDEADBABE ; r9 (garbage)
+			.word 0xDEADBABE ; r10 (garbage)
+
+	;patch cro (0x1DBA90 patch) (rohax stuff)
+		.word 0x0010b5b4 ; pop {r0, r1, r2, r3, r4, pc}
+			.word CROLOCATION+0x1DBA90 ; r0 (dst)
+			.word ROPLOCATION+croPatch1DBA90 ; r1 (src)
+			.word croPatch1DBA90_end-croPatch1DBA90  ; r2 (size)
+			.word 0xDEADBABE ; r3 (garbage)
+			.word 0xDEADBABE ; r4 (garbage)
+		.word 0x00240B54 ; memcpy (ends in LDMFD   SP!, {R4-R10,LR})
+			.word 0xDEADBABE ; r4 (garbage)
+			.word 0xDEADBABE ; r5 (garbage)
+			.word 0xDEADBABE ; r6 (garbage)
+			.word 0xDEADBABE ; r7 (garbage)
+			.word 0xDEADBABE ; r8 (garbage)
+			.word 0xDEADBABE ; r9 (garbage)
+			.word 0xDEADBABE ; r10 (garbage)
 
 	;load cro
 
@@ -255,8 +333,8 @@ thread0rop:
 		.byte 0x00
 		.byte 0x00
 	ossCro_str:
-		; .string "rom:/cro/oss.cro"
-		.string "sdmc:/new_oss.cro"
+		.string "rom:/cro/oss.cro"
+		; .string "sdmc:/new_oss.cro"
 		.byte 0x00
 		.byte 0x00
 
@@ -278,6 +356,31 @@ thread0rop:
 	.align 0x10
 	crrPatch:
 		.incbin "crr_patch.bin"
+
+	.align 0x4
+	croPatch0:
+	.incbin "../build/cro/patch0.bin"
+	croPatch0_end:
+
+	.align 0x4
+	croPatch700:
+	.incbin "../build/cro/patch700.bin"
+	croPatch700_end:
+
+	.align 0x4
+	croPatch2000:
+	.incbin "../build/cro/patch2000.bin"
+	croPatch2000_end:
+
+	.align 0x4
+	croPatch1D9020:
+	.incbin "../build/cro/patch1D9020.bin"
+	croPatch1D9020_end:
+
+	.align 0x4
+	croPatch1DBA90:
+	.incbin "../build/cro/patch1DBA90.bin"
+	croPatch1DBA90_end:
 
 	.align 0x4
 	fileObj:
