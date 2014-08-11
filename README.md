@@ -1,7 +1,18 @@
 ninjhax
 =======
 
-list of files to build :
+to build :
+
+	make
+
+
+extra files required to make :
+
+	scripts/blowfish_processed.bin
+	oss_cro/oss.cro
+
+
+description of files :
  
 	cn_qr_initial_loader
 		qr code that ROPs its way to gspwn, gets code exec, downloads cn_secondary_payload through HTTP and launches it
