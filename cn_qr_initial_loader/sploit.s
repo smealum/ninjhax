@@ -1,6 +1,6 @@
 .nds
 
-.open "sploit_proto.bin","sploit_map.bin",0x0
+.open "sploit_proto.bin","cn_qr_initial_loader.bin",0x0
 
 GSPHEAP equ 0x14000000
 PATCHLOCATION equ GSPHEAP

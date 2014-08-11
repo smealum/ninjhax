@@ -6,9 +6,9 @@
 #include <ctr/svc.h>
 #include <ctr/APT.h>
 #include "text.h"
-#include "initial_rop_bin.h"
-#include "thread0rop_bin.h"
-#include "bootloader_bin.h"
+#include "spider_initial_rop_bin.h"
+#include "spider_thread0_rop_bin.h"
+#include "cn_bootloader_bin.h"
 
 #define TOPFBADR1 ((u8*)0x1444B9C0)
 #define TOPFBADR2 ((u8*)0x14491EE0)
@@ -358,7 +358,7 @@ int main()
 
 		{
 			memset((u8*)0x14100000, 0x00, 0x2000);
-			memcpy((u8*)0x14100000, initial_rop_bin, initial_rop_bin_size);
+			memcpy((u8*)0x14100000, spider_initial_rop_bin, spider_initial_rop_bin_size);
 			_GSPGPU_FlushDataCache(gspHandle, 0xFFFF8001, (u32*)0x14100000, 0x1000);
 
 			doGspwn((u32*)0x14100000, (u32*)0x18CEB000, 0x1000);
@@ -366,7 +366,7 @@ int main()
 
 		{
 			memset((u8*)0x14100000, 0x00, 0x2000);
-			memcpy((u8*)0x14100000, thread0rop_bin, thread0rop_bin_size);
+			memcpy((u8*)0x14100000, spider_thread0_rop_bin, spider_thread0_rop_bin_size);
 			_GSPGPU_FlushDataCache(gspHandle, 0xFFFF8001, (u32*)0x14100000, 0x1000);
 
 			doGspwn((u32*)0x14100000, (u32*)0x18CEA000, 0x1000);
@@ -452,7 +452,7 @@ int main()
 		_GSPGPU_FlushDataCache(gspHandle, 0xFFFF8001, (u32*)TOPFBADR1, 0x46500*2);
 	}
 
-	memcpy((u8*)0x13FF0000, bootloader_bin, bootloader_bin_size);
+	memcpy((u8*)0x13FF0000, cn_bootloader_bin, cn_bootloader_bin_size);
 
 	for(i=0;i<0x1000;i++)
 	{

@@ -75,7 +75,7 @@ BOOTLOADERLOC equ 0x000F0000
 
 .orga 0x3000
 appCode:
-	.incbin "arm11u.bin"
+	; .incbin "arm11u.bin"
 endAppCode:
 
 .close

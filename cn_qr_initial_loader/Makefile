@@ -1,6 +1,7 @@
 SCRIPTS = "../scripts"
+NAME = cn_qr_initial_loader
 
-all: sploit_map.bin.png
+all: $(NAME).bin.png
 
 %.bin.png: %.bin
 	@python $(SCRIPTS)/crypt.py $< $(SCRIPTS)
@@ -9,12 +10,12 @@ all: sploit_map.bin.png
 
 clean:
 	@cd cn_initial && make clean
-	@rm sploit_map.bin sploit_map.bin.png
+	@rm $(NAME).bin $(NAME).bin.png
 	@echo "all cleaned up !"
 
 -include $(DFILES)
 
-sploit_map.bin: sploit_proto.bin sploit.s cn_initial/cn_initial.bin
+$(NAME).bin: sploit_proto.bin sploit.s cn_initial/cn_initial.bin
 	armips sploit.s
 
 cn_initial/cn_initial.bin:
