@@ -330,7 +330,7 @@ thread0rop:
 		.word CROMAPADR+0x2000
 		.word 0xDEADDEAD
 
-.orga 0x800
+; .orga 0x800
 	.align 0x8
 	romfsHandle:
 		.word 0x00000000

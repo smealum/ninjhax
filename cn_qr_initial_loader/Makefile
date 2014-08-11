@@ -1,6 +1,8 @@
 SCRIPTS = "../scripts"
 NAME = cn_qr_initial_loader
 
+.PHONY: all cn_initial/cn_initial.bin
+
 all: $(NAME).bin.png
 
 %.bin.png: %.bin
@@ -10,7 +12,7 @@ all: $(NAME).bin.png
 
 clean:
 	@cd cn_initial && make clean
-	@rm $(NAME).bin $(NAME).bin.png
+	@rm -f $(NAME).bin $(NAME).bin.png
 	@echo "all cleaned up !"
 
 -include $(DFILES)

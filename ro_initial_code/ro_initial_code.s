@@ -36,8 +36,8 @@ SPIDERHANDLE_LOCATION equ 0x0FFFFF34
 
 		;copy code to new memory block
 			ldr r0, =CODELOCATION
-			ldr r1, =CROMAPADR+roCode
-			ldr r2, =CROMAPADR+roCodeEnd
+			ldr r1, =CROMAPADR+roCode+0x700
+			ldr r2, =CROMAPADR+roCodeEnd+0x700
 			roCodeCopyLoop:
 				ldr r3, [r1], #4
 				str r3, [r0], #4

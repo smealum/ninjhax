@@ -8,5 +8,5 @@ oss_new.cro: oss.cro
 	@python $(SCRIPTS)/fixCRO.py out_oss.cro
 
 clean:
-	rm build/*
+	@rm -f out_oss.cro
 	@echo "all cleaned up !"

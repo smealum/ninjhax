@@ -275,7 +275,7 @@ int _main()
 
 	// drawHex(ret,0,line+=10);
 
-	ret=HTTPC_CreateContext(httpcHandle,"http://smealum.net/ninjhax/cn_menu.bin", &httpContextHandle);
+	ret=HTTPC_CreateContext(httpcHandle,"http://smealum.net/ninjhax//cn_secondary_payload.bin", &httpContextHandle);
 
 	// drawHex(ret,0,line+=10);
 	

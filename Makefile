@@ -1,7 +1,6 @@
 SCRIPTS = "scripts"
-MKDIR = $(mkdir build && mkdir build/cro)
 
-.PHONY: directories all build/cn_qr_initial_loader.bin.png
+.PHONY: directories all cn_qr_initial_loader/cn_qr_initial_loader.bin.png cn_secondary_payload/cn_secondary_payload.bin cn_bootloader/cn_bootloader.bin spider_initial_rop/spider_initial_rop.bin spider_thread0_rop/spider_thread0_rop.bin oss_cro/out_oss.cro build/ro_initial_code.bin build/ro_initial_rop.bin build/spider_code.bin
 
 all: directories build/cn_qr_initial_loader.bin.png build/cn_secondary_payload.bin
 	@cp build/cn_qr_initial_loader.bin.png ./
@@ -74,5 +73,16 @@ spider_code/spider_code.bin:
 
 
 clean:
-	rm build/*
+	@rm -rf build/*
+	@cd cn_bootloader && make clean
+	@cd cn_qr_initial_loader && make clean
+	# @cd cn_save_initial_loader && make clean
+	@cd cn_secondary_payload && make clean
+	@cd oss_cro && make clean
+	# @cd ro_command_handler && make clean
+	@cd ro_initial_code && make clean
+	@cd ro_initial_rop && make clean
+	@cd spider_code && make clean
+	@cd spider_initial_rop && make clean
+	@cd spider_thread0_rop && make clean
 	@echo "all cleaned up !"

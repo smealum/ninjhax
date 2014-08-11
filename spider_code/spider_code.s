@@ -182,7 +182,7 @@ SPIDERHANDLE_LOCATION equ 0x0FFFFF34
 	;reconnect to ro
 		sub sp, #0x20
 		;connect back to srv:
-			ldr r1, =CROMAPADR+srvString
+			ldr r1, =CROMAPADR+srvString+0x2000
 			.word 0xEF00002D ; svc 0x2D (ConnectToPort)
 			str r1, [sp]
 

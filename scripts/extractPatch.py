@@ -15,8 +15,8 @@ if len(sys.argv)>5:
 	size=int(sys.argv[5], 0)
 else:
 	k=offset
-	while getWord(origdata,k)!=getWord(patchdata,k):
-		k+=4
+	while getWord(origdata,k,n=8)!=getWord(patchdata,k,n=8):
+		k+=8
 	size=k-offset
 
 open(outfn,"wb").write(patchdata[offset:(offset+size)])
