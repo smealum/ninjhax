@@ -79,7 +79,7 @@ clean:
 	# @cd cn_save_initial_loader && make clean
 	@cd cn_secondary_payload && make clean
 	@cd oss_cro && make clean
-	# @cd ro_command_handler && make clean
+	@cd ro_command_handler && make clean
 	@cd ro_initial_code && make clean
 	@cd ro_initial_rop && make clean
 	@cd spider_code && make clean
