@@ -51,7 +51,7 @@ int _fread(void* dst, int size, int count, Handle file)
 	Result ret;
 	if((ret=FSFILE_Read(file, &bytesRead, fileOffset, (u32*)dst, size*count))!=0)return ret;
 	fileOffset+=bytesRead;
-	return bytesRead;
+	return bytesRead/size;
 }
 
 int _fseek(Handle file, u64 offset, int origin)
