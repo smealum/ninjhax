@@ -296,6 +296,20 @@ Result _HB_SetupBootloader(Handle handle, u32 addr)
 	return cmdbuf[1];
 }
 
+Result _HB_GetHandle(Handle handle, u32 index, Handle* out)
+{
+	u32* cmdbuf=getThreadCommandBuffer();
+	cmdbuf[0]=0x00040040; //request header code
+	cmdbuf[1]=index;
+	
+	Result ret=0;
+	if((ret=svc_sendSyncRequest(handle)))return ret;
+
+	if(out)*out=cmdbuf[3];
+
+	return cmdbuf[1];
+}
+
 void bruteforceCloseHandle(u16 index, u32 maxCnt)
 {
 	int i;
@@ -433,17 +447,15 @@ int main()
 		_aptCloseSession();
 	}
 
-	// debug[9]=_HB_FlushInvalidateCache(debug[8]);
-	// debug[10]=_HB_FlushInvalidateCache(debug[8]);
-	// Handle spiderSrvHandle=debug[8];
 	Handle hbHandle=debug[8];
 	debug[8]=0x0;
 	_HB_FlushInvalidateCache(hbHandle);
+	Handle fsHandle;
+	debug[8]=_HB_GetHandle(hbHandle, 0x0, &fsHandle);
 
 	//allocate some memory for the bootloader code
 	u32 out; ret=svc_controlMemory(&out, 0x13FF0000, 0x00000000, 0x00008000, MEMOP_COMMIT, 0x3);
 
-	// while(1)
 	int i;
 	for(i=0;i<0x1000;i++)
 	{

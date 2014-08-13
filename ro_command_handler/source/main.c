@@ -5,6 +5,8 @@
 #include <ctr/srv.h>
 #include <ctr/svc.h>
 
+#define NUM_CMD (4)
+
 int* numSessionHandles=(int*)0x140092FC;
 Handle* sessionHandles=(Handle*)0x14009B08;
 
@@ -12,11 +14,14 @@ Result svc_controlProcessMemory(Handle KProcess, unsigned int Addr0, unsigned in
 Result svc_mapProcessMemory(Handle KProcess, unsigned int StartAddr, unsigned int EndAddr);
 Result svc_unmapProcessMemory(Handle KProcess, unsigned int StartAddr, unsigned int EndAddr);
 
+Handle sentHandleTable[8];
+typedef void (*cmdHandlerFunction)(u32* cmdbuf);
+
 void HB_FlushInvalidateCache(u32* cmdbuf)
 {
 	if(!cmdbuf)return;
 
-	Handle processHandle=cmdbuf[3];
+	const Handle processHandle=cmdbuf[3];
 
 	svc_mapProcessMemory(processHandle, 0x00100000, 0x00200000);
 	svc_unmapProcessMemory(processHandle, 0x00100000, 0x00200000);
@@ -32,8 +37,8 @@ void HB_SetupBootloader(u32* cmdbuf)
 {
 	if(!cmdbuf)return;
 
-	u32 memBlockAdr=cmdbuf[1];
-	Handle processHandle=cmdbuf[3];
+	const u32 memBlockAdr=cmdbuf[1];
+	const Handle processHandle=cmdbuf[3];
 	
 	// map block to pre-0x00100000 address
 	svc_controlProcessMemory(processHandle, 0x000F0000, memBlockAdr, 0x00008000, MEMOP_MAP, 0x7);
@@ -45,8 +50,56 @@ void HB_SetupBootloader(u32* cmdbuf)
 	cmdbuf[1]=0x00000000;
 }
 
+void HB_SendHandle(u32* cmdbuf)
+{
+	if(!cmdbuf)return;
+
+	const u32 handleIndex=cmdbuf[1];
+	const Handle sentHandle=cmdbuf[3];
+
+	if(handleIndex>=8)
+	{
+		//response
+		cmdbuf[0]=0x00030040;
+		cmdbuf[1]=0xFFFFFFFF;
+		return;
+	}
+	
+	if(sentHandleTable[handleIndex])svc_closeHandle(sentHandleTable[handleIndex]);
+	sentHandleTable[handleIndex]=sentHandle;
+
+	//response
+	cmdbuf[0]=0x00030040;
+	cmdbuf[1]=0x00000000;
+}
+
+void HB_GetHandle(u32* cmdbuf)
+{
+	if(!cmdbuf)return;
+
+	const u32 handleIndex=cmdbuf[1];
+
+	if(handleIndex>=8 || !sentHandleTable[handleIndex])
+	{
+		//response
+		cmdbuf[0]=0x00040040;
+		cmdbuf[1]=0xFFFFFFFF;
+		return;
+	}
+	
+	//response
+	cmdbuf[0]=0x00040042;
+	cmdbuf[1]=0x00000000;
+	cmdbuf[2]=0x00000000;
+	cmdbuf[3]=sentHandleTable[handleIndex];
+}
+
+cmdHandlerFunction commandHandlers[NUM_CMD]={HB_FlushInvalidateCache, HB_SetupBootloader, HB_SendHandle, HB_GetHandle};
+
 int _main(Result ret, int currentHandleIndex)
 {
+	int i;
+	for(i=0;i<8;i++)sentHandleTable[i]=0;
 	while(1)
 	{
 		if(ret==0xc920181a)
@@ -73,15 +126,8 @@ int _main(Result ret, int currentHandleIndex)
 					{
 						//receiving command from ongoing session
 						u32* cmdbuf=getThreadCommandBuffer();
-						switch(cmdbuf[0]>>16)
-						{
-							case 0x1:
-								HB_FlushInvalidateCache(cmdbuf);
-								break;
-							case 0x2:
-								HB_SetupBootloader(cmdbuf);
-								break;
-						}
+						u8 cmdIndex=cmdbuf[0]>>16;
+						if(cmdIndex<NUM_CMD && cmdIndex>0)commandHandlers[cmdIndex-1](cmdbuf);
 					}
 					break;
 			}

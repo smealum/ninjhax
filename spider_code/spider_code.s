@@ -206,45 +206,45 @@ SPIDERHANDLE_LOCATION equ 0x0FFFFF34
 			ldrne r1, =0xCAFE0081
 			ldrne r1, [r1]
 
+		;srv:GetServiceHandle("fs:USER")
+			mrc p15, 0, r8, c13, c0, 3
+			add r8, #0x80
+			ldr r0, =0x00050100
+			str r0, [r8], #4
+			ldr r0, =0x553A7366  ;fs:U
+			str r0, [r8], #4
+			ldr r0, =0x00524553  ;SER
+			str r0, [r8], #4
+			ldr r0, =0x00000007 ;strlen
+			str r0, [r8], #4
+			ldr r0, =0x00000000 ;0x0
+			str r0, [r8], #4
+
+			ldr r0, [sp]
+			.word 0xEF000032 ; svc 0x32 (SendSyncRequest)
+			ldr r1, [r8, #-0x8]
+			str r1, [sp, #0xC]
+
+			;induce crash if there's an error
+			cmp r0, #0
+			ldrne r1, =0xCAFE0082
+			ldrne r1, [r1]
 
 			ldr r1, =RO_HANDLELOC
 			ldr r1, [r1]
 			str r1, [sp, #4]
-		; ;srv:GetServiceHandle
-		; 	mrc p15, 0, r8, c13, c0, 3
-		; 	add r8, #0x80
-		; 	ldr r0, =0x00050100
-		; 	str r0, [r8], #4
-		; 	ldr r0, =0x3A72646C ;ldr:
-		; 	str r0, [r8], #4
-		; 	ldr r0, =0x00006F72 ;ro
-		; 	str r0, [r8], #4
-		; 	ldr r0, =0x00000006 ;strlen
-		; 	str r0, [r8], #4
-		; 	ldr r0, =0x00000000 ;0x0
-		; 	str r0, [r8], #4
 
-		; 	ldr r0, [sp]
-		; 	.word 0xEF000032 ; svc 0x32 (SendSyncRequest)
-		; 	ldr r1, [r8, #-0x8]
-		; 	str r1, [sp, #4]
-
-		; 	;induce crash if there's an error
-		; 	cmp r0, #0
-		; 	ldrne r1, =0xCAFE0082
-		; 	ldrne r1, [r1]
-
-		;hb:FlushInvalidateCache
+		;hb:SendHandle
 			mrc p15, 0, r8, c13, c0, 3
 			add r8, #0x80
 
-			ldr r0, =0x00010042
-			str r0, [r8], #4
-			ldr r0, =0x00100000
+			ldr r0, =0x00030042
 			str r0, [r8], #4
 			ldr r0, =0x00000000
 			str r0, [r8], #4
-			ldr r0, =0xFFFF8001 ;current KProcess
+			ldr r0, =0x00000000
+			str r0, [r8], #4
+			ldr r0, [sp, 0xC] ; fs:USER handle
 			str r0, [r8], #4
 
 			ldr r0, [sp, #4]
@@ -318,6 +318,10 @@ SPIDERHANDLE_LOCATION equ 0x0FFFFF34
 			ldr r0, [sp, #8]
 			.word 0xEF000023 ; svc 0x23 (CloseHandle)
 
+
+		;close handle (fs:USER)
+			ldr r0, [sp, #0xC]
+			.word 0xEF000023 ; svc 0x23 (CloseHandle)
 
 		;close handle (ldr:ro)
 			ldr r0, [sp, #4]
