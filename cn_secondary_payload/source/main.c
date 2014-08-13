@@ -367,9 +367,9 @@ int main()
 		{
 			memset((u8*)0x14100000, 0x00, 0x2000);
 			memcpy((u8*)0x14100000, spider_thread0_rop_bin, spider_thread0_rop_bin_size);
-			_GSPGPU_FlushDataCache(gspHandle, 0xFFFF8001, (u32*)0x14100000, 0x1000);
+			_GSPGPU_FlushDataCache(gspHandle, 0xFFFF8001, (u32*)0x14100000, 0x2000);
 
-			doGspwn((u32*)0x14100000, (u32*)0x18CEA000, 0x1000);
+			doGspwn((u32*)0x14100000, (u32*)0x18CE9000, 0x2000);
 		}
 
 		svc_sleepThread(100000000);//sleep long enough for memory to be written

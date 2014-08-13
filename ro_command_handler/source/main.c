@@ -8,6 +8,10 @@
 int* numSessionHandles=(int*)0x140092FC;
 Handle* sessionHandles=(Handle*)0x14009B08;
 
+Result svc_controlProcessMemory(Handle KProcess, unsigned int Addr0, unsigned int Addr1, unsigned int Size, unsigned int Type, unsigned int Permissions);
+Result svc_mapProcessMemory(Handle KProcess, unsigned int StartAddr, unsigned int EndAddr);
+Result svc_unmapProcessMemory(Handle KProcess, unsigned int StartAddr, unsigned int EndAddr);
+
 void HB_FlushInvalidateCache(u32* cmdbuf)
 {
 	if(!cmdbuf)return;
