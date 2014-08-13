@@ -119,7 +119,7 @@ int Load3DSX(Handle file, void* baseAddr)
 			if (j >= 2)
 			{
 				// We are not using this table - ignore it
-				_fseek(file, nRelocs, SEEK_CUR);
+				_fseek(file, nRelocs*sizeof(_3DSX_Reloc), SEEK_CUR);
 				continue;
 			}
  
