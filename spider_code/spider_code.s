@@ -234,6 +234,23 @@ SPIDERHANDLE_LOCATION equ 0x0FFFFF34
 			ldr r1, [r1]
 			str r1, [sp, #4]
 
+		;FS:Initialize
+			mrc p15, 0, r8, c13, c0, 3
+			add r8, #0x80
+
+			ldr r0, =0x08010002
+			str r0, [r8], #4
+			ldr r0, =0x00000020
+			str r0, [r8], #4
+			
+			ldr r0, [sp, 0xC] ; fs:USER handle
+			.word 0xEF000032 ; svc 0x32 (SendSyncRequest)
+
+			;induce crash if there's an error
+			cmp r0, #0
+			ldrne r1, =0xCAFE007F
+			ldrne r1, [r1]
+
 		;hb:SendHandle
 			mrc p15, 0, r8, c13, c0, 3
 			add r8, #0x80

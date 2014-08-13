@@ -5,6 +5,7 @@
 #include <ctr/srv.h>
 #include <ctr/svc.h>
 #include <ctr/APT.h>
+#include <ctr/FS.h>
 #include "text.h"
 #include "spider_initial_rop_bin.h"
 #include "spider_thread0_rop_bin.h"
@@ -452,6 +453,19 @@ int main()
 	_HB_FlushInvalidateCache(hbHandle);
 	Handle fsHandle;
 	debug[8]=_HB_GetHandle(hbHandle, 0x0, &fsHandle);
+
+	// //test sdmc
+	// {
+	// 	Result ret;
+	// 	Handle fileHandle;
+	// 	u32 bytesRead;
+	// 	FS_archive sdmcArchive=(FS_archive){0x9, (FS_path){PATH_EMPTY, 1, (u8*)""}};
+	// 	FS_path filePath=(FS_path){PATH_CHAR, 10, (u8*)"/test.bin"};
+	// 	if((ret=FSUSER_OpenFileDirectly(fsHandle, &fileHandle, sdmcArchive, filePath, FS_OPEN_READ, FS_ATTRIBUTE_NONE))!=0)*(u32*)ret=0xCAFE0038;
+	// 	if((ret=FSFILE_Read(fileHandle, &bytesRead, 0x0, (u32*)TOPFBADR1, 0x46500))!=0)*(u32*)ret=0xCAFE0039;
+	// 	FSFILE_Read(fileHandle, &bytesRead, 0x0, (u32*)TOPFBADR2, 0x46500);
+	// 	FSFILE_Close(fileHandle);
+	// }
 
 	//allocate some memory for the bootloader code
 	u32 out; ret=svc_controlMemory(&out, 0x13FF0000, 0x00000000, 0x00008000, MEMOP_COMMIT, 0x3);

@@ -127,7 +127,7 @@ int _main(Result ret, int currentHandleIndex)
 						//receiving command from ongoing session
 						u32* cmdbuf=getThreadCommandBuffer();
 						u8 cmdIndex=cmdbuf[0]>>16;
-						if(cmdIndex<NUM_CMD && cmdIndex>0)commandHandlers[cmdIndex-1](cmdbuf);
+						if(cmdIndex<=NUM_CMD && cmdIndex>0)commandHandlers[cmdIndex-1](cmdbuf);
 					}
 					break;
 			}
