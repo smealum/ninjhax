@@ -3,6 +3,11 @@ ninjhax
 
 to build :
 
+	download and build armips, copy to PATH
+
+	setup CTRULIB env to point to libctru dir
+	setup DEVKITARM env to point to devkitARM dir
+
 	make
 
 
