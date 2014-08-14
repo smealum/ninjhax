@@ -6,41 +6,22 @@ BOOTLOADERLOC equ 0x000F0000
 
 .orga 0x0
 	.arm
-		;ro contains the HB handle
+		;r0 contains the HB handle
+		;r1 contains the file handle
 		mov r10, r0
+		mov r11, r1
 
-		ldr r0, =BOOTLOADERLOC+appCode
-		ldr r1, =0x00100000
-		ldr r2, =endAppCode-appCode
-		mov r3, #0
-		copyLoop:
-			ldr r4, [r0, r3]
-			str r4, [r1, r3]
-			add r3, #4
-			cmp r3, r2
-			blt copyLoop
-
-		ldr r0, =0x0031A000
-		mov r1, #0
-		ldr r2, =0x0002773C
-		mov r3, #0
-		clearLoop:
-			str r1, [r0, r3]
-			add r3, #4
-			cmp r3, r2
-			blt clearLoop
-
-		;hb:FlushInvalidateCache
+		;hb:Load3dsx
 			mrc p15, 0, r8, c13, c0, 3
 			add r8, #0x80
 
-			ldr r0, =0x00010042
+			ldr r0, =0x00050042
 			str r0, [r8], #4
-			ldr r0, =0x00100000
+			ldr r0, =0x00100000 ;baseAddr
 			str r0, [r8], #4
 			ldr r0, =0x00000000
 			str r0, [r8], #4
-			ldr r0, =0xFFFF8001 ;current KProcess
+			mov r0, r11 ;fileHandle
 			str r0, [r8], #4
 
 			mov r0, r10
@@ -48,12 +29,15 @@ BOOTLOADERLOC equ 0x000F0000
 
 			;induce crash if there's an error
 			cmp r0, #0
+			mrceq p15, 0, r8, c13, c0, 3
+			ldreq r0, [r8, #4]
+			cmpeq r0, #0
 			ldrne r1, =0xBABE0083
 			ldrne r1, [r1]
 
 		mov sp, #0x10000000
 
-		ldr r4, =0xDEADCAFE
+		ldr r4, =0xDEADCAF3
 		str r4, [sp, #-4]!
 		str r4, [sp, #-4]!
 		str r4, [sp, #-4]!

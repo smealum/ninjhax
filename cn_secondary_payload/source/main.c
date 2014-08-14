@@ -454,19 +454,6 @@ int main()
 	Handle fsHandle;
 	debug[8]=_HB_GetHandle(hbHandle, 0x0, &fsHandle);
 
-	// //test sdmc
-	// {
-	// 	Result ret;
-	// 	Handle fileHandle;
-	// 	u32 bytesRead;
-	// 	FS_archive sdmcArchive=(FS_archive){0x9, (FS_path){PATH_EMPTY, 1, (u8*)""}};
-	// 	FS_path filePath=(FS_path){PATH_CHAR, 10, (u8*)"/test.bin"};
-	// 	if((ret=FSUSER_OpenFileDirectly(fsHandle, &fileHandle, sdmcArchive, filePath, FS_OPEN_READ, FS_ATTRIBUTE_NONE))!=0)*(u32*)ret=0xCAFE0038;
-	// 	if((ret=FSFILE_Read(fileHandle, &bytesRead, 0x0, (u32*)TOPFBADR1, 0x46500))!=0)*(u32*)ret=0xCAFE0039;
-	// 	FSFILE_Read(fileHandle, &bytesRead, 0x0, (u32*)TOPFBADR2, 0x46500);
-	// 	FSFILE_Close(fileHandle);
-	// }
-
 	//allocate some memory for the bootloader code
 	u32 out; ret=svc_controlMemory(&out, 0x13FF0000, 0x00000000, 0x00008000, MEMOP_COMMIT, 0x3);
 
@@ -498,12 +485,17 @@ int main()
 	
 	svc_controlMemory(&out, 0x14000000, 0x00000000, 0x02000000, MEMOP_FREE, 0x0);
 
-	void (*callBootloader)(Handle h)=(void*)0x000F0000;
+	void (*callBootloader)(Handle hb, Handle file)=(void*)0x000F0000;
 	_GSPGPU_ReleaseRight(*gspHandle); //disable GSP module access
 	svc_closeHandle(*gspHandle);
 
-	callBootloader(hbHandle);
-	// *((u32*)NULL)=0xBABE0061;
+	//open sdmc 3dsx file
+	Handle fileHandle;
+	FS_archive sdmcArchive=(FS_archive){0x9, (FS_path){PATH_EMPTY, 1, (u8*)""}};
+	FS_path filePath=(FS_path){PATH_CHAR, 11, (u8*)"/boot.3dsx"};
+	if((ret=FSUSER_OpenFileDirectly(fsHandle, &fileHandle, sdmcArchive, filePath, FS_OPEN_READ, FS_ATTRIBUTE_NONE))!=0)*(u32*)ret=0xCAFE0038;
+
+	callBootloader(hbHandle, fileHandle);
 
 	while(1);
 	return 0;

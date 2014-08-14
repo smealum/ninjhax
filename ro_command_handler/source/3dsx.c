@@ -45,13 +45,13 @@ Result FSFILE_Read(Handle handle, u32 *bytesRead, u64 offset, u32 *buffer, u32 s
 
 u64 fileOffset;
 
-int _fread(void* dst, int size, int count, Handle file)
+int _fread(void* dst, int size, Handle file)
 {
 	u32 bytesRead;
 	Result ret;
-	if((ret=FSFILE_Read(file, &bytesRead, fileOffset, (u32*)dst, size*count))!=0)return ret;
+	if((ret=FSFILE_Read(file, &bytesRead, fileOffset, (u32*)dst, size))!=0)return ret;
 	fileOffset+=bytesRead;
-	return bytesRead;
+	return (bytesRead==size)?0:-1;
 }
 
 int _fseek(Handle file, u64 offset, int origin)
@@ -70,16 +70,17 @@ int _fseek(Handle file, u64 offset, int origin)
 
 int Load3DSX(Handle file, void* baseAddr)
 {
+	Result ret;
 	u32 i, j, k, m;
 
 	_fseek(file, 0x0, SEEK_SET);
 
 	_3DSX_Header hdr;
-	if (_fread(&hdr, sizeof(hdr), 1, file) != 1)
+	if (_fread(&hdr, sizeof(hdr), file) != 0)
 		return -1;
 
 	if (hdr.magic != _3DSX_MAGIC)
-		return -1;
+		return -2;
 
 	_3DSX_LoadInfo d;
 	u32 offsets[2] = { hdr.codeSegSize, hdr.codeSegSize + hdr.rodataSegSize };
@@ -102,13 +103,13 @@ int Load3DSX(Handle file, void* baseAddr)
 	//    This also checks whether the memory region overflows into IPC data or loader data.
  
 	for (i = 0; i < 3; i ++)
-		if (_fread(&relocs[i*nRelocTables], nRelocTables*4, 1, file) != 1)
-			return -1;
+		if (_fread(&relocs[i*nRelocTables], nRelocTables*4, file) != 0)
+			return -3;
  
 	// Read the segments
-	if (_fread(d.segPtrs[0], hdr.codeSegSize, 1, file) != 1) return -1;
-	if (_fread(d.segPtrs[1], hdr.rodataSegSize, 1, file) != 1) return -1;
-	if (_fread(d.segPtrs[2], hdr.dataSegSize - hdr.bssSize, 1, file) != 1) return -1;
+	if (_fread(d.segPtrs[0], hdr.codeSegSize, file) != 0) return -4;
+	if (_fread(d.segPtrs[1], hdr.rodataSegSize, file) != 0) return -5;
+	if (_fread(d.segPtrs[2], hdr.dataSegSize - hdr.bssSize, file) != 0) return -6;
  
 	// Relocate the segments
 	for (i = 0; i < 3; i ++)
@@ -119,7 +120,7 @@ int Load3DSX(Handle file, void* baseAddr)
 			if (j >= 2)
 			{
 				// We are not using this table - ignore it
-				_fseek(file, nRelocs, SEEK_CUR);
+				_fseek(file, nRelocs*sizeof(_3DSX_Reloc), SEEK_CUR);
 				continue;
 			}
  
@@ -133,8 +134,8 @@ int Load3DSX(Handle file, void* baseAddr)
 				u32 toDo = nRelocs > RELOCBUFSIZE ? RELOCBUFSIZE : nRelocs;
 				nRelocs -= toDo;
  
-				if (_fread(relocTbl, toDo*sizeof(_3DSX_Reloc), 1, file) != 1)
-					return -1;
+				if (_fread(relocTbl, toDo*sizeof(_3DSX_Reloc), file) != 0)
+					return -7;
  
 				for (k = 0; k < toDo && pos < endPos; k ++)
 				{

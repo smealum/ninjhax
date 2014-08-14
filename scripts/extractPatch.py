@@ -7,16 +7,17 @@ origfn=sys.argv[1]
 patchfn=sys.argv[2]
 outfn=sys.argv[3]
 offset=int(sys.argv[4], 0)
+end_offset=int(sys.argv[5], 0)
 
 origdata=bytearray(open(origfn,"rb").read())
 patchdata=bytearray(open(patchfn,"rb").read())
 
-if len(sys.argv)>5:
+if len(sys.argv)>6:
 	size=int(sys.argv[5], 0)
 else:
-	k=offset
-	while getWord(origdata,k,n=8)!=getWord(patchdata,k,n=8):
-		k+=8
+	k=end_offset
+	while getWord(origdata,k-4)==getWord(patchdata,k-4):
+		k-=4
 	size=k-offset
 
 open(outfn,"wb").write(patchdata[offset:(offset+size)])

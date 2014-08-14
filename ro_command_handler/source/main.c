@@ -5,7 +5,7 @@
 #include <ctr/srv.h>
 #include <ctr/svc.h>
 
-#define NUM_CMD (4)
+#define NUM_CMD (5)
 
 int* numSessionHandles=(int*)0x140092FC;
 Handle* sessionHandles=(Handle*)0x14009B08;
@@ -16,6 +16,8 @@ Result svc_unmapProcessMemory(Handle KProcess, unsigned int StartAddr, unsigned 
 
 Handle sentHandleTable[8];
 typedef void (*cmdHandlerFunction)(u32* cmdbuf);
+
+Handle targetProcessHandle;
 
 void HB_FlushInvalidateCache(u32* cmdbuf)
 {
@@ -43,7 +45,8 @@ void HB_SetupBootloader(u32* cmdbuf)
 	// map block to pre-0x00100000 address
 	svc_controlProcessMemory(processHandle, 0x000F0000, memBlockAdr, 0x00008000, MEMOP_MAP, 0x7);
 
-	svc_closeHandle(processHandle);
+	if(targetProcessHandle)svc_closeHandle(targetProcessHandle);
+	targetProcessHandle=processHandle;
 
 	//response
 	cmdbuf[0]=0x00020040;
@@ -94,12 +97,31 @@ void HB_GetHandle(u32* cmdbuf)
 	cmdbuf[3]=sentHandleTable[handleIndex];
 }
 
-cmdHandlerFunction commandHandlers[NUM_CMD]={HB_FlushInvalidateCache, HB_SetupBootloader, HB_SendHandle, HB_GetHandle};
+void HB_Load3dsx(u32* cmdbuf)
+{
+	if(!cmdbuf)return;
+
+	const void* baseAddr=(void*)cmdbuf[1];
+	const Handle fileHandle=cmdbuf[3];
+
+	Result ret;
+	ret=svc_mapProcessMemory(targetProcessHandle, 0x00100000, 0x00200000);
+	if(!ret)ret=Load3DSX(fileHandle, baseAddr);
+	if(!ret)ret=svc_unmapProcessMemory(targetProcessHandle, 0x00100000, 0x00200000);
+
+	//TEMP
+	if(!ret){int i; for(i=0;i<0x10;i++)svc_controlProcessMemory(targetProcessHandle, 0x00100000+i*0x1000, 0x0, 0x00001000, MEMOP_PROTECT, 0x7);}
+
+	cmdbuf[0]=0x00050040;
+	cmdbuf[1]=ret;
+}
+
+cmdHandlerFunction commandHandlers[NUM_CMD]={HB_FlushInvalidateCache, HB_SetupBootloader, HB_SendHandle, HB_GetHandle, HB_Load3dsx};
 
 int _main(Result ret, int currentHandleIndex)
 {
-	int i;
-	for(i=0;i<8;i++)sentHandleTable[i]=0;
+	int i; for(i=0;i<8;i++)sentHandleTable[i]=0;
+	targetProcessHandle=0x0;
 	while(1)
 	{
 		if(ret==0xc920181a)

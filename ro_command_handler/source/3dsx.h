@@ -1,8 +1,6 @@
 #pragma once
- 
-typedef unsigned char u8;
-typedef unsigned short u16;
-typedef unsigned int u32;
+
+#include <ctr/types.h>
  
 // File layout:
 // - File header
@@ -55,3 +53,4 @@ typedef struct
 	u16 skip, patch;
 } _3DSX_Reloc;
 
+int Load3DSX(Handle file, void* baseAddr);
