@@ -1,3 +1,15 @@
+ifeq ($(strip $(DEVKITARM)),)
+$(error "Please set DEVKITARM in your environment. export DEVKITARM=<path to>devkitARM")
+endif
+
+ifeq ($(strip $(CTRULIB)),)
+$(error "Please set CTRULIB in your environment. export DEVKITARM=<path to>ctrulib/libctru")
+endif
+
+ifeq ($(filter $(DEVKITARM)/bin,$(PATH)),)
+export PATH:=$(DEVKITARM)/bin:$(PATH)
+endif
+
 SCRIPTS = "scripts"
 
 .PHONY: directories all cn_qr_initial_loader/cn_qr_initial_loader.bin.png cn_secondary_payload/cn_secondary_payload.bin cn_bootloader/cn_bootloader.bin spider_initial_rop/spider_initial_rop.bin spider_thread0_rop/spider_thread0_rop.bin oss_cro/out_oss.cro build/ro_initial_code.bin build/ro_initial_rop.bin build/spider_code.bin
