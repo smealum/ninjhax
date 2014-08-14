@@ -3,6 +3,8 @@
 #include <string.h>
 #include <ctr/types.h>
 #include <ctr/svc.h>
+
+#include "svc.h"
 #include "3dsx.h"
 
 //code by fincs
@@ -68,9 +70,8 @@ int _fseek(Handle file, u64 offset, int origin)
 	return 0;
 }
 
-int Load3DSX(Handle file, void* baseAddr)
+int Load3DSX(Handle file, Handle process, void* baseAddr)
 {
-	Result ret;
 	u32 i, j, k, m;
 
 	_fseek(file, 0x0, SEEK_SET);
@@ -98,7 +99,7 @@ int Load3DSX(Handle file, void* baseAddr)
 	u32* relocs = (u32*)((char*)d.segPtrs[2] + hdr.dataSegSize - hdr.bssSize);
 	u32 nRelocTables = hdr.relocHdrSize/4;
  
-	u32 totalSize = (u32)(relocs + 3*nRelocTables) - (u32)baseAddr;
+	// u32 totalSize = (u32)(relocs + 3*nRelocTables) - (u32)baseAddr;
 	// XXX: Ensure enough RW pages exist at baseAddr to hold a memory block of length "totalSize".
 	//    This also checks whether the memory region overflows into IPC data or loader data.
  
@@ -162,8 +163,13 @@ int Load3DSX(Handle file, void* baseAddr)
 	// XXX: Write service handle table pointer:
 	//    The address CODE+4 holds the pointer to the service handle table. Copy said table to the bottom of the stack
 	//    (after the ARGV text data) and update this pointer.
-	// XXX: Protect memory at d.segPtrs[0] as CODE   (r-x) -- npages = d.segSizes[0] / 0x1000
-	// XXX: Protect memory at d.segPtrs[1] as RODATA (r--) -- npages = d.segSizes[1] / 0x1000
+
+	// Protect memory at d.segPtrs[0] as CODE   (r-x) -- npages = d.segSizes[0] / 0x1000
+	for(i=0;i<d.segSizes[0]>>12;i++)svc_controlProcessMemory(process, (u32)d.segPtrs[0]+i*0x1000, 0x0, 0x00001000, MEMOP_PROTECT, 0x5);
+	// Protect memory at d.segPtrs[1] as RODATA (r--) -- npages = d.segSizes[1] / 0x1000
+	for(i=0;i<d.segSizes[1]>>12;i++)svc_controlProcessMemory(process, (u32)d.segPtrs[1]+i*0x1000, 0x0, 0x00001000, MEMOP_PROTECT, 0x1);
+	// Protect memory at d.segPtrs[2] as DATA (rw-) -- npages = d.segSizes[2] / 0x1000
+	for(i=0;i<d.segSizes[2]>>12;i++)svc_controlProcessMemory(process, (u32)d.segPtrs[2]+i*0x1000, 0x0, 0x00001000, MEMOP_PROTECT, 0x3);
  
 	return 0; // Success.
 }

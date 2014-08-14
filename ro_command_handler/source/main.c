@@ -5,14 +5,13 @@
 #include <ctr/srv.h>
 #include <ctr/svc.h>
 
+#include "svc.h"
+#include "3dsx.h"
+
 #define NUM_CMD (5)
 
 int* numSessionHandles=(int*)0x140092FC;
 Handle* sessionHandles=(Handle*)0x14009B08;
-
-Result svc_controlProcessMemory(Handle KProcess, unsigned int Addr0, unsigned int Addr1, unsigned int Size, unsigned int Type, unsigned int Permissions);
-Result svc_mapProcessMemory(Handle KProcess, unsigned int StartAddr, unsigned int EndAddr);
-Result svc_unmapProcessMemory(Handle KProcess, unsigned int StartAddr, unsigned int EndAddr);
 
 Handle sentHandleTable[8];
 typedef void (*cmdHandlerFunction)(u32* cmdbuf);
@@ -106,11 +105,8 @@ void HB_Load3dsx(u32* cmdbuf)
 
 	Result ret;
 	ret=svc_mapProcessMemory(targetProcessHandle, 0x00100000, 0x00200000);
-	if(!ret)ret=Load3DSX(fileHandle, baseAddr);
+	if(!ret)ret=Load3DSX(fileHandle, targetProcessHandle, (void*)baseAddr);
 	if(!ret)ret=svc_unmapProcessMemory(targetProcessHandle, 0x00100000, 0x00200000);
-
-	//TEMP
-	if(!ret){int i; for(i=0;i<0x10;i++)svc_controlProcessMemory(targetProcessHandle, 0x00100000+i*0x1000, 0x0, 0x00001000, MEMOP_PROTECT, 0x7);}
 
 	cmdbuf[0]=0x00050040;
 	cmdbuf[1]=ret;

@@ -53,4 +53,4 @@ typedef struct
 	u16 skip, patch;
 } _3DSX_Reloc;
 
-int Load3DSX(Handle file, void* baseAddr);
+int Load3DSX(Handle file, Handle process, void* baseAddr);
