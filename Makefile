@@ -35,7 +35,7 @@ cn_save_initial_loader/cn_save_initial_loader.bin:
 
 
 build/cn_secondary_payload.bin: cn_secondary_payload/cn_secondary_payload.bin
-	@cp cn_secondary_payload/cn_secondary_payload.bin build
+	@python $(SCRIPTS)/blowfish.py cn_secondary_payload/cn_secondary_payload.bin build/cn_secondary_payload.bin scripts
 cn_secondary_payload/cn_secondary_payload.bin: build/spider_initial_rop.bin build/spider_thread0_rop.bin build/cn_bootloader.bin
 	@cp build/spider_initial_rop.bin cn_secondary_payload/data
 	@cp build/spider_thread0_rop.bin cn_secondary_payload/data

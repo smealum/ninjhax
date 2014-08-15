@@ -304,6 +304,14 @@ int _main()
 
 	HTTPC_CloseContext(httpcHandle2, httpContextHandle);
 
+	//TODO : modify key/parray first ?
+	//decrypt secondary payload
+	Result (*blowfishKeyScheduler)(u32* dst)=(void*)0x001A44BC;
+	Result (*blowfishDecrypt)(u32* blowfishKeyData, u32* src, u32* dst, u32 size)=(void*)0x001A2180;
+
+	blowfishKeyScheduler((u32*)0x14200000);
+	blowfishDecrypt((u32*)0x14200000, (u32*)0x14100000, (u32*)0x14100000, 0x300000);
+
 	Result (*_DSP_UnloadComponent)(Handle* handle)=(void*)0x002BA368;
 	Handle** dspHandle=(Handle**)0x334EFC;
 
