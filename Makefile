@@ -12,10 +12,11 @@ endif
 
 SCRIPTS = "scripts"
 
-.PHONY: directories all cn_qr_initial_loader/cn_qr_initial_loader.bin.png cn_secondary_payload/cn_secondary_payload.bin cn_bootloader/cn_bootloader.bin spider_initial_rop/spider_initial_rop.bin spider_thread0_rop/spider_thread0_rop.bin oss_cro/out_oss.cro build/ro_initial_code.bin build/ro_initial_rop.bin build/spider_code.bin
+.PHONY: directories all cn_qr_initial_loader/cn_qr_initial_loader.bin.png cn_save_initial_loader/cn_save_initial_loader.bin cn_secondary_payload/cn_secondary_payload.bin cn_bootloader/cn_bootloader.bin spider_initial_rop/spider_initial_rop.bin spider_thread0_rop/spider_thread0_rop.bin oss_cro/out_oss.cro build/ro_initial_code.bin build/ro_initial_rop.bin build/spider_code.bin
 
-all: directories build/cn_qr_initial_loader.bin.png build/cn_secondary_payload.bin
+all: directories build/cn_qr_initial_loader.bin.png build/cn_save_initial_loader.bin build/cn_secondary_payload.bin
 	@cp build/cn_qr_initial_loader.bin.png ./
+	@cp build/cn_save_initial_loader.bin ./
 	@cp build/cn_secondary_payload.bin ./
 directories:
 	@mkdir -p build && mkdir -p build/cro
@@ -24,6 +25,12 @@ directories:
 build/cn_qr_initial_loader.bin.png: cn_qr_initial_loader/cn_qr_initial_loader.bin.png
 	@cp cn_qr_initial_loader/cn_qr_initial_loader.bin.png build
 cn_qr_initial_loader/cn_qr_initial_loader.bin.png:
+	@cd cn_qr_initial_loader && make
+
+
+build/cn_save_initial_loader.bin: cn_save_initial_loader/cn_save_initial_loader.bin
+	@cp cn_save_initial_loader/cn_save_initial_loader.bin build
+cn_save_initial_loader/cn_save_initial_loader.bin:
 	@cd cn_qr_initial_loader && make
 
 
@@ -94,7 +101,7 @@ clean:
 	@rm -rf build/*
 	@cd cn_bootloader && make clean
 	@cd cn_qr_initial_loader && make clean
-	# @cd cn_save_initial_loader && make clean
+	@cd cn_save_initial_loader && make clean
 	@cd cn_secondary_payload && make clean
 	@cd oss_cro && make clean
 	@cd ro_command_handler && make clean
