@@ -2,9 +2,6 @@ import os
 import sys
 import struct
 import ctypes
-import compress
-#compress.py from https://github.com/magical/nlzss/blob/master/compress.py
-#slightly modified padding
 
 def getWord(b, k, n=4):
 	return sum(list(map(lambda c: b[k+c]<<(c*8),range(n))))
@@ -61,21 +58,6 @@ def encrypt(din,dout):
 		ret=cipher(S,P,l,r,0)
 		dout[(k):(k+4)]=struct.pack("I",ret[0]&0xFFFFFFFF)
 		dout[(k+4):(k+8)]=struct.pack("I",ret[1]&0xFFFFFFFF)
-
-def calcCRC(d):
-	l=len(d)
-	R3=0x04C11DB7
-	R0=0xFFFFFFFF
-	for R2 in range(l):
-		R1=d[R2]
-		R0=R0^(R1<<24)
-		for R1 in range(8):
-			if R0&0x80000000==0:
-				R0=R0<<1
-			else:
-				R0=R3^(R0<<1)
-	R0=R0&0xFFFFFFFF
-	return ctypes.c_uint(~R0).value
 
 path="./"
 if len(sys.argv)>3:
