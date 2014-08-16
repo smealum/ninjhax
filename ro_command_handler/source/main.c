@@ -16,6 +16,8 @@ Handle* sessionHandles=(Handle*)0x14009B08;
 Handle sentHandleTable[8];
 typedef void (*cmdHandlerFunction)(u32* cmdbuf);
 
+service_list_t* __service_ptr=(service_list_t*)0x000F7000;
+
 Handle targetProcessHandle;
 
 void HB_FlushInvalidateCache(u32* cmdbuf)
@@ -42,6 +44,7 @@ void HB_SetupBootloader(u32* cmdbuf)
 	const Handle processHandle=cmdbuf[3];
 	
 	// map block to pre-0x00100000 address
+	// TODO : make first half RX and second half RW
 	svc_controlProcessMemory(processHandle, 0x000F0000, memBlockAdr, 0x00008000, MEMOP_MAP, 0x7);
 
 	if(targetProcessHandle)svc_closeHandle(targetProcessHandle);
@@ -150,7 +153,7 @@ int _main(Result ret, int currentHandleIndex)
 					break;
 			}
 		}
-		ret=svc_replyAndReceive(&currentHandleIndex, sessionHandles, *numSessionHandles, sessionHandles[currentHandleIndex]);
+		ret=svc_replyAndReceive((s32*)&currentHandleIndex, sessionHandles, *numSessionHandles, sessionHandles[currentHandleIndex]);
 	}
 
 	return 0;

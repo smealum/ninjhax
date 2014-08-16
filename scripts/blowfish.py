@@ -65,6 +65,10 @@ if len(sys.argv)>3:
 
 data=bytearray(open(sys.argv[1],"rb").read())
 
+padding=8-(len(data)%8)
+for k in range(padding):
+	data.append(0)
+
 dataOut=data[:]
 (S,P)=loadSP(path+"/blowfish_processed.bin")
 encrypt(data,dataOut)

@@ -53,4 +53,16 @@ typedef struct
 	u16 skip, patch;
 } _3DSX_Reloc;
 
+//service override stuff
+typedef struct {
+    u32 num;
+
+    struct {
+        char name[8];
+        Handle handle;
+    } services[];
+}service_list_t;
+
+extern service_list_t* __service_ptr;
+
 int Load3DSX(Handle file, Handle process, void* baseAddr);

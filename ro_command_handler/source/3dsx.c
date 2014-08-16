@@ -160,9 +160,14 @@ int Load3DSX(Handle file, Handle process, void* baseAddr)
 	// XXX: Write ARGV structure:
 	//    If the start of the data segment begins with "_arg", a devkitARM __argv structure follows immediately after.
 	//    Refer to e.g. hbmenu (DS) code to know how to fill it. Allocate ARGV text data at the bottom of the stack.
-	// XXX: Write service handle table pointer:
-	//    The address CODE+4 holds the pointer to the service handle table. Copy said table to the bottom of the stack
-	//    (after the ARGV text data) and update this pointer.
+
+	//check magic
+	if(((u32*)baseAddr)[1]==0x6D72705F)
+	{
+		// Write service handle table pointer
+		// the actual structure has to be filled out by cn_bootloader
+		((u32*)baseAddr)[2]=(u32)__service_ptr;
+	}
 
 	// Protect memory at d.segPtrs[0] as CODE   (r-x) -- npages = d.segSizes[0] / 0x1000
 	for(i=0;i<d.segSizes[0]>>12;i++)svc_controlProcessMemory(process, (u32)d.segPtrs[0]+i*0x1000, 0x0, 0x00001000, MEMOP_PROTECT, 0x5);
