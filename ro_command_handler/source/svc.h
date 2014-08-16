@@ -1,3 +1,5 @@
+#pragma once
+
 Result svc_acceptSession(Handle* session, Handle port);
 Result svc_replyAndReceive(s32* index, Handle* handles, s32 handleCount, Handle replyTarget);
 

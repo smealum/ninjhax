@@ -43,7 +43,7 @@ endef
 all: $(PROJECTNAME).bin
 
 ctrulib:
-	cd $(CTRULIB) && make
+	cd "$(CTRULIB)" && make
 
 $(PROJECTNAME).bin: $(PROJECTNAME).elf
 	$(OBJCOPY) -O binary $< $@

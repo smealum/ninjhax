@@ -18,6 +18,7 @@ NAME = cn_qr_initial_loader
 all: $(NAME).bin.png
 
 %.bin.png: %.bin
+	@python $(SCRIPTS)/obfuscator5000.py $<
 	@python $(SCRIPTS)/crypt.py $< $(SCRIPTS)
 	@$(SCRIPTS)/qrcode.exe -8 -o $@ < tmp
 	@rm tmp
