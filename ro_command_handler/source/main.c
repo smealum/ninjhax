@@ -108,6 +108,7 @@ void HB_Load3dsx(u32* cmdbuf)
 
 	Result ret;
 	ret=svc_mapProcessMemory(targetProcessHandle, 0x00100000, 0x00200000);
+	if(!ret)memset((void*)0x00100000, 0x00, 0x00200000-0x00100000);
 	if(!ret)ret=Load3DSX(fileHandle, targetProcessHandle, (void*)baseAddr);
 	if(!ret)ret=svc_unmapProcessMemory(targetProcessHandle, 0x00100000, 0x00200000);
 
