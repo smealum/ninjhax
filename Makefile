@@ -12,15 +12,17 @@ endif
 
 SCRIPTS = "scripts"
 
-.PHONY: directories all cn_qr_initial_loader/cn_qr_initial_loader.bin.png cn_save_initial_loader/cn_save_initial_loader.bin cn_secondary_payload/cn_secondary_payload.bin cn_bootloader/cn_bootloader.bin spider_initial_rop/spider_initial_rop.bin spider_thread0_rop/spider_thread0_rop.bin oss_cro/out_oss.cro build/ro_initial_code.bin build/ro_initial_rop.bin build/spider_code.bin
+.PHONY: directories all build/constants cn_qr_initial_loader/cn_qr_initial_loader.bin.png cn_save_initial_loader/cn_save_initial_loader.bin cn_secondary_payload/cn_secondary_payload.bin cn_bootloader/cn_bootloader.bin spider_initial_rop/spider_initial_rop.bin spider_thread0_rop/spider_thread0_rop.bin oss_cro/out_oss.cro build/ro_initial_code.bin build/ro_initial_rop.bin build/spider_code.bin
 
-all: directories build/cn_qr_initial_loader.bin.png build/cn_save_initial_loader.bin build/cn_secondary_payload.bin
+all: directories build/constants build/cn_qr_initial_loader.bin.png build/cn_save_initial_loader.bin build/cn_secondary_payload.bin
 	@cp build/cn_qr_initial_loader.bin.png ./
 	@cp build/cn_save_initial_loader.bin ./
 	@cp build/cn_secondary_payload.bin ./
 directories:
 	@mkdir -p build && mkdir -p build/cro
 
+build/constants: ro_constants/constants.txt spider_constants/constants.txt cn_constants/constants.txt
+	@python $(SCRIPTS)/makeHeaders.py build/constants $^
 
 build/cn_qr_initial_loader.bin.png: cn_qr_initial_loader/cn_qr_initial_loader.bin.png
 	@cp cn_qr_initial_loader/cn_qr_initial_loader.bin.png build
