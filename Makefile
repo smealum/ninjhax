@@ -20,7 +20,7 @@ export SPIDERVERSION
 
 SCRIPTS = "scripts"
 
-.PHONY: directories all build/constants cn_qr_initial_loader/cn_qr_initial_loader.bin.png cn_save_initial_loader/cn_save_initial_loader.bin cn_secondary_payload/cn_secondary_payload.bin cn_bootloader/cn_bootloader.bin spider_initial_rop/spider_initial_rop.bin spider_thread0_rop/spider_thread0_rop.bin oss_cro/out_oss.cro build/ro_initial_code.bin build/ro_initial_rop.bin build/spider_code.bin
+.PHONY: directories all build/constants ro_constants/constants.txt spider_constants/constants.txt cn_constants/constants.txt cn_qr_initial_loader/cn_qr_initial_loader.bin.png cn_save_initial_loader/cn_save_initial_loader.bin cn_secondary_payload/cn_secondary_payload.bin cn_bootloader/cn_bootloader.bin spider_initial_rop/spider_initial_rop.bin spider_thread0_rop/spider_thread0_rop.bin oss_cro/out_oss.cro build/ro_initial_code.bin build/ro_initial_rop.bin build/spider_code.bin
 
 all: directories build/constants build/cn_qr_initial_loader.bin.png build/cn_save_initial_loader.bin build/cn_secondary_payload.bin
 	@cp build/cn_qr_initial_loader.bin.png ./
@@ -28,6 +28,13 @@ all: directories build/constants build/cn_qr_initial_loader.bin.png build/cn_sav
 	@cp build/cn_secondary_payload.bin ./
 directories:
 	@mkdir -p build && mkdir -p build/cro
+
+ro_constants/constants.txt:
+	@cd ro_constants && make
+spider_constants/constants.txt:
+	@cd spider_constants && make
+cn_constants/constants.txt:
+	@cd cn_constants && make
 
 build/constants: ro_constants/constants.txt spider_constants/constants.txt cn_constants/constants.txt
 	@python $(SCRIPTS)/makeHeaders.py build/constants $^
@@ -109,6 +116,9 @@ spider_code/spider_code.bin:
 
 clean:
 	@rm -rf build/*
+	@cd cn_constants && make clean
+	@cd ro_constants && make clean
+	@cd spider_constants && make clean
 	@cd cn_bootloader && make clean
 	@cd cn_qr_initial_loader && make clean
 	@cd cn_save_initial_loader && make clean
