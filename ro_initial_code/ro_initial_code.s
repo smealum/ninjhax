@@ -1,21 +1,6 @@
 .nds
 
-ROPROCESSHANDLEADR equ 0x14009600
-SPIDERPROCESSHANDLEADR equ 0x14009600
-
-CROMAPADR equ 0x007e5000
-CROLOCATION equ 0x083A5000
-
-CODELOCATION equ 0x0E000000
-CODELOCATION2 equ 0x0E001000
-
-SPIDER_GSPHANDLE equ 0x003DA72C
-RO_HANDLELOC equ 0x003D8FDC
-
-SESSIONHANDLECNT_ADR equ 0x140092FC
-SESSIONHANDLES_ADR equ 0x14009B08
-
-SPIDERHANDLE_LOCATION equ 0x0FFFFF34
+.include "../build/constants.s"
 
 .Create "ro_initial_code.bin",0x0
 
@@ -23,7 +8,7 @@ SPIDERHANDLE_LOCATION equ 0x0FFFFF34
 	.arm
 		;allocate some memory for our code
 			ldr r0, =0x00000003 ; type (PROTECT)
-			ldr r1, =CODELOCATION ; addr0
+			ldr r1, =RO_CODELOCATION ; addr0
 			ldr r2, =0x00000000 ; addr1
 			ldr r3, =0x00002000 ; size
 			ldr r4, =0x00000003 ; permissions (RW)
@@ -36,7 +21,7 @@ SPIDERHANDLE_LOCATION equ 0x0FFFFF34
 			ldrne r1, [r1]
 
 		;copy code to new memory block
-			ldr r0, =CODELOCATION
+			ldr r0, =RO_CODELOCATION
 			ldr r1, =CROMAPADR+roCommandHandler+0x700
 			ldr r2, =CROMAPADR+roCommandHandler_end+0x700
 			roCodeCopyLoop:
@@ -46,7 +31,7 @@ SPIDERHANDLE_LOCATION equ 0x0FFFFF34
 				blt roCodeCopyLoop
 
 		;copy code to new memory block
-			ldr r0, =CODELOCATION2
+			ldr r0, =RO_CODELOCATION2
 			ldr r1, =CROMAPADR+roCode+0x700
 			ldr r2, =CROMAPADR+roCodeEnd+0x700
 			roCodeCopyLoop2:
@@ -58,7 +43,7 @@ SPIDERHANDLE_LOCATION equ 0x0FFFFF34
 		;make new memory block RWX
 			ldr r0, =ROPROCESSHANDLEADR
 			ldr r0, [r0]
-			ldr r1, =CODELOCATION ; addr0
+			ldr r1, =RO_CODELOCATION ; addr0
 			ldr r2, =0x00000000 ; addr1
 			ldr r3, =0x00002000 ; size
 			ldr r4, =0x00000006 ; type (PROTECT)
@@ -71,14 +56,14 @@ SPIDERHANDLE_LOCATION equ 0x0FFFFF34
 			ldrne r1, [r1]
 
 		;unmap spider mem (mostly for cache reason)
-		ldr r0, =SPIDERHANDLE_LOCATION
+		ldr r0, =RO_SPIDERHANDLE_LOCATION
 		ldr r0, [r0]
 		mov r1, #0x00100000
 		mov r2, #0x0df00000
 		mov r6, #0x00000000
 		ldr r7, =0xDEADCAFE
 		ldr r8, =0xDEADCAFE
-		ldr lr, =CODELOCATION2
+		ldr lr, =RO_CODELOCATION2
 		stmfd sp!, {r4-r8,lr}
 		ldr pc, =0x14002A34
 
@@ -91,7 +76,7 @@ SPIDERHANDLE_LOCATION equ 0x0FFFFF34
 		ldr r6, =0x216 ; oss.cro size in pages -1
 
 		croProtectLoop:
-			ldr r0, =SPIDERHANDLE_LOCATION
+			ldr r0, =RO_SPIDERHANDLE_LOCATION
 			ldr r0, [r0]
 			ldr r1, =CROMAPADR ; addr0
 			add r1, r6, lsl 12
@@ -114,7 +99,7 @@ SPIDERHANDLE_LOCATION equ 0x0FFFFF34
 		ldr r6, =0x26D+0x64+0x18+0x57-1 ; .text size in pages -1
 
 		textProtectLoop:
-			ldr r0, =SPIDERHANDLE_LOCATION
+			ldr r0, =RO_SPIDERHANDLE_LOCATION
 			ldr r0, [r0]
 			ldr r1, =0x00100000
 			add r1, r6, lsl 12
@@ -134,7 +119,7 @@ SPIDERHANDLE_LOCATION equ 0x0FFFFF34
 			bge textProtectLoop
 
 		; ;close spider process handle
-		; 	ldr r0, =SPIDERHANDLE_LOCATION
+		; 	ldr r0, =RO_SPIDERHANDLE_LOCATION
 		; 	ldr r0, [r0]
 		; 	.word 0xEF000023 ; svc 0x23 (CloseHandle)
 
@@ -146,10 +131,10 @@ SPIDERHANDLE_LOCATION equ 0x0FFFFF34
 
 			ldr r0, =0x0FFFFFD0 ;last index
 			ldr r5, [r0]
-			ldr r1, =SESSIONHANDLES_ADR
-			ldr r2, =SESSIONHANDLECNT_ADR
+			ldr r1, =RO_SESSIONHANDLES_ADR
+			ldr r2, =RO_SESSIONHANDLECNT_ADR
 			ldr r2, [r2]
-			ldr r3, =SESSIONHANDLES_ADR
+			ldr r3, =RO_SESSIONHANDLES_ADR
 			ldr r3, [r3, r5, lsl 2]
 
 			.word 0xEF00004F ; svc 0x4F (ReplyAndReceive)
@@ -160,7 +145,7 @@ SPIDERHANDLE_LOCATION equ 0x0FFFFF34
 			;value >=2 => got a command
 
 
-		ldr pc, =CODELOCATION
+		ldr pc, =RO_CODELOCATION
 
 	.pool
 	roCodeEnd:

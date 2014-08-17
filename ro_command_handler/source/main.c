@@ -5,13 +5,15 @@
 #include <ctr/srv.h>
 #include <ctr/svc.h>
 
+#include "../../build/constants.h"
+
 #include "svc.h"
 #include "3dsx.h"
 
 #define NUM_CMD (5)
 
-int* numSessionHandles=(int*)0x140092FC;
-Handle* sessionHandles=(Handle*)0x14009B08;
+int* numSessionHandles=(int*)RO_SESSIONHANDLECNT_ADR;
+Handle* sessionHandles=(Handle*)RO_SESSIONHANDLES_ADR;
 
 Handle sentHandleTable[8];
 typedef void (*cmdHandlerFunction)(u32* cmdbuf);

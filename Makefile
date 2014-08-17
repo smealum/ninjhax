@@ -77,19 +77,19 @@ oss_cro/out_oss.cro: build/ro_initial_rop.bin build/ro_initial_code.bin build/sp
 
 build/ro_initial_rop.bin: ro_initial_rop/ro_initial_rop.bin
 	@cp ro_initial_rop/ro_initial_rop.bin build
-ro_initial_rop/ro_initial_rop.bin:
+ro_initial_rop/ro_initial_rop.bin: build/constants
 	@cd ro_initial_rop && make
 
 
 build/ro_initial_code.bin: ro_initial_code/ro_initial_code.bin
 	@cp ro_initial_code/ro_initial_code.bin build
-ro_initial_code/ro_initial_code.bin: build/ro_command_handler.bin
+ro_initial_code/ro_initial_code.bin: build/ro_command_handler.bin build/constants
 	@cd ro_initial_code && make
 
 
 build/ro_command_handler.bin: ro_command_handler/ro_command_handler.bin
 	@cp ro_command_handler/ro_command_handler.bin build
-ro_command_handler/ro_command_handler.bin:
+ro_command_handler/ro_command_handler.bin: build/constants
 	@cd ro_command_handler && make
 
 

