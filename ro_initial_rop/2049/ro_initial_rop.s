@@ -1,6 +1,6 @@
 .nds
 
-.include "../build/constants.s"
+.include "../../build/constants.s"
 
 .create "ro_initial_rop.bin",0x0
 

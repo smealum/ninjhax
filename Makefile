@@ -10,6 +10,14 @@ ifeq ($(filter $(DEVKITARM)/bin,$(PATH)),)
 export PATH:=$(DEVKITARM)/bin:$(PATH)
 endif
 
+CNVERSION = WEST
+ROVERSION = 2049
+SPIDERVERSION = 4096
+
+export CNVERSION
+export ROVERSION
+export SPIDERVERSION
+
 SCRIPTS = "scripts"
 
 .PHONY: directories all build/constants cn_qr_initial_loader/cn_qr_initial_loader.bin.png cn_save_initial_loader/cn_save_initial_loader.bin cn_secondary_payload/cn_secondary_payload.bin cn_bootloader/cn_bootloader.bin spider_initial_rop/spider_initial_rop.bin spider_thread0_rop/spider_thread0_rop.bin oss_cro/out_oss.cro build/ro_initial_code.bin build/ro_initial_rop.bin build/spider_code.bin
@@ -27,7 +35,7 @@ build/constants: ro_constants/constants.txt spider_constants/constants.txt cn_co
 build/cn_qr_initial_loader.bin.png: cn_qr_initial_loader/cn_qr_initial_loader.bin.png
 	@cp cn_qr_initial_loader/cn_qr_initial_loader.bin.png build
 cn_qr_initial_loader/cn_qr_initial_loader.bin.png:
-	@cd cn_qr_initial_loader && make
+	@cd cn_qr_initial_loader && make $(VERSIONS)
 
 
 build/cn_save_initial_loader.bin: cn_save_initial_loader/cn_save_initial_loader.bin
