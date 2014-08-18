@@ -1,6 +1,5 @@
 This is a (probably non-exhaustive) list of what remains to be done on the exploit codebase before release :
 
- - List item
  - support CN_JPN
  - improve spider cleanup stability (filtered spray)
  - support spider v2050 - support pre-5.0 FIRM
