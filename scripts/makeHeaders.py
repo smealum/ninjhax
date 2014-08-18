@@ -16,6 +16,12 @@ def outputConstantsS(d):
 		out+=(k+" equ ("+str(d[k])+")")+"\n"
 	return out
 
+def outputConstantsPY(d):
+	out=""
+	for k in d:
+		out+=(k+" = ("+str(d[k])+")")+"\n"
+	return out
+
 if len(sys.argv)<2:
 	print("use : "+sys.argv[0]+" <extensionless_output_name> <input_file1> <input_file2> ...")
 	exit()
@@ -29,3 +35,4 @@ for fn in sys.argv[2:]:
 
 open(sys.argv[1]+".h","w").write(outputConstantsH(d))
 open(sys.argv[1]+".s","w").write(outputConstantsS(d))
+open(sys.argv[1]+".py","w").write(outputConstantsPY(d))

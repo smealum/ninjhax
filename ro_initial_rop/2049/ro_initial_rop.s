@@ -40,7 +40,7 @@
 	.word 0x140057a8 ; pop {pc} (NOP)
 
 ;protect spider process handle value
-.orga 0x4C
+.orga RO_SPIDERHANDLE_LOCATION-(RO_ROP_START+RO_ROP_OFFSET)
 	.word 0x1400379c ; pop {r1, pc}
 		.word 0xDEADBABE ; 0xDEADBABE is filtered out by makeROP.py (DO NOT CHANGE)
 

@@ -1,4 +1,7 @@
 import sys
+import os
+sys.path.append(os.path.abspath("../build/"))
+from constants import *
 
 #values for oss.cro in 7.1-16E
  
@@ -26,14 +29,14 @@ crodata=bytearray(open(crofn,"rb").read())
 putWord(crodata, 0x1D9020, 0x4C000)
 
 #patch to change segment1's address
-writeRelocationPatch(crodata, 0, 0x4B010, 0x0FFFFED4, 0x2)
+writeRelocationPatch(crodata, 0, 0x4B010, RO_ROP_START, 0x2)
 
 #actual ROP
 i=1
 for k in range(0,len(ropdata)-4,4):
 	v=getWord(ropdata,k+4)
 	if v!=0xDEADBABE:
-		writeRelocationPatch(crodata, i, k+0x14, v)
+		writeRelocationPatch(crodata, i, k+RO_ROP_OFFSET, v)
 		i+=1
 
 #initial return address
