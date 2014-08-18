@@ -41,7 +41,7 @@
 				blt roCodeCopyLoop2
 
 		;make new memory block RWX
-			ldr r0, =ROPROCESSHANDLEADR
+			ldr r0, =RO_PROCESSHANDLEADR
 			ldr r0, [r0]
 			ldr r1, =RO_CODELOCATION ; addr0
 			ldr r2, =0x00000000 ; addr1
@@ -65,7 +65,7 @@
 		ldr r8, =0xDEADCAFE
 		ldr lr, =RO_CODELOCATION2
 		stmfd sp!, {r4-r8,lr}
-		ldr pc, =0x14002A34
+		ldr pc, =RO_UNMAPPROCESSMEM_GADGET
 
 	roCode:
 		;r8 = cmdbuf

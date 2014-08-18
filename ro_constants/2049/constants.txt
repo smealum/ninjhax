@@ -13,5 +13,7 @@
 	"RO_SPIDERHANDLE_LOCATION" : "0x0FFFFF34",
 
 	"RO_ROP_START" : "0x0FFFFED4",
-	"RO_ROP_OFFSET" : "0x14"
+	"RO_ROP_OFFSET" : "0x14",
+
+	"RO_UNMAPPROCESSMEM_GADGET" : "0x14002A34", #used in ro_initial_code only
 }
