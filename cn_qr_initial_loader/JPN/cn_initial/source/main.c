@@ -228,29 +228,31 @@ int _main()
 	int line=10;
 	Result ret;
 
-	Handle* addressArbiterHandle=(Handle*)0x334960;
+	Handle* addressArbiterHandle=(Handle*)0x003414B0;
 
 	//close threads
 		//patch waitSyncN
-		patchMem(gspHandle, 0x14000000+CN_TEXTPAOFFSET+0x00192200, 0x200, 0x19, 0x4F);
-		patchMem(gspHandle, 0x14000000+CN_TEXTPAOFFSET+0x00192600, 0x200, 0x7, 0x13);
-		patchMem(gspHandle, 0x14000000+CN_TEXTPAOFFSET+0x001CA200, 0x200, 0xB, 0x1E);
-		patchMem(gspHandle, 0x14000000+CN_TEXTPAOFFSET+0x000C6100, 0x200, 0x3C, 0x52);
+		patchMem(gspHandle, 0x14000000+CN_TEXTPAOFFSET+0x0019BD00, 0x200, 0xB, 0x41);
+		patchMem(gspHandle, 0x14000000+CN_TEXTPAOFFSET+0x0019C000, 0x200, 0x39, 0x45);
+		patchMem(gspHandle, 0x14000000+CN_TEXTPAOFFSET+0x001D3700, 0x200, 0x7, 0x1A);
+		patchMem(gspHandle, 0x14000000+CN_TEXTPAOFFSET+0x001C9100, 0x200, 0x2E, 0x44);
 
 		//patch arbitrateAddress
-		patchMem(gspHandle, 0x14000000+CN_TEXTPAOFFSET+0x001C9E00, 0x200, 0x14, 0x40);
+		patchMem(gspHandle, 0x14000000+CN_TEXTPAOFFSET+0x001D3300, 0x200, 0x10, 0x3C);
 
-		//close handles
-		ret=svc_closeHandle(*((Handle*)0x359938));
-		ret=svc_closeHandle(*((Handle*)0x34FEA4));
-		ret=svc_closeHandle(*((Handle*)0x356274));
-		ret=svc_closeHandle(*((Handle*)0x334730));
-		ret=svc_closeHandle(*((Handle*)0x334F64));
+// //TODO ? (unnecessary with the bruteforce handle closing in secondary payload)
+// 		//close handles
+// 		ret=svc_closeHandle(*((Handle*)0x359938));
+// 		ret=svc_closeHandle(*((Handle*)0x34FEA4));
+// 		ret=svc_closeHandle(*((Handle*)0x356274));
+// 		ret=svc_closeHandle(*((Handle*)0x334730));
+// 		ret=svc_closeHandle(*((Handle*)0x334F64));
+
 
 		//wake threads
-		svc_arbitrateAddress(*addressArbiterHandle, 0x35811c, 0, -1, 0);
-		svc_signalEvent(((Handle*)0x3480d0)[2]);
-		s32 out; svc_releaseSemaphore(&out, *(Handle*)0x357490, 1);
+		svc_arbitrateAddress(*addressArbiterHandle, 0x364ccc, 0, -1, 0);
+		svc_signalEvent(((Handle*)0x354ba8)[2]);
+		s32 out; svc_releaseSemaphore(&out, *(Handle*)0x341AB0, 1); //CHECK !
 
 
 
@@ -294,14 +296,14 @@ int _main()
 	//TODO : modify key/parray first ?
 	//(use some of its slots as variables in ROP to confuse people ?)
 	//decrypt secondary payload
-	Result (*blowfishKeyScheduler)(u32* dst)=(void*)0x001A44BC;
-	Result (*blowfishDecrypt)(u32* blowfishKeyData, u32* src, u32* dst, u32 size)=(void*)0x001A4B04;
+	Result (*blowfishKeyScheduler)(u32* dst)=(void*)0x001A5900;
+	Result (*blowfishDecrypt)(u32* blowfishKeyData, u32* src, u32* dst, u32 size)=(void*)0x001A5F48;
 
 	blowfishKeyScheduler((u32*)0x14200000);
 	blowfishDecrypt((u32*)0x14200000, (u32*)buffer, (u32*)buffer, secondaryPayloadSize);
 
-	Result (*_DSP_UnloadComponent)(Handle* handle)=(void*)0x002BA368;
-	Handle** dspHandle=(Handle**)0x334EFC;
+	Result (*_DSP_UnloadComponent)(Handle* handle)=(void*)0x002C3A78;
+	Handle** dspHandle=(Handle**)0x341A4C;
 
 	_DSP_UnloadComponent(*dspHandle);
 
