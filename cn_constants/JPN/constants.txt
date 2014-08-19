@@ -9,6 +9,8 @@
 	("CN_GSPGPU_FlushDataCache_ADR", "0x002DAAC4"),
 	("CN_nn__gxlow__CTR__CmdReqQueueTx__TryEnqueue", "0x001C5B1C"),
 
+	("CN_HEAPSIZE", "0x01D8D000"),
+
 	# careful about that as this address does contain some code/data
 	("CN_INITIALCODE_OFFSET", "0x001E2900"),
 

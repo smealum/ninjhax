@@ -323,16 +323,16 @@ int main()
 	drawString(TOPFBADR1,"spiderto",0,line);
 	drawString(TOPFBADR2,"spiderto",0,line+=10);
 
-	Handle* srvHandle=(Handle*)0x334F6C;
+	Handle* srvHandle=(Handle*)CN_SRVHANDLE_ADR;
 	Handle* gspHandle=(Handle*)CN_GSPHANDLE_ADR;
 
-	Handle aptLockHandle=*((Handle*)0x334720);
+	Handle aptLockHandle=*((Handle*)CN_APTLOCKHANDLE_ADR);
 	Handle aptuHandle=0x00;
 	Result ret;
 
 	u8 recvbuf[0x1000];
 
-	Result (*_GSPGPU_FlushDataCache)(Handle* handle, Handle kprocess, u32* addr, u32 size)=(void*)0x002D15D4;
+	Result (*_GSPGPU_FlushDataCache)(Handle* handle, Handle kprocess, u32* addr, u32 size)=(void*)CN_GSPGPU_FlushDataCache_ADR;
 
 	{
 		u32 buf;
@@ -396,8 +396,8 @@ int main()
 		//cleanup
 		{
 			//unmap GSP and HID shared mem
-			svc_unmapMemoryBlock(*((Handle*)0x0034EC98), 0x10000000);
-			svc_unmapMemoryBlock(*((Handle*)0x00356254), 0x10002000);
+			svc_unmapMemoryBlock(*((Handle*)CN_HIDMEMHANDLE_ADR), 0x10000000);
+			svc_unmapMemoryBlock(*((Handle*)CN_GSPMEMHANDLE_ADR), 0x10002000);
 
 			Handle _srvHandle=*srvHandle;
 			Handle _gspHandle=*gspHandle;
@@ -417,8 +417,7 @@ int main()
 
 			//free GSP heap and regular heap
 			u32 out;
-			svc_controlMemory(&out, 0x08000000, 0x00000000, 0x01d9a000, MEMOP_FREE, 0x0);
-			// svc_controlMemory(&out, 0x14000000, 0x00000000, 0x02000000, MEMOP_FREE, 0x0);
+			svc_controlMemory(&out, 0x08000000, 0x00000000, CN_HEAPSIZE, MEMOP_FREE, 0x0);
 		}
 
 		_GSPGPU_ReleaseRight(*gspHandle); //disable GSP module access
