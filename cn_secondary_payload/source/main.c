@@ -184,7 +184,7 @@ void doGspwn(u32* src, u32* dst, u32 size)
 		0x00000000, //unused
 	};
 
-	u32** sharedGspCmdBuf=(u32**)(0x356208+0x58);
+	u32** sharedGspCmdBuf=(u32**)(CN_GSPSHAREDBUF_ADR);
 	nn__gxlow__CTR__CmdReqQueueTx__TryEnqueue(sharedGspCmdBuf, gxCommand);
 }
 
@@ -324,7 +324,7 @@ int main()
 	drawString(TOPFBADR2,"spiderto",0,line+=10);
 
 	Handle* srvHandle=(Handle*)0x334F6C;
-	Handle* gspHandle=(Handle*)0x334F28;
+	Handle* gspHandle=(Handle*)CN_GSPHANDLE_ADR;
 
 	Handle aptLockHandle=*((Handle*)0x334720);
 	Handle aptuHandle=0x00;

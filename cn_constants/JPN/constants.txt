@@ -1,0 +1,25 @@
+[
+	("CN_GSPHEAP", "0x14000000"),
+
+	("CN_GSPHANDLE_ADR", "0x00341A78"),
+	("CN_GSPSHAREDBUF_ADR", "0x362DA8+0x58"),
+	
+	("CN_SRVHANDLE_ADR", "0x00341AC0"),
+
+	("CN_GSPGPU_FlushDataCache_ADR", "0x002DAAC4"),
+	("CN_nn__gxlow__CTR__CmdReqQueueTx__TryEnqueue", "0x001C5B1C"),
+
+	# careful about that as this address does contain some code/data
+	("CN_INITIALCODE_OFFSET", "0x001E2900"),
+
+	("CN_TEXTPAOFFSET", "0x03E00000"),
+
+	("CN_STACKPAYLOADADR", "0x0FFFFA64"),
+	("CN_HEAPPAYLOADADR", "0x8E3D928"),
+
+	("CN_CODELOCATIONPAOFF", "(0x100000)"),
+	("CN_CODELOCATIONGSP", "(CN_GSPHEAP+CN_CODELOCATIONPAOFF)"),
+
+	("CN_TOPFBADR1", "(0x1444B9C0)"),
+	("CN_TOPFBADR2", "(0x14491EE0)")
+]
