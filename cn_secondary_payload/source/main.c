@@ -11,10 +11,10 @@
 #include "spider_thread0_rop_bin.h"
 #include "cn_bootloader_bin.h"
 
-#define TOPFBADR1 ((u8*)0x1444B9C0)
-#define TOPFBADR2 ((u8*)0x14491EE0)
+#include "../../build/constants.h"
 
-#define TEXTPAOFFSET 0x03E00000
+#define TOPFBADR1 ((u8*)CN_TOPFBADR1)
+#define TOPFBADR2 ((u8*)CN_TOPFBADR2)
 
 typedef enum
 {

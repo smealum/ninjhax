@@ -6,10 +6,10 @@
 #include <ctr/svc.h>
 #include "text.h"
 
-#define TEXTPAOFFSET 0x03E00000
+#include "../../../../build/constants.h"
 
-#define TOPFBADR1 ((u8*)0x1444B9C0)
-#define TOPFBADR2 ((u8*)0x14491EE0)
+#define TOPFBADR1 ((u8*)CN_TOPFBADR1)
+#define TOPFBADR2 ((u8*)CN_TOPFBADR2)
 
 int _strlen(char* str)
 {
@@ -97,28 +97,6 @@ Result HTTPC_CloseContext(Handle handle, Handle contextHandle)
 
 	return cmdbuf[1];
 }
-
-// Result HTTPC_AddRequestHeaderField(Handle handle, Handle contextHandle, char* name, char* value)
-// {
-// 	u32* cmdbuf=getThreadCommandBuffer();
-
-// 	int l1=_strlen(name)+1;
-// 	int l2=_strlen(value)+1;
-
-// 	cmdbuf[0]=0x1100c4; //request header code
-// 	cmdbuf[1]=contextHandle;
-// 	cmdbuf[2]=l1;
-// 	cmdbuf[3]=l2;
-// 	cmdbuf[4]=(l1<<14)|0xC02;
-// 	cmdbuf[5]=(u32)name;
-// 	cmdbuf[6]=(l1<<4)|0xA;
-// 	cmdbuf[7]=(u32)value;
-	
-// 	Result ret=0;
-// 	if((ret=svc_sendSyncRequest(handle)))return ret;
-
-// 	return cmdbuf[1];
-// }
 
 Result HTTPC_BeginRequest(Handle handle, Handle contextHandle)
 {
@@ -254,15 +232,13 @@ int _main()
 
 	//close threads
 		//patch waitSyncN
-		// patchMem(gspHandle, 0x14000000+TEXTPAOFFSET+0x000EBE00, 0x200, 0x5, 0xE);
-		// patchMem(gspHandle, 0x14000000+TEXTPAOFFSET+0x000EBE00, 0x200, 0x9, 0xE);
-		patchMem(gspHandle, 0x14000000+TEXTPAOFFSET+0x00192200, 0x200, 0x19, 0x4F);
-		patchMem(gspHandle, 0x14000000+TEXTPAOFFSET+0x00192600, 0x200, 0x7, 0x13);
-		patchMem(gspHandle, 0x14000000+TEXTPAOFFSET+0x001CA200, 0x200, 0xB, 0x1E);
-		patchMem(gspHandle, 0x14000000+TEXTPAOFFSET+0x000C6100, 0x200, 0x3C, 0x52);
+		patchMem(gspHandle, 0x14000000+CN_TEXTPAOFFSET+0x00192200, 0x200, 0x19, 0x4F);
+		patchMem(gspHandle, 0x14000000+CN_TEXTPAOFFSET+0x00192600, 0x200, 0x7, 0x13);
+		patchMem(gspHandle, 0x14000000+CN_TEXTPAOFFSET+0x001CA200, 0x200, 0xB, 0x1E);
+		patchMem(gspHandle, 0x14000000+CN_TEXTPAOFFSET+0x000C6100, 0x200, 0x3C, 0x52);
 
 		//patch arbitrateAddress
-		patchMem(gspHandle, 0x14000000+TEXTPAOFFSET+0x001C9E00, 0x200, 0x14, 0x40);
+		patchMem(gspHandle, 0x14000000+CN_TEXTPAOFFSET+0x001C9E00, 0x200, 0x14, 0x40);
 
 		//close handles
 		ret=svc_closeHandle(*((Handle*)0x359938));
@@ -302,12 +278,6 @@ int _main()
 
 	// drawHex(ret,0,line+=10);
 
-	// // ret=HTTPC_AddRequestHeaderField(httpcHandle2, httpContextHandle, "User-Agent", "CTR AC/02");
-	// // ret=HTTPC_AddRequestHeaderField(httpcHandle2, httpContextHandle, "Content-Type", "text/html");
-	// // ret=HTTPC_AddRequestHeaderField(httpcHandle2, httpContextHandle, "Connection", "Close");
-	
-	// drawHex(ret,0,line+=10);
-
 	ret=HTTPC_BeginRequest(httpcHandle2, httpContextHandle);
 
 	// drawHex(ret,0,line+=10);
@@ -338,8 +308,7 @@ int _main()
 	ret=_GSPGPU_FlushDataCache(gspHandle, 0xFFFF8001, (u32*)buffer, 0x300000);
 	// drawHex(ret,0,line+=10);
 
-	// doGspwn((u32*)(0x14100000), (u32*)(0x14000000+TEXTPAOFFSET), 0x001D9000);
-	doGspwn((u32*)(buffer), (u32*)(0x14000000+TEXTPAOFFSET), 0x0000A000);
+	doGspwn((u32*)(buffer), (u32*)(0x14000000+CN_TEXTPAOFFSET), 0x0000A000);
 
 	svc_sleepThread(0x3B9ACA00);
 

