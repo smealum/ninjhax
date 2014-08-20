@@ -22,8 +22,8 @@
 
 		;copy code to new memory block
 			ldr r0, =RO_CODELOCATION
-			ldr r1, =CROMAPADR+roCommandHandler+0x700
-			ldr r2, =CROMAPADR+roCommandHandler_end+0x700
+			ldr r1, =SPIDER_CROMAPADR+roCommandHandler+CRO_ROCODE_OFFSET
+			ldr r2, =SPIDER_CROMAPADR+roCommandHandler_end+CRO_ROCODE_OFFSET
 			roCodeCopyLoop:
 				ldr r3, [r1], #4
 				str r3, [r0], #4
@@ -32,8 +32,8 @@
 
 		;copy code to new memory block
 			ldr r0, =RO_CODELOCATION2
-			ldr r1, =CROMAPADR+roCode+0x700
-			ldr r2, =CROMAPADR+roCodeEnd+0x700
+			ldr r1, =SPIDER_CROMAPADR+roCode+CRO_ROCODE_OFFSET
+			ldr r2, =SPIDER_CROMAPADR+roCodeEnd+CRO_ROCODE_OFFSET
 			roCodeCopyLoop2:
 				ldr r3, [r1], #4
 				str r3, [r0], #4
@@ -78,7 +78,7 @@
 		croProtectLoop:
 			ldr r0, =RO_SPIDERHANDLE_LOCATION
 			ldr r0, [r0]
-			ldr r1, =CROMAPADR ; addr0
+			ldr r1, =SPIDER_CROMAPADR ; addr0
 			add r1, r6, lsl 12
 			ldr r2, =0x00000000 ; addr1
 			ldr r3, =0x00001000 ; size

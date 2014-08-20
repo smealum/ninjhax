@@ -1,20 +1,6 @@
 .nds
 
-ROPROCESSHANDLEADR equ 0x14009600
-SPIDERPROCESSHANDLEADR equ 0x14009600
-
-CROMAPADR equ 0x007e5000
-CROLOCATION equ 0x083A5000
-
-CODELOCATION equ 0x0E000000
-
-SPIDER_GSPHANDLE equ 0x003DA72C
-RO_HANDLELOC equ 0x003D8FDC
-
-SESSIONHANDLECNT_ADR equ 0x140092FC
-SESSIONHANDLES_ADR equ 0x14009B08
-
-SPIDERHANDLE_LOCATION equ 0x0FFFFF34
+.include "../build/constants.s"
 
 .Create "spider_code.bin",0x0
 
@@ -91,7 +77,7 @@ SPIDERHANDLE_LOCATION equ 0x0FFFFF34
 	; 	add r8, #0x80
 	; 	ldr r0, =0x00170000
 	; 	str r0, [r8], #4
-	; 	ldr r0, =SPIDER_GSPHANDLE
+	; 	ldr r0, =SPIDER_GSPHANDLE_ADR
 	; 	ldr r0, [r0]
 	; 	.word 0xEF000032 ; svc 0x32 (SendSyncRequest)
 
@@ -130,9 +116,9 @@ SPIDERHANDLE_LOCATION equ 0x0FFFFF34
 	; 	ldr r8, =0x003D1000
 	; 	ldr r9, =0x003D1000+0x00017E80+0x00056830
 	; 	ldr r10, =0x7FFF
-	; 	ldr r11, =SPIDER_GSPHANDLE
+	; 	ldr r11, =SPIDER_GSPHANDLE_ADR
 	; 	ldr r11, [r11]
-	; 	ldr r12, =RO_HANDLELOC
+	; 	ldr r12, =SPIDER_ROHANDLE_ADR
 	; 	ldr r12, [r12]
 	; 	closeHandleLoop1:
 	; 		ldr r0, [r8], #4
@@ -182,7 +168,7 @@ SPIDERHANDLE_LOCATION equ 0x0FFFFF34
 	;reconnect to ro
 		sub sp, #0x20
 		;connect back to srv:
-			ldr r1, =CROMAPADR+srvString+0x2000
+			ldr r1, =SPIDER_CROMAPADR+srvString+CRO_SPIDERCODE_OFFSET
 			.word 0xEF00002D ; svc 0x2D (ConnectToPort)
 			str r1, [sp]
 
@@ -230,7 +216,7 @@ SPIDERHANDLE_LOCATION equ 0x0FFFFF34
 			ldrne r1, =0xCAFE0082
 			ldrne r1, [r1]
 
-			ldr r1, =RO_HANDLELOC
+			ldr r1, =SPIDER_ROHANDLE_ADR
 			ldr r1, [r1]
 			str r1, [sp, #4]
 
@@ -242,7 +228,7 @@ SPIDERHANDLE_LOCATION equ 0x0FFFFF34
 			str r0, [r8], #4
 			ldr r0, =0x00000020
 			str r0, [r8], #4
-			
+
 			ldr r0, [sp, 0xC] ; fs:USER handle
 			.word 0xEF000032 ; svc 0x32 (SendSyncRequest)
 
@@ -313,7 +299,7 @@ SPIDERHANDLE_LOCATION equ 0x0FFFFF34
 			str r0, [r8], #4
 			ldr r0, =0x00000002 ;(arg size << 14)|2
 			str r0, [r8], #4
-			ldr r0, =CROMAPADR ;arg buffer addr
+			ldr r0, =SPIDER_CROMAPADR ;arg buffer addr
 			str r0, [r8], #4
 
 			ldr r0, [sp, #8]
@@ -355,7 +341,7 @@ SPIDERHANDLE_LOCATION equ 0x0FFFFF34
 		add r8, #0x80
 		ldr r0, =0x00170000
 		str r0, [r8], #4
-		ldr r0, =SPIDER_GSPHANDLE
+		ldr r0, =SPIDER_GSPHANDLE_ADR
 		ldr r0, [r0]
 		.word 0xEF000032 ; svc 0x32 (SendSyncRequest)
 
