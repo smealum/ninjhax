@@ -1,11 +1,13 @@
 .nds
 
+.include "../build/constants.s"
+
 .open "out_oss.cro",0x0
 
-.orga 0x700
+.orga CRO_ROCODE_OFFSET
 	.incbin "../build/ro_initial_code.bin"
 
-.orga 0x2000
+.orga CRO_SPIDERCODE_OFFSET
 	.incbin "../build/spider_code.bin"
 
 .close

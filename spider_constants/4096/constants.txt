@@ -1,0 +1,4 @@
+[
+	("CRO_ROCODE_OFFSET", "0x700"),
+	("CRO_SPIDERCODE_OFFSET", "0x2000"),
+]

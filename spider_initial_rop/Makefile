@@ -16,8 +16,10 @@ all: spider_initial_rop.bin
 
 clean:
 	@rm -f spider_initial_rop.bin
+	@cd $(SPIDERVERSION) && make clean
 	@echo "all cleaned up !"
 
-%.bin: %.s
-	@armips $<
+spider_initial_rop.bin:
+	@cd $(SPIDERVERSION) && make
+	@cp $(SPIDERVERSION)/$@ ./
 	@python $(SCRIPTS)/obfuscator5000.py $@

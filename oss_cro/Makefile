@@ -19,6 +19,10 @@ oss_new.cro: oss.cro
 	@armips oss.s
 	@python $(SCRIPTS)/fixCRO.py out_oss.cro
 
+oss.cro:
+	@cp $(SPIDERVERSION)/$@ ./
+
 clean:
+	@rm -f oss.cro
 	@rm -f out_oss.cro
 	@echo "all cleaned up !"

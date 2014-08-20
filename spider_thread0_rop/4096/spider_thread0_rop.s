@@ -1,7 +1,7 @@
 .nds
 
 .create "spider_thread0_rop.bin",0x0
-.loadtable "unicode.tbl"
+.loadtable "../unicode.tbl"
 
 ROPLOCATIONPA equ 0x24CE9000
 ROPLOCATION equ 0x09A69000
@@ -371,32 +371,32 @@ thread0rop:
 
 	.align 0x4
 	crrPatch:
-		.incbin "../build/cro/patchCRR.bin"
+		.incbin "../../build/cro/patchCRR.bin"
 	crrPatch_end:
 
 	.align 0x4
 	croPatch0:
-	.incbin "../build/cro/patch0.bin"
+	.incbin "../../build/cro/patch0.bin"
 	croPatch0_end:
 
 	.align 0x4
 	croPatch700:
-	.incbin "../build/cro/patch700.bin"
+	.incbin "../../build/cro/patch700.bin"
 	croPatch700_end:
 
 	.align 0x4
 	croPatch2000:
-	.incbin "../build/cro/patch2000.bin"
+	.incbin "../../build/cro/patch2000.bin"
 	croPatch2000_end:
 
 	.align 0x4
 	croPatch1D9020:
-	.incbin "../build/cro/patch1D9020.bin"
+	.incbin "../../build/cro/patch1D9020.bin"
 	croPatch1D9020_end:
 
 	.align 0x4
 	croPatch1DBA90:
-	.incbin "../build/cro/patch1DBA90.bin"
+	.incbin "../../build/cro/patch1DBA90.bin"
 	croPatch1DBA90_end:
 
 	.align 0x4
