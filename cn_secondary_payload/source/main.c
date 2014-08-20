@@ -171,7 +171,7 @@ Result _GSPGPU_ReleaseRight(Handle handle)
 
 void doGspwn(u32* src, u32* dst, u32 size)
 {
-	Result (*nn__gxlow__CTR__CmdReqQueueTx__TryEnqueue)(u32** sharedGspCmdBuf, u32* cmdAdr)=(void*)0x001C2B54;
+	Result (*nn__gxlow__CTR__CmdReqQueueTx__TryEnqueue)(u32** sharedGspCmdBuf, u32* cmdAdr)=(void*)CN_nn__gxlow__CTR__CmdReqQueueTx__TryEnqueue;
 	u32 gxCommand[]=
 	{
 		0x00000004, //command header (SetTextureCopy)
@@ -404,9 +404,9 @@ int main()
 
 			//close all handles in data and .bss sections
 			int i;
-			for(i=0;i<(0x2773C+0x20070)/4;i++)
+			for(i=0;i<(CN_DATABSS_SIZE)/4;i++)
 			{
-				Handle val=((Handle*)(0x0031A000))[i];
+				Handle val=((Handle*)(CN_DATABSS_START))[i];
 				if(val && (val&0x7FFF)<0x30 && val!=_srvHandle && val!=_gspHandle)svc_closeHandle(val);
 			}
 
@@ -427,7 +427,7 @@ int main()
 
 	_GSPGPU_AcquireRight(*gspHandle, 0x0); //get in line for gsp rights
 
-	u32* debug=(u32*)0x0031A000;
+	u32* debug=(u32*)CN_DATABSS_START;
 	debug[6]=0xDEADBABE;
 	debug[7]=0xDEADBABE;
 	debug[8]=0xDEADBABE;
