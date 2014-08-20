@@ -9,3 +9,5 @@ This is a (probably non-exhaustive) list of what remains to be done on the explo
  - "boot.3dsx" not found screen
  - "couldn't retrieve HTTP payload" thing
  - savedata uninstaller
+ - return to hbmenu (LR)
+ - 
