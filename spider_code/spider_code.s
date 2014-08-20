@@ -70,22 +70,6 @@
 	ldr r1, =0x00000000
 	.word 0xEF00000A ; sleep
 
-	;release GSP rights
-
-	; ;GSPGPU_ReleaseRight
-	; 	mrc p15, 0, r8, c13, c0, 3
-	; 	add r8, #0x80
-	; 	ldr r0, =0x00170000
-	; 	str r0, [r8], #4
-	; 	ldr r0, =SPIDER_GSPHANDLE_ADR
-	; 	ldr r0, [r0]
-	; 	.word 0xEF000032 ; svc 0x32 (SendSyncRequest)
-
-	; 	;induce crash if there's an error
-	; 	cmp r0, #0
-	; 	ldrne r1, =0xCAFE0021
-	; 	ldrne r1, [r1]
-
 	;unmap memory blocks
 		;addr 0x10000000
 			ldr r0, =0x003D7C8C
@@ -153,9 +137,9 @@
 
 	;free GSP heap
 		ldr r0, =0x00000001 ; type (FREE)
-		ldr r1, =0x18352000 ; addr0
-		ldr r2, =0x00000001000 ; addr1
-		ldr r3, =0x00800000 ; size
+		ldr r1, =SPIDER_GSPHEAPSTART ; addr0
+		ldr r2, =0x00000000 ; addr1
+		ldr r3, =SPIDER_GSPHEAPSIZE ; size
 		ldr r4, =0x00000000 ; permissions (RW)
 
 		.word 0xEF000001 ; svc 0x01 (ControlMemory)
@@ -294,8 +278,6 @@
 			ldr r0, =0x00000000 ;val 0x0
 			str r0, [r8], #4
 			ldr r0, [sp, #4] ;arg handle (ldr:ro)
-			; ldr r0, [sp] ;arg handle (srv)
-			; ldr r0, =0x00000000 ;arg handle (none)
 			str r0, [r8], #4
 			ldr r0, =0x00000002 ;(arg size << 14)|2
 			str r0, [r8], #4
