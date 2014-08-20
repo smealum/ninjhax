@@ -16,7 +16,8 @@ CNVERSION = WEST
 ROVERSION = 2049
 # ROVERSION = 3074
 # ROVERSION = 4096
-SPIDERVERSION = 4096
+SPIDERVERSION = 3074
+# SPIDERVERSION = 4096
 
 export CNVERSION
 export ROVERSION
@@ -57,7 +58,8 @@ cn_save_initial_loader/cn_save_initial_loader.bin:
 
 build/cn_secondary_payload.bin: cn_secondary_payload/cn_secondary_payload.bin
 	@python $(SCRIPTS)/blowfish.py cn_secondary_payload/cn_secondary_payload.bin build/cn_secondary_payload.bin scripts
-cn_secondary_payload/cn_secondary_payload.bin: build/spider_initial_rop.bin build/spider_thread0_rop.bin build/cn_bootloader.bin
+cn_secondary_payload/cn_secondary_payload.bin: build/spider_hook_rop.bin build/spider_initial_rop.bin build/spider_thread0_rop.bin build/cn_bootloader.bin
+	@cp build/spider_hook_rop.bin cn_secondary_payload/data
 	@cp build/spider_initial_rop.bin cn_secondary_payload/data
 	@cp build/spider_thread0_rop.bin cn_secondary_payload/data
 	@cp build/cn_bootloader.bin cn_secondary_payload/data
@@ -68,6 +70,12 @@ build/cn_bootloader.bin: cn_bootloader/cn_bootloader.bin
 	@cp cn_bootloader/cn_bootloader.bin build
 cn_bootloader/cn_bootloader.bin:
 	@cd cn_bootloader && make
+
+
+build/spider_hook_rop.bin: spider_hook_rop/spider_hook_rop.bin
+	@cp spider_hook_rop/spider_hook_rop.bin build
+spider_hook_rop/spider_hook_rop.bin:
+	@cd spider_hook_rop && make
 
 
 build/spider_initial_rop.bin: spider_initial_rop/spider_initial_rop.bin

@@ -6,7 +6,7 @@
 
 ;spider code
 .arm
-	ldr r2, =0x00100000+0x0026D000
+	ldr r2, =0x00100000+SPIDER_TEXT_LENGTH
 	ldr r0, =0xEF000009 ; svc 0x09 (ExitThread)
 	ldr r1, =0x00100000
 	exitThreadLoop:

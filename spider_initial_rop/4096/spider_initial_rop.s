@@ -27,7 +27,7 @@
 			.word 0x0FFFFF10 ; r4
 
 		.word 0x0010c2fc ; pop {r0, pc}
-			.word SPIDER_THREAD0ROP_ADR ; r0
+			.word SPIDER_THREAD0ROP_VADR ; r0
 		.word 0x00109d04 ; str r0, [r4] | pop {r4, pc}
 			.word 0x0FFFFF14 ; r4
 
