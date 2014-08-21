@@ -8,6 +8,17 @@
 	("SPIDER_THREAD0ROP_PADR", "0x24CE9000"),
 	("SPIDER_THREAD0ROP_VADR", "0x09A69000"),
 
+	#cleanup stuff
+	("SPIDER_PROCSEMAPHORE_ADR", "0x003D8F68"), # TODO : check
+	("SPIDER_APTHANDLES_ADR", "0x003d1fbc"), # miraculously unchanged
+	("SPIDER_ADDRESSARBITER_ADR", "0x003d8f38"), # miraculously unchanged
+	("SPIDER_ARBADDRESS_1", "0x09a6c1d4"), # miraculously unchanged
+	("SPIDER_ARBADDRESS_2", "0x08005264"), # miraculously unchanged
+	("SPIDER_ARBADDRESS_3", "0x00439964"), # miraculously unchanged
+	("SPIDER_ARBADDRESS_4", "0x080493b8"), # miraculously unchanged
+	("SPIDER_HIDMEMHANDLE_ADR", "0x004142F0+0x2C+0x14"), # miraculously unchanged
+	("SPIDER_GSPMEMHANDLE_ADR", "0x003D7C40+0x14+0x38"), # miraculously unchanged
+
 	("SPIDER_GSPSHAREDMEM_ADR", "0x3D7C40+0x58"),
 	("SPIDER_GSPHEAPSTART", "0x18352000"),
 	("SPIDER_GSPHEAPSIZE", "0x00800000"),

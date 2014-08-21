@@ -15,20 +15,20 @@
 		blt exitThreadLoop
 
 	;wake thread1
-	ldr r1, =0x003f7670
+	ldr r1, =SPIDER_PROCSEMAPHORE_ADR
 	ldr r1, [r1]
 	mov r2, #1
 	.word 0xEF000016 ; svc 0x16 (ReleaseSemaphore)
 
 	;wake thread2
-	ldr r0, =0x3d1fbc+8
+	ldr r0, =SPIDER_APTHANDLES_ADR+8
 	ldr r0, [r0]
 	.word 0xEF000018 ; svc 0x18 (SignalEvent)
 
 	;wake thread3 and thread4
-	ldr r0, =0x003d8f38
+	ldr r0, =SPIDER_ADDRESSARBITER_ADR
 	ldr r0, [r0] ; handle
-	ldr r1, =0x09a6c1d4 ;addr
+	ldr r1, =SPIDER_ARBADDRESS_1 ;addr
 	ldr r2, =0x00000000 ; arbitration type
 	ldr r3, =0xFFFFFFFF ; value (-1)
 	ldr r4, =0x00000000 ; nanoseconds
@@ -36,9 +36,9 @@
 	.word 0xEF000022 ; svc 0x22 (ArbitrateAddress)
 
 	;wake thread7
-	ldr r0, =0x003d8f38
+	ldr r0, =SPIDER_ADDRESSARBITER_ADR
 	ldr r0, [r0] ; handle
-	ldr r1, =0x08005264 ;addr
+	ldr r1, =SPIDER_ARBADDRESS_2 ;addr
 	ldr r2, =0x00000000 ; arbitration type
 	ldr r3, =0xFFFFFFFF ; value (-1)
 	ldr r4, =0x00000000 ; nanoseconds
@@ -46,9 +46,9 @@
 	.word 0xEF000022 ; svc 0x22 (ArbitrateAddress)
 
 	;wake thread8
-	ldr r0, =0x003d8f38
+	ldr r0, =SPIDER_ADDRESSARBITER_ADR
 	ldr r0, [r0] ; handle
-	ldr r1, =0x00439964 ;addr
+	ldr r1, =SPIDER_ARBADDRESS_3 ;addr
 	ldr r2, =0x00000000 ; arbitration type
 	ldr r3, =0xFFFFFFFF ; value (-1)
 	ldr r4, =0x00000000 ; nanoseconds
@@ -56,9 +56,9 @@
 	.word 0xEF000022 ; svc 0x22 (ArbitrateAddress)
 
 	;wake thread10
-	ldr r0, =0x003d8f38
+	ldr r0, =SPIDER_ADDRESSARBITER_ADR
 	ldr r0, [r0] ; handle
-	ldr r1, =0x080493b8 ;addr
+	ldr r1, =SPIDER_ARBADDRESS_4 ;addr
 	ldr r2, =0x00000000 ; arbitration type
 	ldr r3, =0xFFFFFFFF ; value (-1)
 	ldr r4, =0x00000000 ; nanoseconds
@@ -72,7 +72,7 @@
 
 	;unmap memory blocks
 		;addr 0x10000000
-			ldr r0, =0x003D7C8C
+			ldr r0, =SPIDER_HIDMEMHANDLE_ADR
 			ldr r0, [r0] ; handle
 			ldr r1, =0x10000000 ; addr
 
@@ -84,7 +84,7 @@
 			ldrne r1, [r1]
 
 		;addr 0x10002000
-			ldr r0, =0x00414330
+			ldr r0, =SPIDER_GSPMEMHANDLE_ADR
 			ldr r0, [r0] ; handle
 			ldr r1, =0x10002000 ; addr
 
