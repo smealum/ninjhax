@@ -14,7 +14,9 @@ to build :
 extra files required to make :
 
 	scripts/blowfish_processed.bin
-	oss_cro/oss.cro
+	oss_cro/2050/oss.cro
+	oss_cro/3074/oss.cro
+	oss_cro/4096/oss.cro
 
 
 description of files :
