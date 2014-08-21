@@ -16,7 +16,8 @@ all: spider_hook_rop.bin
 
 clean:
 	@rm -f spider_hook_rop.bin
-	@cd $(SPIDERVERSION) && make clean
+	@cd 3074 && make clean
+	@cd 4096 && make clean
 	@echo "all cleaned up !"
 
 spider_hook_rop.bin:

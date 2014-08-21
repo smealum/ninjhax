@@ -10,9 +10,6 @@ thread0rop:
 	;actual ROP start
 
 	;grab ldr:ro handle
-		.word 0xDEAD0001
-		.word 0xDEAD0002
-		.word 0xDEAD0003
 		.word 0x0010c320 ; pop {r0, pc}
 			.word SPIDER_ROHANDLE_ADR ; r0 (dst)
 		.word 0x00228b10 ; pop {r1, pc}

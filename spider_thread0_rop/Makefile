@@ -16,7 +16,8 @@ all: spider_thread0_rop.bin
 
 clean:
 	@rm -f spider_thread0_rop.bin
-	@cd $(SPIDERVERSION) && make clean
+	@cd 3074 && make clean
+	@cd 4096 && make clean
 	@echo "all cleaned up !"
 
 spider_thread0_rop.bin:

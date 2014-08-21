@@ -16,8 +16,8 @@ CNVERSION = WEST
 ROVERSION = 2049
 # ROVERSION = 3074
 # ROVERSION = 4096
-# SPIDERVERSION = 3074
-SPIDERVERSION = 4096
+SPIDERVERSION = 3074
+# SPIDERVERSION = 4096
 
 export CNVERSION
 export ROVERSION
@@ -140,6 +140,7 @@ clean:
 	@cd ro_initial_code && make clean
 	@cd ro_initial_rop && make clean
 	@cd spider_code && make clean
+	@cd spider_hook_rop && make clean
 	@cd spider_initial_rop && make clean
 	@cd spider_thread0_rop && make clean
 	@echo "all cleaned up !"

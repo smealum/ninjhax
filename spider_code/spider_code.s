@@ -70,30 +70,30 @@
 	ldr r1, =0x00000000
 	.word 0xEF00000A ; sleep
 
-	;unmap memory blocks
-		;addr 0x10000000
-			ldr r0, =SPIDER_HIDMEMHANDLE_ADR
-			ldr r0, [r0] ; handle
-			ldr r1, =0x10000000 ; addr
+	; ;unmap memory blocks
+	; 	;addr 0x10000000
+	; 		ldr r0, =SPIDER_HIDMEMHANDLE_ADR
+	; 		ldr r0, [r0] ; handle
+	; 		ldr r1, =0x10000000 ; addr
 
-			.word 0xEF000020 ; svc 0x20 (UnmapMemoryBlock)
+	; 		.word 0xEF000020 ; svc 0x20 (UnmapMemoryBlock)
 
-			;induce crash if there's an error
-			cmp r0, #0
-			ldrne r1, =0xCAFE0062
-			ldrne r1, [r1]
+	; 		;induce crash if there's an error
+	; 		cmp r0, #0
+	; 		ldrne r1, =0xCAFE0062
+	; 		ldrne r1, [r1]
 
-		;addr 0x10002000
-			ldr r0, =SPIDER_GSPMEMHANDLE_ADR
-			ldr r0, [r0] ; handle
-			ldr r1, =0x10002000 ; addr
+	; 	;addr 0x10002000
+	; 		ldr r0, =SPIDER_GSPMEMHANDLE_ADR
+	; 		ldr r0, [r0] ; handle
+	; 		ldr r1, =0x10002000 ; addr
 
-			.word 0xEF000020 ; svc 0x20 (UnmapMemoryBlock)
+	; 		.word 0xEF000020 ; svc 0x20 (UnmapMemoryBlock)
 
-			;induce crash if there's an error
-			cmp r0, #0
-			ldrne r1, =0xCAFE0063
-			ldrne r1, [r1]
+	; 		;induce crash if there's an error
+	; 		cmp r0, #0
+	; 		ldrne r1, =0xCAFE0063
+	; 		ldrne r1, [r1]
 
 	; ;bruteforce-close all handles
 	; 	;scanning data and .bss sections for handles (and closing them)
