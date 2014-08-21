@@ -363,22 +363,22 @@ thread0rop:
 
 	.align 0x4
 	croPatch700:
-	.incbin "../../build/cro/patch700.bin"
+	.incbin "../../build/cro/patch1.bin"
 	croPatch700_end:
 
 	.align 0x4
 	croPatch2000:
-	.incbin "../../build/cro/patch2000.bin"
+	.incbin "../../build/cro/patch2.bin"
 	croPatch2000_end:
 
 	.align 0x4
 	croPatch1D9020:
-	.incbin "../../build/cro/patch1D9020.bin"
+	.incbin "../../build/cro/patch3.bin"
 	croPatch1D9020_end:
 
 	.align 0x4
 	croPatch1DBA90:
-	.incbin "../../build/cro/patch1DBA90.bin"
+	.incbin "../../build/cro/patch4.bin"
 	croPatch1DBA90_end:
 
 	.align 0x4
