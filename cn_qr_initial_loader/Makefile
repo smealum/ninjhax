@@ -16,7 +16,8 @@ all: cn_qr_initial_loader.bin.png
 
 clean:
 	@rm -f cn_qr_initial_loader.bin.png
-	@cd $(CNVERSION) && make clean
+	@cd WEST && make clean
+	@cd JPN && make clean
 	@echo "all cleaned up !"
 
 cn_qr_initial_loader.bin.png:

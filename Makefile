@@ -10,6 +10,9 @@ ifeq ($(filter $(DEVKITARM)/bin,$(PATH)),)
 export PATH:=$(DEVKITARM)/bin:$(PATH)
 endif
 
+FIRMVERSION = OLD_MEMMAP
+# FIRMVERSION = NEW_MEMMAP
+
 CNVERSION = WEST
 # CNVERSION = JPN
 # ROVERSION = 1024
@@ -19,13 +22,14 @@ ROVERSION = 2049
 SPIDERVERSION = 3074
 # SPIDERVERSION = 4096
 
+export FIRMVERSION
 export CNVERSION
 export ROVERSION
 export SPIDERVERSION
 
 SCRIPTS = "scripts"
 
-.PHONY: directories all build/constants ro_constants/constants.txt spider_constants/constants.txt cn_constants/constants.txt cn_qr_initial_loader/cn_qr_initial_loader.bin.png cn_save_initial_loader/cn_save_initial_loader.bin cn_secondary_payload/cn_secondary_payload.bin cn_bootloader/cn_bootloader.bin spider_initial_rop/spider_initial_rop.bin spider_thread0_rop/spider_thread0_rop.bin oss_cro/out_oss.cro build/ro_initial_code.bin build/ro_initial_rop.bin build/spider_code.bin
+.PHONY: directories all build/constants firm_constants/constants.txt ro_constants/constants.txt spider_constants/constants.txt cn_constants/constants.txt cn_qr_initial_loader/cn_qr_initial_loader.bin.png cn_save_initial_loader/cn_save_initial_loader.bin cn_secondary_payload/cn_secondary_payload.bin cn_bootloader/cn_bootloader.bin spider_initial_rop/spider_initial_rop.bin spider_thread0_rop/spider_thread0_rop.bin oss_cro/out_oss.cro build/ro_initial_code.bin build/ro_initial_rop.bin build/spider_code.bin
 
 all: directories build/constants build/cn_qr_initial_loader.bin.png build/cn_save_initial_loader.bin build/cn_secondary_payload.bin
 	@cp build/cn_qr_initial_loader.bin.png ./
@@ -34,6 +38,8 @@ all: directories build/constants build/cn_qr_initial_loader.bin.png build/cn_sav
 directories:
 	@mkdir -p build && mkdir -p build/cro
 
+firm_constants/constants.txt:
+	@cd firm_constants && make
 ro_constants/constants.txt:
 	@cd ro_constants && make
 spider_constants/constants.txt:
@@ -41,7 +47,7 @@ spider_constants/constants.txt:
 cn_constants/constants.txt:
 	@cd cn_constants && make
 
-build/constants: ro_constants/constants.txt spider_constants/constants.txt cn_constants/constants.txt
+build/constants: firm_constants/constants.txt ro_constants/constants.txt spider_constants/constants.txt cn_constants/constants.txt
 	@python $(SCRIPTS)/makeHeaders.py build/constants $^
 
 build/cn_qr_initial_loader.bin.png: cn_qr_initial_loader/cn_qr_initial_loader.bin.png
@@ -128,6 +134,7 @@ spider_code/spider_code.bin:
 
 clean:
 	@rm -rf build/*
+	@cd firm_constants && make clean
 	@cd cn_constants && make clean
 	@cd ro_constants && make clean
 	@cd spider_constants && make clean
