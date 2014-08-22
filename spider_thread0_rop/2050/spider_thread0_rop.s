@@ -204,8 +204,8 @@ thread0rop:
 	;patch cro (0x700 patch) (ro code)
 		.word 0x0028270c ; pop {r0, r1, r2, r3, r4, pc}
 			.word SPIDER_CROLOCATION+0x700 ; r0 (dst)
-			.word SPIDER_THREAD0ROP_VADR+croPatch700 ; r1 (src)
-			.word croPatch700_end-croPatch700  ; r2 (size)
+			.word SPIDER_THREAD0ROP_VADR+croPatch1 ; r1 (src)
+			.word croPatch1_end-croPatch1  ; r2 (size)
 			.word 0xDEADC0DE ; r3 (garbage)
 			.word 0xDEADC0DE ; r4 (garbage)
 		.word 0x00240B5C ; memcpy (ends in LDMFD   SP!, {R4-R10,LR})
@@ -220,8 +220,8 @@ thread0rop:
 	;patch cro (0x2000 patch) (spider code)
 		.word 0x0028270c ; pop {r0, r1, r2, r3, r4, pc}
 			.word SPIDER_CROLOCATION+0x2000 ; r0 (dst)
-			.word SPIDER_THREAD0ROP_VADR+croPatch2000 ; r1 (src)
-			.word croPatch2000_end-croPatch2000  ; r2 (size)
+			.word SPIDER_THREAD0ROP_VADR+croPatch2 ; r1 (src)
+			.word croPatch2_end-croPatch2  ; r2 (size)
 			.word 0xDEADC0DE ; r3 (garbage)
 			.word 0xDEADC0DE ; r4 (garbage)
 		.word 0x00240B5C ; memcpy (ends in LDMFD   SP!, {R4-R10,LR})
@@ -236,8 +236,8 @@ thread0rop:
 	;patch cro (0x1D9020 patch) (rohax stuff)
 		.word 0x0028270c ; pop {r0, r1, r2, r3, r4, pc}
 			.word SPIDER_CROLOCATION+0x1D9020 ; r0 (dst)
-			.word SPIDER_THREAD0ROP_VADR+croPatch1D9020 ; r1 (src)
-			.word croPatch1D9020_end-croPatch1D9020  ; r2 (size)
+			.word SPIDER_THREAD0ROP_VADR+croPatch3 ; r1 (src)
+			.word croPatch3_end-croPatch3  ; r2 (size)
 			.word 0xDEADC0DE ; r3 (garbage)
 			.word 0xDEADC0DE ; r4 (garbage)
 		.word 0x00240B5C ; memcpy (ends in LDMFD   SP!, {R4-R10,LR})
@@ -252,8 +252,8 @@ thread0rop:
 	;patch cro (0x1DBA90 patch) (rohax stuff)
 		.word 0x0028270c ; pop {r0, r1, r2, r3, r4, pc}
 			.word SPIDER_CROLOCATION+0x1DBA90 ; r0 (dst)
-			.word SPIDER_THREAD0ROP_VADR+croPatch1DBA90 ; r1 (src)
-			.word croPatch1DBA90_end-croPatch1DBA90  ; r2 (size)
+			.word SPIDER_THREAD0ROP_VADR+croPatch4 ; r1 (src)
+			.word croPatch4_end-croPatch4  ; r2 (size)
 			.word 0xDEADC0DE ; r3 (garbage)
 			.word 0xDEADC0DE ; r4 (garbage)
 		.word 0x00240B5C ; memcpy (ends in LDMFD   SP!, {R4-R10,LR})
@@ -357,24 +357,24 @@ thread0rop:
 	croPatch0_end:
 
 	.align 0x4
-	croPatch700:
+	croPatch1:
 	.incbin "../../build/cro/patch1.bin"
-	croPatch700_end:
+	croPatch1_end:
 
 	.align 0x4
-	croPatch2000:
+	croPatch2:
 	.incbin "../../build/cro/patch2.bin"
-	croPatch2000_end:
+	croPatch2_end:
 
 	.align 0x4
-	croPatch1D9020:
+	croPatch3:
 	.incbin "../../build/cro/patch3.bin"
-	croPatch1D9020_end:
+	croPatch3_end:
 
 	.align 0x4
-	croPatch1DBA90:
+	croPatch4:
 	.incbin "../../build/cro/patch4.bin"
-	croPatch1DBA90_end:
+	croPatch4_end:
 
 	.align 0x4
 	fileObj:

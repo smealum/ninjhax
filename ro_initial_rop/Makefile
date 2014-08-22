@@ -16,7 +16,10 @@ all: ro_initial_rop.bin
 
 clean:
 	@rm -f ro_initial_rop.bin
-	@cd $(ROVERSION) && make clean
+	@cd 1024 && make clean
+	@cd 2049 && make clean
+	@cd 3074 && make clean
+	@cd 4096 && make clean
 	@echo "all cleaned up !"
 
 ro_initial_rop.bin:

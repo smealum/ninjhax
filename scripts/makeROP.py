@@ -13,10 +13,10 @@ def putWord(b, k, v, n=4):
 		b[k+c]=(v>>(c*8))&0xFF
 
 def writeRelocationPatch(b, i, a, v, s=0x1):
-	k=0x1DBA90+i*0xC
+	k=CRO_PATCH4_OFFSET+i*0xC
 	putWord(b, k+0x0, (a<<4)|s)
 	putWord(b, k+0x4, 0x00000302)
-	putWord(b, k+0x8, v-0x08381050)
+	putWord(b, k+0x8, v-CRO_RELOCATION_OFFSET)
 
 ropfn=sys.argv[1]
 crofn=sys.argv[2]
@@ -26,10 +26,12 @@ ropdata=bytearray(open(ropfn,"rb").read())
 crodata=bytearray(open(crofn,"rb").read())
 
 #make segment2 just a bit larger so we can modify the segment table with relocation patches
-putWord(crodata, 0x1D9020, 0x4C000)
+putWord(crodata, CRO_PATCH3_OFFSET, CRO_SEGMENT2_SIZE)
+
+segmentLocation=getWord(crodata, CRO_PATCH3_OFFSET-0x4)
 
 #patch to change segment1's address
-writeRelocationPatch(crodata, 0, 0x4B010, RO_ROP_START, 0x2)
+writeRelocationPatch(crodata, 0, (CRO_PATCH3_OFFSET-0x10)-segmentLocation, RO_ROP_START, 0x2)
 
 #actual ROP
 i=1
