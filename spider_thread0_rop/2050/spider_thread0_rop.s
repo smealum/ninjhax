@@ -185,9 +185,9 @@ thread0rop:
 			.word 0xDEADC0DE ; r8 (garbage)
 			.word 0xDEADC0DE ; r9 (garbage)
 
-	;patch cro (0x0 patch) (hashes)
+	;patch cro (hashes)
 		.word 0x0028270c ; pop {r0, r1, r2, r3, r4, pc}
-			.word SPIDER_CROLOCATION+0x0 ; r0 (dst)
+			.word SPIDER_CROLOCATION+CRO_PATCH0_OFFSET ; r0 (dst)
 			.word SPIDER_THREAD0ROP_VADR+croPatch0 ; r1 (src)
 			.word croPatch0_end-croPatch0  ; r2 (size)
 			.word 0xDEADC0DE ; r3 (garbage)
@@ -201,9 +201,9 @@ thread0rop:
 			.word 0xDEADC0DE ; r9 (garbage)
 			.word 0xDEADC0DE ; r10 (garbage)
 
-	;patch cro (0x700 patch) (ro code)
+	;patch cro (ro code)
 		.word 0x0028270c ; pop {r0, r1, r2, r3, r4, pc}
-			.word SPIDER_CROLOCATION+0x700 ; r0 (dst)
+			.word SPIDER_CROLOCATION+CRO_PATCH1_OFFSET ; r0 (dst)
 			.word SPIDER_THREAD0ROP_VADR+croPatch1 ; r1 (src)
 			.word croPatch1_end-croPatch1  ; r2 (size)
 			.word 0xDEADC0DE ; r3 (garbage)
@@ -217,9 +217,9 @@ thread0rop:
 			.word 0xDEADC0DE ; r9 (garbage)
 			.word 0xDEADC0DE ; r10 (garbage)
 
-	;patch cro (0x2000 patch) (spider code)
+	;patch cro (spider code)
 		.word 0x0028270c ; pop {r0, r1, r2, r3, r4, pc}
-			.word SPIDER_CROLOCATION+0x2000 ; r0 (dst)
+			.word SPIDER_CROLOCATION+CRO_PATCH2_OFFSET ; r0 (dst)
 			.word SPIDER_THREAD0ROP_VADR+croPatch2 ; r1 (src)
 			.word croPatch2_end-croPatch2  ; r2 (size)
 			.word 0xDEADC0DE ; r3 (garbage)
@@ -233,9 +233,9 @@ thread0rop:
 			.word 0xDEADC0DE ; r9 (garbage)
 			.word 0xDEADC0DE ; r10 (garbage)
 
-	;patch cro (0x1D9020 patch) (rohax stuff)
+	;patch cro (rohax stuff)
 		.word 0x0028270c ; pop {r0, r1, r2, r3, r4, pc}
-			.word SPIDER_CROLOCATION+0x1D9020 ; r0 (dst)
+			.word SPIDER_CROLOCATION+CRO_PATCH3_OFFSET ; r0 (dst)
 			.word SPIDER_THREAD0ROP_VADR+croPatch3 ; r1 (src)
 			.word croPatch3_end-croPatch3  ; r2 (size)
 			.word 0xDEADC0DE ; r3 (garbage)
@@ -249,9 +249,9 @@ thread0rop:
 			.word 0xDEADC0DE ; r9 (garbage)
 			.word 0xDEADC0DE ; r10 (garbage)
 
-	;patch cro (0x1DBA90 patch) (rohax stuff)
+	;patch cro (rohax stuff)
 		.word 0x0028270c ; pop {r0, r1, r2, r3, r4, pc}
-			.word SPIDER_CROLOCATION+0x1DBA90 ; r0 (dst)
+			.word SPIDER_CROLOCATION+CRO_PATCH4_OFFSET ; r0 (dst)
 			.word SPIDER_THREAD0ROP_VADR+croPatch4 ; r1 (src)
 			.word croPatch4_end-croPatch4  ; r2 (size)
 			.word 0xDEADC0DE ; r3 (garbage)
