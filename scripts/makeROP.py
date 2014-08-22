@@ -3,8 +3,6 @@ import os
 sys.path.append(os.path.abspath(os.path.dirname(os.path.abspath(__file__))+"/../build/"))
 from constants import *
 
-#values for oss.cro in 7.1-16E
- 
 def getWord(b, k, n=4):
 	return sum(list(map(lambda c: b[k+c]<<(c*8),range(n))))
  
