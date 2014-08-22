@@ -311,23 +311,27 @@ int main()
 
 		_GSPGPU_AcquireRight(*gspHandle, 0x0); //get in line for gsp rights
 
+		//need to sleep longer on 4.x ?
 		svc_sleepThread(1000000000); //sleep long enough for spider to startup
 
 		//read spider memory
 		{
-			doGspwn((u32*)0x18CEC000, (u32*)0x14000000, 0x00000200);
+			_GSPGPU_FlushDataCache(gspHandle, 0xFFFF8001, (u32*)0x14100000, 0x00000200);
+			doGspwn((u32*)(SPIDER_HOOKROP_PADR-0x0C000000), (u32*)0x14100000, 0x00000200);
 		}
 
 		svc_sleepThread(1000000); //sleep long enough for memory to be read
 
 		//patch memdump and write it
 		{
-			((u8*)0x14000000)[0x14]=0xFF;
-			memcpy(((u8*)0x14000174), spider_hook_rop_bin, 0xC);
-			_GSPGPU_FlushDataCache(gspHandle, 0xFFFF8001, (u32*)0x14000000, 0x01000000);
+			((u8*)0x14100000)[0x14]=0xFF;
+			memcpy(((u8*)(0x14100000+SPIDER_HOOKROP_OFFSET)), spider_hook_rop_bin, 0xC);
+			_GSPGPU_FlushDataCache(gspHandle, 0xFFFF8001, (u32*)0x14100000, 0x00000200);
 
-			doGspwn((u32*)0x14000000, (u32*)0x18CEC000, 0x00000200);
+			doGspwn((u32*)0x14100000, (u32*)(SPIDER_HOOKROP_PADR-0x0C000000), 0x00000200);
 		}
+
+		svc_sleepThread(100000000);
 
 		{
 			memset((u8*)0x14100000, 0x00, 0x2000);
@@ -336,6 +340,8 @@ int main()
 
 			doGspwn((u32*)0x14100000, (u32*)(SPIDER_INITIALROP_PADR-0x0C000000), 0x1000);
 		}
+
+		svc_sleepThread(100000000);
 
 		{
 			memset((u8*)0x14100000, 0x00, 0x2000);

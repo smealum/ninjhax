@@ -272,24 +272,31 @@ int _main()
 	
 	Handle httpcHandle2;
 	ret=_srv_getServiceHandle(srvHandle, &httpcHandle2, "http:C");
+	if(ret)*(u32*)NULL=0xC0DE0001;
 
 	ret=HTTPC_InitializeConnectionSession(httpcHandle2, httpContextHandle);
+	if(ret)*(u32*)NULL=0xC0DE0002;
 	ret=HTTPC_SetProxyDefault(httpcHandle2, httpContextHandle);
+	if(ret)*(u32*)NULL=0xC0DE0003;
 
 	// drawHex(ret,0,line+=10);
 
 	ret=HTTPC_BeginRequest(httpcHandle2, httpContextHandle);
+	if(ret)*(u32*)NULL=0xC0DE0004;
 
 	// drawHex(ret,0,line+=10);
 
 	u8* buffer=(u8*)0x14100000;
 	u32 secondaryPayloadSize=0x0;
 	ret=HTTPC_ReceiveData(httpcHandle2, httpContextHandle, buffer, 0x300000);
+	if(ret)*(u32*)NULL=0xC0DE0005;
 	ret=HTTPC_GetDownloadSizeState(httpcHandle2, httpContextHandle, &secondaryPayloadSize);
+	if(ret)*(u32*)NULL=0xC0DE0006;
 
 	// drawHex(ret,0,line+=10);
 
 	HTTPC_CloseContext(httpcHandle2, httpContextHandle);
+	if(ret)*(u32*)NULL=0xC0DE0007;
 
 	//TODO : modify key/parray first ?
 	//(use some of its slots as variables in ROP to confuse people ?)
