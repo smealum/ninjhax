@@ -73,7 +73,7 @@
 		add r8, #0x80
 
 		;make the spider CRO region RWX under spider as well
-		ldr r6, =0x216 ; oss.cro size in pages -1
+		ldr r6, =(CRO_SIZE>>12)-1 ; oss.cro size in pages -1
 
 		croProtectLoop:
 			ldr r0, =RO_SPIDERHANDLE_LOCATION
@@ -96,7 +96,7 @@
 			bge croProtectLoop
 
 		;make the spider .text region RWX under spider as well
-		ldr r6, =0x26D+0x64+0x18+0x57-1 ; .text size in pages -1
+		ldr r6, =SPIDER_TOTAL_PAGES-1 ; .text size in pages -1
 
 		textProtectLoop:
 			ldr r0, =RO_SPIDERHANDLE_LOCATION
