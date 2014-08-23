@@ -56,7 +56,7 @@ cn_constants/constants.txt:
 	@cd cn_constants && make
 
 build/constants: firm_constants/constants.txt ro_constants/constants.txt spider_constants/constants.txt cn_constants/constants.txt
-	@python $(SCRIPTS)/makeHeaders.py $(FIRMVERSION) $(CNVERSION) $(ROVERSION) $(SPIDERVERSION) build/constants $^
+	@python $(SCRIPTS)/makeHeaders.py $(FIRMVERSION) $(CNVERSION) $(SPIDERVERSION) $(ROVERSION) build/constants $^
 
 build/cn_qr_initial_loader.bin.png: cn_qr_initial_loader/cn_qr_initial_loader.bin.png
 	@cp cn_qr_initial_loader/cn_qr_initial_loader.bin.png build
