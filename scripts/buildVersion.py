@@ -7,7 +7,7 @@ def getRoVersion(v):
 		return "0"
 	elif v[0]<5:
 		return "1024"
-	elif not(v[0]>=7 and v[1]>=2):
+	elif not(v[0]>=7 and v[1]>=2) and v[0]<=7:
 		return "2049"
 	elif v[0]<8:
 		return "3074"
@@ -51,6 +51,5 @@ if r:
 	v=(cverMajor, cverMinor, cverMicro, nupVersion, nupRegion)
 	os.system("make clean")	
 	os.system("make CNVERSION="+getCnVersion(v)+" ROVERSION="+getRoVersion(v)+" SPIDERVERSION="+getSpiderVersion(v)+" FIRMVERSION="+getFirmVersion(v))
-	# print(getFirmVersion(v)+" "+getCnVersion(v)+" "+getSpiderVersion(v)+" "+getRoVersion(v))
 else:
 	print("invalid version format; learn2read.")
