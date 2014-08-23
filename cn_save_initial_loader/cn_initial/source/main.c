@@ -4,7 +4,10 @@
 #include <ctr/types.h>
 #include <ctr/srv.h>
 #include <ctr/svc.h>
+#include <ctr/FS.h>
 #include "text.h"
+
+#include "../../../build/constants.h"
 
 #define TEXTPAOFFSET 0x03E00000
 
@@ -22,131 +25,6 @@ void _strcpy(char* dst, char* src)
 {
 	while(*src)*(dst++)=*(src++);
 	*dst=0x00;
-}
-
-//?
-Result HTTPC_Initialize(Handle handle)
-{
-	u32* cmdbuf=getThreadCommandBuffer();
-
-	cmdbuf[0]=0x10044; //request header code
-	cmdbuf[1]=0x1000; //unk
-	cmdbuf[2]=0x20; //unk
-	
-	Result ret=0;
-	if((ret=svc_sendSyncRequest(handle)))return ret;
-
-	return cmdbuf[1];
-}
-
-Result HTTPC_CreateContext(Handle handle, char* url, Handle* contextHandle)
-{
-	u32* cmdbuf=getThreadCommandBuffer();
-	u32 l=_strlen(url)+1;
-
-	cmdbuf[0]=0x20082; //request header code
-	cmdbuf[1]=l;
-	cmdbuf[2]=0x01; //unk
-	cmdbuf[3]=(l<<4)|0xA;
-	cmdbuf[4]=(u32)url;
-	
-	Result ret=0;
-	if((ret=svc_sendSyncRequest(handle)))return ret;
-	
-	if(contextHandle)*contextHandle=cmdbuf[2];
-
-	return cmdbuf[1];
-}
-
-Result HTTPC_InitializeConnectionSession(Handle handle, Handle contextHandle)
-{
-	u32* cmdbuf=getThreadCommandBuffer();
-
-	cmdbuf[0]=0x80042; //request header code
-	cmdbuf[1]=contextHandle;
-	cmdbuf[2]=0x20; //unk, fixed to that in code
-	
-	Result ret=0;
-	if((ret=svc_sendSyncRequest(handle)))return ret;
-
-	return cmdbuf[1];
-}
-
-Result HTTPC_SetProxyDefault(Handle handle, Handle contextHandle)
-{
-	u32* cmdbuf=getThreadCommandBuffer();
-
-	cmdbuf[0]=0xe0040; //request header code
-	cmdbuf[1]=contextHandle;
-	
-	Result ret=0;
-	if((ret=svc_sendSyncRequest(handle)))return ret;
-
-	return cmdbuf[1];
-}
-
-Result HTTPC_CloseContext(Handle handle, Handle contextHandle)
-{
-	u32* cmdbuf=getThreadCommandBuffer();
-
-	cmdbuf[0]=0x30040; //request header code
-	cmdbuf[1]=contextHandle;
-	
-	Result ret=0;
-	if((ret=svc_sendSyncRequest(handle)))return ret;
-
-	return cmdbuf[1];
-}
-
-// Result HTTPC_AddRequestHeaderField(Handle handle, Handle contextHandle, char* name, char* value)
-// {
-// 	u32* cmdbuf=getThreadCommandBuffer();
-
-// 	int l1=_strlen(name)+1;
-// 	int l2=_strlen(value)+1;
-
-// 	cmdbuf[0]=0x1100c4; //request header code
-// 	cmdbuf[1]=contextHandle;
-// 	cmdbuf[2]=l1;
-// 	cmdbuf[3]=l2;
-// 	cmdbuf[4]=(l1<<14)|0xC02;
-// 	cmdbuf[5]=(u32)name;
-// 	cmdbuf[6]=(l1<<4)|0xA;
-// 	cmdbuf[7]=(u32)value;
-	
-// 	Result ret=0;
-// 	if((ret=svc_sendSyncRequest(handle)))return ret;
-
-// 	return cmdbuf[1];
-// }
-
-Result HTTPC_BeginRequest(Handle handle, Handle contextHandle)
-{
-	u32* cmdbuf=getThreadCommandBuffer();
-
-	cmdbuf[0]=0x90040; //request header code
-	cmdbuf[1]=contextHandle;
-	
-	Result ret=0;
-	if((ret=svc_sendSyncRequest(handle)))return ret;
-
-	return cmdbuf[1];
-}
-
-Result HTTPC_ReceiveData(Handle handle, Handle contextHandle, u8* buffer, u32 size)
-{
-	u32* cmdbuf=getThreadCommandBuffer();
-
-	cmdbuf[0]=0xB0082; //request header code
-	cmdbuf[1]=contextHandle;
-	cmdbuf[2]=size;
-	cmdbuf[3]=(size<<4)|12;
-	cmdbuf[4]=(u32)buffer;
-	
-	Result ret=0;
-	if((ret=svc_sendSyncRequest(handle)))return ret;
-
-	return cmdbuf[1];
 }
 
 Result _srv_getServiceHandle(Handle* handleptr, Handle* out, char* server)
@@ -214,23 +92,81 @@ void patchMem(Handle* gspHandle, u32 dst, u32 size, u32 start, u32 end)
 	Result (*_GSPGPU_FlushDataCache)(Handle* handle, Handle kprocess, u32* addr, u32 size)=(void*)0x002D15D4;
 
 	int i;
+	_GSPGPU_FlushDataCache(gspHandle, 0xFFFF8001, (u32*)0x14100000, 0x200);
 	doGspwn((u32*)(dst), (u32*)(0x14100000), 0x200);
-	svc_sleepThread(0x100000);
+	svc_sleepThread(0x1000000);
 	for(i=start;i<end;i++)((u32*)0x14100000)[i]=0xEF000009;
 	_GSPGPU_FlushDataCache(gspHandle, 0xFFFF8001, (u32*)0x14100000, 0x200);
 	doGspwn((u32*)(0x14100000), (u32*)(dst), 0x200);
-	svc_sleepThread(0x100000);
+	svc_sleepThread(0x1000000);
+}
+
+Result _FSUSER_OpenFileDirectly(Handle* handle, Handle* out, FS_archive archive, FS_path fileLowPath, u32 openflags, u32 attributes) //no need to have archive opened
+{
+	u32* cmdbuf=getThreadCommandBuffer();
+
+	cmdbuf[0]=0x08030204;
+	cmdbuf[1]=0;
+	cmdbuf[2]=archive.id;
+	cmdbuf[3]=archive.lowPath.type;
+	cmdbuf[4]=archive.lowPath.size;
+	cmdbuf[5]=fileLowPath.type;
+	cmdbuf[6]=fileLowPath.size;
+	cmdbuf[7]=openflags;
+	cmdbuf[8]=attributes;
+	cmdbuf[9]=(archive.lowPath.size<<14)|0x802;
+	cmdbuf[10]=(u32)archive.lowPath.data;
+	cmdbuf[11]=(fileLowPath.size<<14)|2;
+	cmdbuf[12]=(u32)fileLowPath.data;
+ 
+	Result ret=0;
+	if((ret=svc_sendSyncRequest(*handle)))return ret;
+ 
+	if(out)*out=cmdbuf[3];
+ 
+	return cmdbuf[1];
+}
+
+Result _FSFILE_Close(Handle handle)
+{
+	u32* cmdbuf=getThreadCommandBuffer();
+
+	cmdbuf[0]=0x08080000;
+
+	Result ret=0;
+	if((ret=svc_sendSyncRequest(handle)))return ret;
+
+	return cmdbuf[1];
+}
+
+Result _FSFILE_Read(Handle handle, u32 *bytesRead, u64 offset, u32 *buffer, u32 size)
+{
+	u32 *cmdbuf=getThreadCommandBuffer();
+ 
+	cmdbuf[0]=0x080200C2;
+	cmdbuf[1]=(u32)offset;
+	cmdbuf[2]=(u32)(offset>>32);
+	cmdbuf[3]=size;
+	cmdbuf[4]=(size<<4)|12;
+	cmdbuf[5]=(u32)buffer;
+ 
+	Result ret=0;
+	if((ret=svc_sendSyncRequest(handle)))return ret;
+
+	if(bytesRead)*bytesRead=cmdbuf[2];
+
+	return cmdbuf[1];
 }
 
 int _main()
 {
-	Handle* gspHandle=(Handle*)0x00334F28;
-	Result (*_GSPGPU_FlushDataCache)(Handle* handle, Handle kprocess, u32* addr, u32 size)=(void*)0x002D15D4;
+	Handle* gspHandle=(Handle*)CN_GSPHANDLE_ADR;
+	Result (*_GSPGPU_FlushDataCache)(Handle* handle, Handle kprocess, u32* addr, u32 size)=(void*)CN_GSPGPU_FlushDataCache_ADR;
 
 	// drawString(TOPFBADR1,"ninjhaxx",0,0);
 	// drawString(TOPFBADR2,"ninjhaxx",0,0);
 
-	Handle* srvHandle=(Handle*)0x334F6C;
+	Handle* srvHandle=(Handle*)CN_SRVHANDLE_ADR;
 
 	int line=10;
 	Result ret;
@@ -239,15 +175,13 @@ int _main()
 
 	//close threads
 		//patch waitSyncN
-		// patchMem(gspHandle, 0x14000000+TEXTPAOFFSET+0x000EBE00, 0x200, 0x5, 0xE);
-		// patchMem(gspHandle, 0x14000000+TEXTPAOFFSET+0x000EBE00, 0x200, 0x9, 0xE);
-		patchMem(gspHandle, 0x14000000+TEXTPAOFFSET+0x00192200, 0x200, 0x19, 0x4F);
-		patchMem(gspHandle, 0x14000000+TEXTPAOFFSET+0x00192600, 0x200, 0x7, 0x13);
-		patchMem(gspHandle, 0x14000000+TEXTPAOFFSET+0x001CA200, 0x200, 0xB, 0x1E);
-		patchMem(gspHandle, 0x14000000+TEXTPAOFFSET+0x000C6100, 0x200, 0x3C, 0x52);
+		patchMem(gspHandle, 0x14000000+CN_TEXTPAOFFSET+0x00192200, 0x200, 0x19, 0x4F);
+		patchMem(gspHandle, 0x14000000+CN_TEXTPAOFFSET+0x00192600, 0x200, 0x7, 0x13);
+		patchMem(gspHandle, 0x14000000+CN_TEXTPAOFFSET+0x001CA200, 0x200, 0xB, 0x1E);
+		patchMem(gspHandle, 0x14000000+CN_TEXTPAOFFSET+0x000C6100, 0x200, 0x3C, 0x52);
 
 		//patch arbitrateAddress
-		patchMem(gspHandle, 0x14000000+TEXTPAOFFSET+0x001C9E00, 0x200, 0x14, 0x40);
+		patchMem(gspHandle, 0x14000000+CN_TEXTPAOFFSET+0x001C9E00, 0x200, 0x14, 0x40);
 
 		//close handles
 		ret=svc_closeHandle(*((Handle*)0x359938));
@@ -261,48 +195,33 @@ int _main()
 		svc_signalEvent(((Handle*)0x3480d0)[2]);
 		s32 out; svc_releaseSemaphore(&out, *(Handle*)0x357490, 1);
 
+	svc_sleepThread(0x10000000);
 
+	//load secondary payload
+	u32 secondaryPayloadSize;
+	{
+		Result ret;
+		Handle* fsuHandle=(Handle*)CN_FSHANDLE_ADR;
+		FS_archive saveArchive=(FS_archive){0x00000004, (FS_path){PATH_EMPTY, 1, (u8*)""}};
 
-	Handle httpcHandle;
-	ret=_srv_getServiceHandle(srvHandle, &httpcHandle, "http:C");
+		//write secondary payload file
+		Handle fileHandle;
+		ret=_FSUSER_OpenFileDirectly(fsuHandle, &fileHandle, saveArchive, FS_makePath(PATH_CHAR, "/edit/payload.bin"), FS_OPEN_READ, FS_ATTRIBUTE_NONE);
+		if(ret)*(u32*)NULL=0xC0DF0002;
+		ret=_FSFILE_Read(fileHandle, &secondaryPayloadSize, 0x0, (u32*)0x14100000, 0xA000);
+		if(ret)*(u32*)NULL=0xC0DF0003;
+		ret=_FSFILE_Close(fileHandle);
+		if(ret)*(u32*)NULL=0xC0DF0004;
+	}
 
-	// drawHex(ret,0,line+=10);
-	// drawHex(httpcHandle,0,line+=10);
+	//decrypt it
+	{
+		Result (*blowfishKeyScheduler)(u32* dst)=(void*)0x001A44BC;
+		Result (*blowfishDecrypt)(u32* blowfishKeyData, u32* src, u32* dst, u32 size)=(void*)0x001A4B04;
 
-	Handle httpContextHandle=0x00;
-
-	ret=HTTPC_Initialize(httpcHandle);
-
-	// drawHex(ret,0,line+=10);
-
-	ret=HTTPC_CreateContext(httpcHandle,"http://smealum.net/ninjhax//cn_secondary_payload.bin", &httpContextHandle);
-
-	// drawHex(ret,0,line+=10);
-	
-	Handle httpcHandle2;
-	ret=_srv_getServiceHandle(srvHandle, &httpcHandle2, "http:C");
-
-	ret=HTTPC_InitializeConnectionSession(httpcHandle2, httpContextHandle);
-	ret=HTTPC_SetProxyDefault(httpcHandle2, httpContextHandle);
-
-	// drawHex(ret,0,line+=10);
-
-	// // ret=HTTPC_AddRequestHeaderField(httpcHandle2, httpContextHandle, "User-Agent", "CTR AC/02");
-	// // ret=HTTPC_AddRequestHeaderField(httpcHandle2, httpContextHandle, "Content-Type", "text/html");
-	// // ret=HTTPC_AddRequestHeaderField(httpcHandle2, httpContextHandle, "Connection", "Close");
-	
-	// drawHex(ret,0,line+=10);
-
-	ret=HTTPC_BeginRequest(httpcHandle2, httpContextHandle);
-
-	// drawHex(ret,0,line+=10);
-
-	u8* buffer=(u8*)0x14100000;
-	ret=HTTPC_ReceiveData(httpcHandle2, httpContextHandle, buffer, 0x300000);
-
-	// drawHex(ret,0,line+=10);
-
-	HTTPC_CloseContext(httpcHandle2, httpContextHandle);
+		blowfishKeyScheduler((u32*)0x14200000);
+		blowfishDecrypt((u32*)0x14200000, (u32*)0x14100000, (u32*)0x14100000, secondaryPayloadSize);
+	}
 
 	Result (*_DSP_UnloadComponent)(Handle* handle)=(void*)0x002BA368;
 	Handle** dspHandle=(Handle**)0x334EFC;
@@ -310,18 +229,14 @@ int _main()
 	_DSP_UnloadComponent(*dspHandle);
 
 	ret=_GSPGPU_FlushDataCache(gspHandle, 0xFFFF8001, (u32*)0x14100000, 0x300000);
-	// drawHex(ret,0,line+=10);
 
-	// doGspwn((u32*)(0x14100000), (u32*)(0x14000000+TEXTPAOFFSET), 0x001D9000);
 	doGspwn((u32*)(0x14100000), (u32*)(0x14000000+TEXTPAOFFSET), 0x0000A000);
 
 	svc_sleepThread(0x3B9ACA00);
 
-	// drawString(TOPFBADR1,"ninjhax2",100,0);
-	// drawString(TOPFBADR2,"ninjhax2",100,0);
 
-	void (*reset)(void)=(void*)0x00100000;
-	reset();
+	void (*reset)(int size)=(void*)0x00100000;
+	reset(0);
 
 	while(1);
 	return 0;

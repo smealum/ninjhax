@@ -67,12 +67,13 @@ cn_qr_initial_loader/cn_qr_initial_loader.bin.png:
 build/cn_save_initial_loader.bin: cn_save_initial_loader/cn_save_initial_loader.bin
 	@cp cn_save_initial_loader/cn_save_initial_loader.bin build
 cn_save_initial_loader/cn_save_initial_loader.bin:
-	@cd cn_qr_initial_loader && make
+	@cd cn_save_initial_loader && make
 
 
 build/cn_secondary_payload.bin: cn_secondary_payload/cn_secondary_payload.bin
 	@python $(SCRIPTS)/blowfish.py cn_secondary_payload/cn_secondary_payload.bin build/cn_secondary_payload.bin scripts
-cn_secondary_payload/cn_secondary_payload.bin: build/spider_hook_rop.bin build/spider_initial_rop.bin build/spider_thread0_rop.bin build/cn_bootloader.bin
+cn_secondary_payload/cn_secondary_payload.bin: build/cn_save_initial_loader.bin build/spider_hook_rop.bin build/spider_initial_rop.bin build/spider_thread0_rop.bin build/cn_bootloader.bin
+	@cp build/cn_save_initial_loader.bin cn_secondary_payload/data
 	@cp build/spider_hook_rop.bin cn_secondary_payload/data
 	@cp build/spider_initial_rop.bin cn_secondary_payload/data
 	@cp build/spider_thread0_rop.bin cn_secondary_payload/data

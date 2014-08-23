@@ -11,7 +11,7 @@ export PATH:=$(DEVKITARM)/bin:$(PATH)
 endif
 
 SCRIPTS = "../scripts"
-NAME = cn_qr_initial_loader
+NAME = cn_save_initial_loader
 
 .PHONY: all cn_initial/cn_initial.bin
 

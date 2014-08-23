@@ -11,6 +11,7 @@
 #include "spider_initial_rop_bin.h"
 #include "spider_thread0_rop_bin.h"
 #include "cn_bootloader_bin.h"
+#include "cn_save_initial_loader_bin.h"
 
 #include "../../build/constants.h"
 
@@ -97,13 +98,22 @@ void hex2str(char* out, u32 val)
 	out[8]=0x00;
 }
 
+void renderString(char* str, int x, int y)
+{
+	Handle* gspHandle=(Handle*)CN_GSPHANDLE_ADR;
+	Result (*_GSPGPU_FlushDataCache)(Handle* handle, Handle kprocess, u8* addr, u32 size)=(void*)CN_GSPGPU_FlushDataCache_ADR;
+	drawString(TOPFBADR1,str,x,y);
+	drawString(TOPFBADR2,str,x,y);
+	_GSPGPU_FlushDataCache(gspHandle, 0xFFFF8001, TOPFBADR1, 240*400*3);
+	_GSPGPU_FlushDataCache(gspHandle, 0xFFFF8001, TOPFBADR2, 240*400*3);
+}
+
 void drawHex(u32 val, int x, int y)
 {
 	char str[9];
 
 	hex2str(str,val);
-	drawString(TOPFBADR1,str,x,y);
-	drawString(TOPFBADR2,str,x,y);
+	renderString(str,x,y);
 }
 
 Result _APT_PrepareToStartSystemApplet(Handle handle, NS_APPID appId)
@@ -275,11 +285,89 @@ void bruteforceCloseHandle(u16 index, u32 maxCnt)
 	for(i=0;i<maxCnt;i++)if(!svc_closeHandle((index)|(i<<15)))return;
 }
 
-int main()
+//no idea what this does; apparently used to switch up save partitions
+Result FSUSER_ControlArchive(Handle handle, FS_archive archive)
+{
+	u32* cmdbuf=getThreadCommandBuffer();
+
+	u32 b1, b2;
+	((u8*)&b1)[0]=0x4e;
+	((u8*)&b2)[0]=0xe4;
+
+	cmdbuf[0]=0x080d0144;
+	cmdbuf[1]=archive.handleLow;
+	cmdbuf[2]=archive.handleHigh;
+	cmdbuf[3]=0x0;
+	cmdbuf[4]=0x1; //buffer1 size
+	cmdbuf[5]=0x1; //buffer1 size
+	cmdbuf[6]=0x1a;
+	cmdbuf[7]=(u32)&b1;
+	cmdbuf[8]=0x1c;
+	cmdbuf[9]=(u32)&b2;
+ 
+	Result ret=0;
+	if((ret=svc_sendSyncRequest(handle)))return ret;
+ 
+	return cmdbuf[1];
+}
+
+void installerScreen(u32 size)
+{
+	memset(TOPFBADR1, 0x00, 240*400*3);
+	memset(TOPFBADR2, 0x00, 240*400*3);
+
+	renderString("install the exploit to your savegame ?\nthis operation is reversible.\n    A : Yes \n    B : No  ",0,0);
+
+	while(1)
+	{
+		u32 PAD=((u32*)0x10000000)[7];
+		drawHex(PAD,100,100);
+		if(PAD&PAD_A)
+		{
+			//install
+			int line=40;
+			Result ret;
+			Handle fsuHandle=*(Handle*)CN_FSHANDLE_ADR;
+			FS_archive saveArchive=(FS_archive){0x00000004, (FS_path){PATH_EMPTY, 1, (u8*)""}};
+			ret=FSUSER_OpenArchive(fsuHandle, &saveArchive);
+			drawHex(ret,0,line+=10);
+
+			u32 totalWritten;
+			Handle fileHandle;
+
+			//write exploit map file
+			ret=FSUSER_OpenFile(fsuHandle, &fileHandle, saveArchive, FS_makePath(PATH_CHAR, "/edit/mslot0.map"), FS_OPEN_WRITE|FS_OPEN_CREATE, FS_ATTRIBUTE_NONE);
+			drawHex(ret,0,line+=10);
+			ret=FSFILE_Write(fileHandle, &totalWritten, 0x0, (u32*)cn_save_initial_loader_bin, cn_save_initial_loader_bin_size, 0x10001);
+			drawHex(ret,0,line+=10);
+			drawHex(totalWritten,0,line+=10);
+			ret=FSFILE_Close(fileHandle);
+			drawHex(ret,0,line+=10);
+
+			//write secondary payload file
+			ret=FSUSER_OpenFile(fsuHandle, &fileHandle, saveArchive, FS_makePath(PATH_CHAR, "/edit/payload.bin"), FS_OPEN_WRITE|FS_OPEN_CREATE, FS_ATTRIBUTE_NONE);
+			drawHex(ret,0,line+=10);
+			ret=FSFILE_Write(fileHandle, &totalWritten, 0x0, (u32*)0x14300000, size, 0x10001);
+			drawHex(ret,0,line+=10);
+			drawHex(totalWritten,0,line+=10);
+			ret=FSFILE_Close(fileHandle);
+			drawHex(ret,0,line+=10);
+
+			ret=FSUSER_ControlArchive(fsuHandle, saveArchive);
+			drawHex(ret,0,line+=10);
+			drawHex(0xDEAD0000,0,90);
+			break;
+		}else if(PAD&PAD_B)break;
+	}
+
+	memset(TOPFBADR1, 0x00, 240*400*3);
+	memset(TOPFBADR2, 0x00, 240*400*3);
+}
+
+int main(u32 size, char** argv)
 {
 	int line=10;
-	drawString(TOPFBADR1,"spiderto",0,line);
-	drawString(TOPFBADR2,"spiderto",0,line+=10);
+	renderString("spiderto",0,line+=10);
 
 	Handle* srvHandle=(Handle*)CN_SRVHANDLE_ADR;
 	Handle* gspHandle=(Handle*)CN_GSPHANDLE_ADR;
@@ -291,6 +379,8 @@ int main()
 	u8 recvbuf[0x1000];
 
 	Result (*_GSPGPU_FlushDataCache)(Handle* handle, Handle kprocess, u32* addr, u32 size)=(void*)CN_GSPGPU_FlushDataCache_ADR;
+
+	if(size)installerScreen(size);
 
 	{
 		u32 buf;
@@ -306,6 +396,7 @@ int main()
 			ret=_APT_StartSystemApplet(aptuHandle, APPID_WEB, &buf, 0, 0);
 		_aptCloseSession();
 		drawHex(ret,0,line+=10);
+		drawHex(size,0,line+=10);
 
 		svc_sleepThread(100000000); //sleep just long enough for menu to grab rights
 

@@ -6,7 +6,8 @@
 
 _start:
 	# blx __libc_init_array
-	mov r0, #0
+	# don't clear r0 in order to protect mode arg
+	# mov r0, #0
 	mov r1, #0
 	mov r2, #0
 	mov r3, #0
