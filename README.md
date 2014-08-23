@@ -10,6 +10,8 @@ to build :
 
 	for a single specific version :
 		python scripts/buildVersion.py "7.1.0-16E"
+	for ALL versions :
+		python scripts/buildAll.py
 
 
 extra files required to make :
