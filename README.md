@@ -8,7 +8,8 @@ to build :
 	setup CTRULIB env to point to libctru dir
 	setup DEVKITARM env to point to devkitARM dir
 
-	make
+	for a single specific version :
+		python scripts/buildVersion.py "7.1.0-16E"
 
 
 extra files required to make :
