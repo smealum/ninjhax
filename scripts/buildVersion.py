@@ -32,9 +32,9 @@ def getCnVersion(v):
 
 def getFirmVersion(v):
 	if v[0]<5:
-		return "OLD_MEMMAP"
+		return "PRE5"
 	else:
-		return "NEW_MEMMAP"
+		return "POST5"
 
 
 #format : "X.X.X-XR"
@@ -51,5 +51,6 @@ if r:
 	v=(cverMajor, cverMinor, cverMicro, nupVersion, nupRegion)
 	os.system("make clean")	
 	os.system("make CNVERSION="+getCnVersion(v)+" ROVERSION="+getRoVersion(v)+" SPIDERVERSION="+getSpiderVersion(v)+" FIRMVERSION="+getFirmVersion(v))
+	# print(getFirmVersion(v)+" "+getCnVersion(v)+" "+getSpiderVersion(v)+" "+getRoVersion(v))
 else:
 	print("invalid version format; learn2read.")

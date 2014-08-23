@@ -2,8 +2,8 @@ all: constants.txt
 
 clean:
 	@rm -f constants.txt
-	@cd OLD_MEMMAP && make clean
-	@cd NEW_MEMMAP && make clean
+	@cd PRE5 && make clean
+	@cd POST5 && make clean
 	@echo "all cleaned up !"
 
 constants.txt:
