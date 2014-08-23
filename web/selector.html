@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title> firmware version selector </title>
+
+  <link rel="stylesheet" type="text/css" href="/css/result-light.css">
+  
+  <style type='text/css'>
+    .firmware-form {
+        margin-top:300px;
+        text-align:center;
+        font-size:26px;
+    }
+    .firmware-form select {
+        width:50px;
+        height:50px;
+        font-size:26px;
+        text-align:center;
+    }
+    .firmware-form button {
+        display:block;
+        margin:50px auto 0;
+    }
+  </style>
+  
+
+
+<script type='text/javascript'>//<![CDATA[ 
+window.onload=function(){
+;
+(function () {
+    'use strict';
+
+    var regions = {
+        'E' : {},
+        'U' : {},
+        'J' : {}
+    }
+
+    var NUPs_1 = {
+        '7' : regions,
+        '8' : regions,
+        '9' : regions,
+        '10' : regions,
+        '11' : regions,
+    }
+
+    var zeroMicro_1 = {
+        '0' : NUPs_1
+    }
+
+    var NUPs_2 = {
+        '7' : regions,
+        '8' : regions,
+        '9' : regions,
+        '10' : regions,
+        '11' : regions,
+        '12' : regions,
+        '13' : regions,
+        '14' : regions,
+        '15' : regions,
+    }
+
+    var zeroMicro_2 = {
+        '0' : NUPs_2
+    }
+
+    var NUPs_3 = {
+        '7' : regions,
+        '8' : regions,
+        '9' : regions,
+        '10' : regions,
+        '11' : regions,
+        '12' : regions,
+        '13' : regions,
+        '14' : regions,
+        '15' : regions,
+        '16' : regions,
+    }
+
+    var zeroMicro_3 = {
+        '0' : NUPs_3
+    }
+
+    var NUPs_4 = {
+        '7' : regions,
+        '8' : regions,
+        '9' : regions,
+        '10' : regions,
+        '11' : regions,
+        '12' : regions,
+        '13' : regions,
+        '14' : regions,
+        '15' : regions,
+        '16' : regions,
+        '17' : regions,
+        '18' : regions,
+        '19' : regions
+    }
+
+    var zeroMicro_4 = {
+        '0' : NUPs_4
+    }
+
+    var options = {
+        '4': {
+            '0': zeroMicro_1,
+            '1': zeroMicro_1,
+            '2': zeroMicro_1,
+            '3': zeroMicro_1,
+            '4': zeroMicro_1,
+            '5': zeroMicro_1
+        },
+        '5': {
+            '0': zeroMicro_2,
+            '1': zeroMicro_2,
+            '2': zeroMicro_2,
+        },
+        '6': {
+            '0': zeroMicro_2,
+            '1': zeroMicro_2,
+            '2': zeroMicro_2,
+            '3': zeroMicro_2,
+        },
+        '7': {
+            '0': zeroMicro_2,
+            '1': zeroMicro_3,
+            '2': zeroMicro_4,
+        },
+        '8': {
+            '0': zeroMicro_4,
+            '1': zeroMicro_4,
+        }
+    }
+
+    var state = {};
+
+    var range = function (a, b) {
+        var xs = [];
+        for (var i = a; i < b; ++i)
+        xs.push(i);
+        return xs;
+    };
+
+    var update = function (id) {
+        var node = document.querySelector('[data-id="' + id + '"]');
+
+        if (!node) {
+            return;
+        }
+
+        range(id, 5).map(function (i) {
+            delete state[i];
+        });
+
+        node.innerHTML = '';
+
+        var lens = range(0, id).reduce(function (acc, i) {
+            return acc[state[i]] || {};
+        }, options);
+
+        Object.keys(lens).map(function (v) {
+            var opt = document.createElement('option');
+            opt.value = v;
+            opt.innerHTML = v;
+
+            node.appendChild(opt);
+        });
+        state[id] = state[id] || Object.keys(lens)[0];
+
+        update(id + 1);
+    };
+
+    /* NodeList does not have map */
+    var selects = document.querySelectorAll('.firmware-form select');
+    for (var i = 0; i < selects.length; ++i) {
+        selects[i].addEventListener('change', function (e) {
+            state[e.target.dataset.id] = e.target.value;
+            update(parseInt(e.target.dataset.id, 10) + 1);
+        });
+    }
+
+    update(0);
+
+    // document.querySelector('.firmware-form').addEventListener('submit', function (e) {
+    //     e.preventDefault();
+    //     alert(state[0] + '.' + state[1] + '.' + state[2] + '-' + state[3] + state[4]);
+    // });
+
+})();
+}//]]>  
+
+</script>
+
+
+</head>
+<body>
+    <form class="firmware-form" action="qr_code.png" method="post">
+        <select data-id="0" name="zero"></select>.
+        <select data-id="1" name="one"></select>.
+        <select data-id="2" name="two"></select>-
+        <select data-id="3" name="three"></select>
+        <select data-id="4" name="four"></select>
+        <button type="submit" >Submit</button>
+    </form>
+</body>
+
+
+</html>
