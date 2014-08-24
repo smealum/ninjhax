@@ -72,6 +72,21 @@
 		mrc p15, 0, r8, c13, c0, 3
 		add r8, #0x80
 
+		; ;unmap CRO mirror
+		; 	ldr r0, =RO_PROCESSHANDLEADR
+		; 	ldr r0, [r0]
+		; 	ldr r1, =SPIDER_CROMAPADR ; addr0
+		; 	ldr r2, =SPIDER_CROLOCATION ; addr1
+		; 	ldr r3, =0x00005000 ; size
+		; 	ldr r4, =0x00000005 ; type (UNMAP)
+		; 	ldr r5, =0x00000007 ; permissions (RWX)
+		; 	.word 0xEF000070 ; svc 0x70 (ControlProcessMemory)
+
+		; 	;induce crash if there's an error
+		; 	cmp r0, #0
+		; 	ldrne r1, =0xCAFE000F
+		; 	ldrne r1, [r1]
+
 		;make the spider CRO region RWX under spider as well
 		ldr r6, =(CRO_SIZE>>12)-1 ; oss.cro size in pages -1
 

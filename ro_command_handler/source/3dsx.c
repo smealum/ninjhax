@@ -4,6 +4,8 @@
 #include <ctr/types.h>
 #include <ctr/svc.h>
 
+#include "../../build/constants.h"
+
 #include "svc.h"
 #include "3dsx.h"
 
@@ -74,6 +76,9 @@ int Load3DSX(Handle file, Handle process, void* baseAddr)
 {
 	u32 i, j, k, m;
 
+	if (baseAddr < (void*)0x00100000)return -9;
+	if (((u32)baseAddr)&0xFFF)return -10;
+
 	_fseek(file, 0x0, SEEK_SET);
 
 	_3DSX_Header hdr;
@@ -99,7 +104,8 @@ int Load3DSX(Handle file, Handle process, void* baseAddr)
 	u32* relocs = (u32*)((char*)d.segPtrs[2] + hdr.dataSegSize - hdr.bssSize);
 	u32 nRelocTables = hdr.relocHdrSize/4;
  
-	// u32 totalSize = (u32)(relocs + 3*nRelocTables) - (u32)baseAddr;
+	u32 totalSize = (u32)(relocs + 3*nRelocTables) - (u32)baseAddr;
+	if (totalSize > (CN_NEWTOTALPAGES-(((u32)baseAddr-0x00100000)>>12))*0x1000)return -8;
 	// XXX: Ensure enough RW pages exist at baseAddr to hold a memory block of length "totalSize".
 	//    This also checks whether the memory region overflows into IPC data or loader data.
  

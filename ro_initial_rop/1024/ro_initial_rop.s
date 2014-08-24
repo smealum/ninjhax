@@ -77,11 +77,11 @@
 		.word 0x00000006 ; r4 (type) (PROTECT)
 		.word 0x00000007 ; r5 (permissions) (RWX)
 	.word 0x14003a50 ; pop {r1, pc}
-		.word 0x007E5000 ; r1 (addr0)
+		.word SPIDER_CROMAPADR ; r1 (addr0)
 
 	.word 0x14004328 ; svcControlProcessMemory | LDMFD SP!, {R4,R5} | BX LR (pop {pc})
 		.word 0xDEADC0DE ; r4 (garbage)
 		.word 0xDEADC0DE ; r5 (garbage)
-	.word 0x007E5700 ; jump to code
+	.word SPIDER_CROMAPADR+CRO_ROCODE_OFFSET ; jump to code
 
 .close

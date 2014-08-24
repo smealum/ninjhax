@@ -49,6 +49,14 @@ void HB_SetupBootloader(u32* cmdbuf)
 	// TODO : make first half RX and second half RW
 	svc_controlProcessMemory(processHandle, 0x000F0000, memBlockAdr, 0x00008000, MEMOP_MAP, 0x7);
 
+	// extend .text/rodata/data/bss area...
+	int i;
+	for(i=0;i<CN_ADDPAGES;i++)
+	{
+		Result ret=svc_controlProcessMemory(processHandle, 0x00100000+(CN_TOTALPAGES+i)*0x1000, CN_ALLOCPAGES_ADR+0x1000*i, 0x1000, MEMOP_MAP, 0x7);
+		if(ret)*(u32*)NULL=ret;
+	}
+
 	if(targetProcessHandle)svc_closeHandle(targetProcessHandle);
 	targetProcessHandle=processHandle;
 
@@ -109,10 +117,10 @@ void HB_Load3dsx(u32* cmdbuf)
 	const Handle fileHandle=cmdbuf[3];
 
 	Result ret;
-	ret=svc_mapProcessMemory(targetProcessHandle, 0x00100000, 0x00200000);
-	if(!ret)memset((void*)0x00100000, 0x00, 0x00200000-0x00100000);
+	ret=svc_mapProcessMemory(targetProcessHandle, 0x00100000, 0x02000000);
+	if(!ret)memset((void*)0x00100000, 0x00, CN_NEWTOTALPAGES*0x1000);
 	if(!ret)ret=Load3DSX(fileHandle, targetProcessHandle, (void*)baseAddr);
-	if(!ret)ret=svc_unmapProcessMemory(targetProcessHandle, 0x00100000, 0x00200000);
+	if(!ret)ret=svc_unmapProcessMemory(targetProcessHandle, 0x00100000, 0x02000000);
 
 	cmdbuf[0]=0x00050040;
 	cmdbuf[1]=ret;

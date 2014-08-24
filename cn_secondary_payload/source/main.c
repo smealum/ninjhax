@@ -331,6 +331,7 @@ void errorScreen(char* str, u32* dv, u8 n)
 		int i;
 		for(i=0;i<n;i++)drawHex(dv[i], 8, 50+n*10);
 	}
+	while(1);
 }
 
 void installerScreen(u32 size)
@@ -537,8 +538,10 @@ int main(u32 size, char** argv)
 	Handle fsHandle;
 	debug[8]=_HB_GetHandle(hbHandle, 0x0, &fsHandle);
 
-	//allocate some memory for the bootloader code
+	//allocate some memory for the bootloader code (will be remapped)
 	u32 out; ret=svc_controlMemory(&out, 0x13FF0000, 0x00000000, 0x00008000, MEMOP_COMMIT, 0x3);
+	//allocate some memory for homebrew .text/rodata/data/bss... (will be remapped)
+	ret=svc_controlMemory(&out, CN_ALLOCPAGES_ADR, 0x00000000, CN_ADDPAGES*0x1000, MEMOP_COMMIT, 0x3);
 
 	int i;
 	for(i=0;i<0x10;i++)
