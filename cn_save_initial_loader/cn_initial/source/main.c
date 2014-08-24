@@ -9,11 +9,6 @@
 
 #include "../../../build/constants.h"
 
-#define TEXTPAOFFSET 0x03E00000
-
-#define TOPFBADR1 ((u8*)0x1444B9C0)
-#define TOPFBADR2 ((u8*)0x14491EE0)
-
 int _strlen(char* str)
 {
 	int l=0;
@@ -64,8 +59,8 @@ Result _srv_getServiceHandle(Handle* handleptr, Handle* out, char* server)
 // 	char str[9];
 
 // 	hex2str(str,val);
-// 	drawString(TOPFBADR1,str,x,y);
-// 	drawString(TOPFBADR2,str,x,y);
+// 	drawString(CN_TOPFBADR1,str,x,y);
+// 	drawString(CN_TOPFBADR2,str,x,y);
 // }
 
 void doGspwn(u32* src, u32* dst, u32 size)
@@ -163,8 +158,8 @@ int _main()
 	Handle* gspHandle=(Handle*)CN_GSPHANDLE_ADR;
 	Result (*_GSPGPU_FlushDataCache)(Handle* handle, Handle kprocess, u32* addr, u32 size)=(void*)CN_GSPGPU_FlushDataCache_ADR;
 
-	// drawString(TOPFBADR1,"ninjhaxx",0,0);
-	// drawString(TOPFBADR2,"ninjhaxx",0,0);
+	// drawString(CN_TOPFBADR1,"ninjhaxx",0,0);
+	// drawString(CN_TOPFBADR2,"ninjhaxx",0,0);
 
 	Handle* srvHandle=(Handle*)CN_SRVHANDLE_ADR;
 
@@ -230,7 +225,7 @@ int _main()
 
 	ret=_GSPGPU_FlushDataCache(gspHandle, 0xFFFF8001, (u32*)0x14100000, 0x300000);
 
-	doGspwn((u32*)(0x14100000), (u32*)(0x14000000+TEXTPAOFFSET), 0x0000A000);
+	doGspwn((u32*)(0x14100000), (u32*)(0x14000000+CN_TEXTPAOFFSET), 0x0000A000);
 
 	svc_sleepThread(0x3B9ACA00);
 
