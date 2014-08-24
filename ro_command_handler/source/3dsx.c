@@ -178,17 +178,27 @@ int Load3DSX(Handle file, Handle process, void* baseAddr)
 			}
 		}
 	}
- 
-	// XXX: Write ARGV structure:
-	//    If the start of the data segment begins with "_arg", a devkitARM __argv structure follows immediately after.
-	//    Refer to e.g. hbmenu (DS) code to know how to fill it. Allocate ARGV text data at the bottom of the stack.
 
-	//check magic
-	if(((u32*)baseAddr)[1]==0x6D72705F)
+	// Detect and fill _prm structure
+	u32* prmStruct = (u32*)baseAddr + 1;
+	if(prmStruct[0]==0x6D72705F)
 	{
 		// Write service handle table pointer
 		// the actual structure has to be filled out by cn_bootloader
-		((u32*)baseAddr)[2]=(u32)__service_ptr;
+		prmStruct[1]=(u32)__service_ptr;
+
+		// XXX: other fields that need filling:
+		// prmStruct[2] <-- __apt_appid (default: 0x300)
+		// prmStruct[3] <-- __heap_size (default: 24*1024*1024)
+		// prmStruct[4] <-- __gsp_heap_size (default: 32*1024*1024)
+		// prmStruct[5] <-- __system_arglist (default: NULL)
+
+		// XXX: Notes on __system_arglist:
+		//     Contains a pointer to a u32 specifying the number of arguments immediately followed
+		//     by the NULL-terminated argument strings themselves (no pointers). The first argument
+		//     should always be the path to the file we are booting. Example:
+		//     \x02\x00\x00\x00sd:/dir/file.3dsx\x00Argument1\x00
+		//     Above corresponds to { "sd:/dir/file.3dsx", "Argument1" }.
 	}
 
 	// Protect memory at d.segPtrs[0] as CODE   (r-x) -- npages = d.segSizes[0] / 0x1000
