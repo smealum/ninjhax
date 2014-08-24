@@ -77,6 +77,7 @@ int Load3DSX(Handle file, Handle process, void* baseAddr)
 	u32 i, j, k, m;
 
 	if (baseAddr < (void*)0x00100000)return -9;
+	if (baseAddr >= (void*)(0x00100000+CN_NEWTOTALPAGES*0x1000))return -9;
 	if (((u32)baseAddr)&0xFFF)return -10;
 
 	_fseek(file, 0x0, SEEK_SET);
