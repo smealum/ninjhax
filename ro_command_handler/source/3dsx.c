@@ -91,13 +91,13 @@ int Load3DSX(Handle file, Handle process, void* baseAddr)
 		return -2;
 
 	_3DSX_LoadInfo d;
-	u32 offsets[2] = { hdr.codeSegSize, hdr.codeSegSize + hdr.rodataSegSize };
 	d.segSizes[0] = (hdr.codeSegSize+0xFFF) &~ 0xFFF;
 	SEC_ASSERT(d.segSizes[0] >= hdr.codeSegSize); // int overflow
 	d.segSizes[1] = (hdr.rodataSegSize+0xFFF) &~ 0xFFF;
 	SEC_ASSERT(d.segSizes[1] >= hdr.rodataSegSize); // int overflow
 	d.segSizes[2] = (hdr.dataSegSize+0xFFF) &~ 0xFFF;
 	SEC_ASSERT(d.segSizes[2] >= hdr.dataSegSize); // int overflow
+	u32 offsets[2] = { d.segSizes[0], d.segSizes[0] + d.segSizes[1] };
 
 	d.segPtrs[0] = baseAddr;
 	d.segPtrs[1] = (char*)d.segPtrs[0] + d.segSizes[0];
