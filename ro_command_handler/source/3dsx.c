@@ -12,7 +12,7 @@
 //code by fincs
 
 #define RELOCBUFSIZE 512
-#define SEC_ASSERT(x) if((x)) return 0x5ECDEAD
+#define SEC_ASSERT(x) if(!(x)) return 0x5ECDEAD
 
 typedef struct
 {
