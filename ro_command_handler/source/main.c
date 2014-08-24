@@ -25,6 +25,8 @@ Handle targetProcessHandle;
 void HB_FlushInvalidateCache(u32* cmdbuf)
 {
 	if(!cmdbuf)return;
+	if(cmdbuf[0] != 0x10042) return;
+	if(cmdbuf[2] != 0)return;
 
 	const Handle processHandle=cmdbuf[3];
 
@@ -41,6 +43,8 @@ void HB_FlushInvalidateCache(u32* cmdbuf)
 void HB_SetupBootloader(u32* cmdbuf)
 {
 	if(!cmdbuf)return;
+	if(cmdbuf[0] != 0x20042) return;
+	if(cmdbuf[2] != 0)return;
 
 	const u32 memBlockAdr=cmdbuf[1];
 	const Handle processHandle=cmdbuf[3];
@@ -68,9 +72,11 @@ void HB_SetupBootloader(u32* cmdbuf)
 void HB_SendHandle(u32* cmdbuf)
 {
 	if(!cmdbuf)return;
+	if(cmdbuf[0] != 0x30042) return;
 
 	const u32 handleIndex=cmdbuf[1];
 	const Handle sentHandle=cmdbuf[3];
+	if((cmdbuf[3] != 0) && (cmdbuf[2] != 0))return;
 
 	if(handleIndex>=8)
 	{
@@ -112,6 +118,8 @@ void HB_GetHandle(u32* cmdbuf)
 void HB_Load3dsx(u32* cmdbuf)
 {
 	if(!cmdbuf)return;
+	if(cmdbuf[0] != 0x50042) return;
+	if(cmdbuf[2] != 0)return;
 
 	const void* baseAddr=(void*)cmdbuf[1];
 	const Handle fileHandle=cmdbuf[3];
