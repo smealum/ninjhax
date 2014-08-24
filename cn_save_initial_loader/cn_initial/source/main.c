@@ -82,12 +82,28 @@ void doGspwn(u32* src, u32* dst, u32 size)
 	nn__gxlow__CTR__CmdReqQueueTx__TryEnqueue(sharedGspCmdBuf, gxCommand);
 }
 
+Result _GSPGPU_InvalidateDataCache(Handle* handle, Handle kprocess, u32* addr, u32 size)
+{
+	u32* cmdbuf=getThreadCommandBuffer();
+
+	cmdbuf[0]=0x00090082;
+	cmdbuf[1]=(u32)addr;
+	cmdbuf[2]=size;
+	cmdbuf[3]=0x00000000;
+	cmdbuf[4]=(u32)kprocess;
+
+	Result ret=0;
+	if((ret=svc_sendSyncRequest(*handle)))return ret;
+
+	return cmdbuf[1];
+}
+
 void patchMem(Handle* gspHandle, u32 dst, u32 size, u32 start, u32 end)
 {
 	Result (*_GSPGPU_FlushDataCache)(Handle* handle, Handle kprocess, u32* addr, u32 size)=(void*)0x002D15D4;
 
 	int i;
-	_GSPGPU_FlushDataCache(gspHandle, 0xFFFF8001, (u32*)0x14100000, 0x200);
+	_GSPGPU_InvalidateDataCache(gspHandle, 0xFFFF8001, (u32*)0x14100000, 0x200);
 	doGspwn((u32*)(dst), (u32*)(0x14100000), 0x200);
 	svc_sleepThread(0x1000000);
 	for(i=start;i<end;i++)((u32*)0x14100000)[i]=0xEF000009;
@@ -173,7 +189,8 @@ int _main()
 		patchMem(gspHandle, 0x14000000+CN_TEXTPAOFFSET+0x00192200, 0x200, 0x19, 0x4F);
 		patchMem(gspHandle, 0x14000000+CN_TEXTPAOFFSET+0x00192600, 0x200, 0x7, 0x13);
 		patchMem(gspHandle, 0x14000000+CN_TEXTPAOFFSET+0x001CA200, 0x200, 0xB, 0x1E);
-		patchMem(gspHandle, 0x14000000+CN_TEXTPAOFFSET+0x000C6100, 0x200, 0x3C, 0x52);
+		// patchMem(gspHandle, 0x14000000+CN_TEXTPAOFFSET+0x000C6100, 0x200, 0x3C, 0x52);
+		*(u8*)0x359935=0x00; //kill thread5 without panicking the kernel...
 
 		//patch arbitrateAddress
 		patchMem(gspHandle, 0x14000000+CN_TEXTPAOFFSET+0x001C9E00, 0x200, 0x14, 0x40);
