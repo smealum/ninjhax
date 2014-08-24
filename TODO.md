@@ -7,7 +7,7 @@ This is a (probably non-exhaustive) list of what remains to be done on the explo
  - ~~support spider v3074/v3075/v3088~~
  - ~~support multiple version simultaneously~~
  - cleanup cn_qr_initial_payload
- - write proper cn_save_initial_payload
+ - ~~write proper cn_save_initial_payload~~
  - "boot.3dsx not found" screen
  - "couldn't retrieve HTTP payload" thing
  - savedata uninstaller
