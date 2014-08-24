@@ -6,11 +6,17 @@
 
 ;spider code
 .arm
-	ldr r2, =0x00100000+SPIDER_TEXT_LENGTH
+	;closeThread text spray
 	ldr r0, =0xEF000009 ; svc 0x09 (ExitThread)
 	ldr r1, =0x00100000
+	ldr r2, =0x00100000+SPIDER_TEXT_LENGTH
 	exitThreadLoop:
-		str r0, [r1], #4
+		ldr r3, [r1]
+		mov r3, r3, lsr #28
+		;heuristic to mostly overwrite ARM instructions
+		cmp r3, #0xE
+		streq r0, [r1]
+		add r1, #4
 		cmp r1, r2
 		blt exitThreadLoop
 
