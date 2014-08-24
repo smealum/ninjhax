@@ -311,11 +311,31 @@ Result FSUSER_ControlArchive(Handle handle, FS_archive archive)
 	return cmdbuf[1];
 }
 
+void clearScreen(u8 shade)
+{
+	Handle* gspHandle=(Handle*)CN_GSPHANDLE_ADR;
+	Result (*_GSPGPU_FlushDataCache)(Handle* handle, Handle kprocess, u8* addr, u32 size)=(void*)CN_GSPGPU_FlushDataCache_ADR;
+	memset(TOPFBADR1, shade, 240*400*3);
+	memset(TOPFBADR2, shade, 240*400*3);
+	_GSPGPU_FlushDataCache(gspHandle, 0xFFFF8001, TOPFBADR1, 240*400*3);
+	_GSPGPU_FlushDataCache(gspHandle, 0xFFFF8001, TOPFBADR2, 240*400*3);
+}
+
+void errorScreen(char* str, u32* dv, u8 n)
+{
+	clearScreen(0x00);
+	renderString("FATAL ERROR",0,0);
+	renderString(str,0,10);
+	if(dv && n)
+	{
+		int i;
+		for(i=0;i<n;i++)drawHex(dv[i], 8, 50+n*10);
+	}
+}
+
 void installerScreen(u32 size)
 {
-	memset(TOPFBADR1, 0x00, 240*400*3);
-	memset(TOPFBADR2, 0x00, 240*400*3);
-
+	clearScreen(0x00);
 	renderString("install the exploit to your savegame ?\nthis operation is reversible.\n    A : Yes \n    B : No  ",0,0);
 
 	while(1)
@@ -325,43 +345,52 @@ void installerScreen(u32 size)
 		if(PAD&PAD_A)
 		{
 			//install
-			int line=40;
+			int state=0;
 			Result ret;
 			Handle fsuHandle=*(Handle*)CN_FSHANDLE_ADR;
 			FS_archive saveArchive=(FS_archive){0x00000004, (FS_path){PATH_EMPTY, 1, (u8*)""}};
-			ret=FSUSER_OpenArchive(fsuHandle, &saveArchive);
-			drawHex(ret,0,line+=10);
-
 			u32 totalWritten;
 			Handle fileHandle;
 
+			renderString("installing...",0,50);
+
+			ret=FSUSER_OpenArchive(fsuHandle, &saveArchive);
+			state++; if(ret)goto installEnd;
+
 			//write exploit map file
 			ret=FSUSER_OpenFile(fsuHandle, &fileHandle, saveArchive, FS_makePath(PATH_CHAR, "/edit/mslot0.map"), FS_OPEN_WRITE|FS_OPEN_CREATE, FS_ATTRIBUTE_NONE);
-			drawHex(ret,0,line+=10);
+			state++; if(ret)goto installEnd;
 			ret=FSFILE_Write(fileHandle, &totalWritten, 0x0, (u32*)cn_save_initial_loader_bin, cn_save_initial_loader_bin_size, 0x10001);
-			drawHex(ret,0,line+=10);
-			drawHex(totalWritten,0,line+=10);
+			state++; if(ret)goto installEnd;
 			ret=FSFILE_Close(fileHandle);
-			drawHex(ret,0,line+=10);
+			state++; if(ret)goto installEnd;
 
 			//write secondary payload file
 			ret=FSUSER_OpenFile(fsuHandle, &fileHandle, saveArchive, FS_makePath(PATH_CHAR, "/edit/payload.bin"), FS_OPEN_WRITE|FS_OPEN_CREATE, FS_ATTRIBUTE_NONE);
-			drawHex(ret,0,line+=10);
+			state++; if(ret)goto installEnd;
 			ret=FSFILE_Write(fileHandle, &totalWritten, 0x0, (u32*)0x14300000, size, 0x10001);
-			drawHex(ret,0,line+=10);
-			drawHex(totalWritten,0,line+=10);
+			state++; if(ret)goto installEnd;
 			ret=FSFILE_Close(fileHandle);
-			drawHex(ret,0,line+=10);
+			state++; if(ret)goto installEnd;
 
 			ret=FSUSER_ControlArchive(fsuHandle, saveArchive);
-			drawHex(ret,0,line+=10);
-			drawHex(0xDEAD0000,0,90);
+			state++; if(ret)goto installEnd;
+
+			ret=FSUSER_CloseArchive(fsuHandle, &saveArchive);
+			state++; if(ret)goto installEnd;
+
+			installEnd:
+			if(ret)
+			{
+				u32 v[2]={ret, state};
+				errorScreen("   installation process failed.\n   please report the below information by\n   email to sme@lum.sexy", v, 2);
+			}
+
+			renderString("installing... done.\nloading menu...",0,50);
+
 			break;
 		}else if(PAD&PAD_B)break;
 	}
-
-	memset(TOPFBADR1, 0x00, 240*400*3);
-	memset(TOPFBADR2, 0x00, 240*400*3);
 }
 
 int main(u32 size, char** argv)
@@ -512,7 +541,7 @@ int main(u32 size, char** argv)
 	u32 out; ret=svc_controlMemory(&out, 0x13FF0000, 0x00000000, 0x00008000, MEMOP_COMMIT, 0x3);
 
 	int i;
-	for(i=0;i<0x1000;i++)
+	for(i=0;i<0x10;i++)
 	{
 		drawHex(line++,0,40);
 		drawHex(0x00DEAD01,0,50);
@@ -521,7 +550,7 @@ int main(u32 size, char** argv)
 
 	memcpy((u8*)0x13FF0000, cn_bootloader_bin, cn_bootloader_bin_size);
 
-	for(i=0;i<0x1000;i++)
+	for(i=0;i<0x10;i++)
 	{
 		drawHex(line++,0,40);
 		drawHex(0x00DEAD02,0,50);
@@ -530,11 +559,20 @@ int main(u32 size, char** argv)
 	
 	if(_HB_SetupBootloader(hbHandle, 0x13FF0000))*((u32*)NULL)=0xBABE0061;
 
-	for(i=0;i<0x1000;i++)
+	for(i=0;i<0x10;i++)
 	{
 		drawHex(line++,0,40);
 		drawHex(0x00DEAD03,0,50);
 		_GSPGPU_FlushDataCache(gspHandle, 0xFFFF8001, (u32*)TOPFBADR1, 0x46500*2);
+	}
+
+	//open sdmc 3dsx file
+	Handle fileHandle;
+	FS_archive sdmcArchive=(FS_archive){0x9, (FS_path){PATH_EMPTY, 1, (u8*)""}};
+	FS_path filePath=(FS_path){PATH_CHAR, 11, (u8*)"/boot.3dsx"};
+	if((ret=FSUSER_OpenFileDirectly(fsHandle, &fileHandle, sdmcArchive, filePath, FS_OPEN_READ, FS_ATTRIBUTE_NONE))!=0)
+	{
+		errorScreen("   failed to open sd:/boot.3dsx.\n    does it exist ?", &ret, 1);
 	}
 	
 	svc_controlMemory(&out, 0x14000000, 0x00000000, 0x02000000, MEMOP_FREE, 0x0);
@@ -542,12 +580,6 @@ int main(u32 size, char** argv)
 	void (*callBootloader)(Handle hb, Handle file)=(void*)0x000F0000;
 	_GSPGPU_ReleaseRight(*gspHandle); //disable GSP module access
 	svc_closeHandle(*gspHandle);
-
-	//open sdmc 3dsx file
-	Handle fileHandle;
-	FS_archive sdmcArchive=(FS_archive){0x9, (FS_path){PATH_EMPTY, 1, (u8*)""}};
-	FS_path filePath=(FS_path){PATH_CHAR, 11, (u8*)"/boot.3dsx"};
-	if((ret=FSUSER_OpenFileDirectly(fsHandle, &fileHandle, sdmcArchive, filePath, FS_OPEN_READ, FS_ATTRIBUTE_NONE))!=0)*(u32*)ret=0xCAFE0038;
 
 	callBootloader(hbHandle, fileHandle);
 
