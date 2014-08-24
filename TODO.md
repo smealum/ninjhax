@@ -15,5 +15,5 @@ This is a (probably non-exhaustive) list of what remains to be done on the explo
  - allocate more memory to CN + clear it before jumping to menu
  - audit/make 3dsx loading code secure
  - write ctrulib APT workaround
- - pass CSND handle
+ - ~~pass CSND handle~~
  - garble URL

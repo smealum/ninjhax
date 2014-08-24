@@ -204,6 +204,34 @@
 			ldr r1, [r1]
 			str r1, [sp, #4]
 
+		;srv:GetServiceHandle("csnd:SND")
+			mrc p15, 0, r8, c13, c0, 3
+			add r8, #0x80
+			ldr r0, =0x00050100
+			str r0, [r8], #4
+			ldr r0, =0x646E7363   ;csnd
+			str r0, [r8], #4
+			ldr r0, =0x444E533A   ;:SND
+			str r0, [r8], #4
+			ldr r0, =0x00000008 ;strlen
+			str r0, [r8], #4
+			ldr r0, =0x00000000 ;0x0
+			str r0, [r8], #4
+
+			ldr r0, [sp]
+			.word 0xEF000032 ; svc 0x32 (SendSyncRequest)
+			ldr r1, [r8, #-0x8]
+			str r1, [sp, #0x10]
+
+			;induce crash if there's an error
+			cmp r0, #0
+			ldrne r1, =0xCAFE008C
+			ldrne r1, [r1]
+
+			ldr r1, =SPIDER_ROHANDLE_ADR
+			ldr r1, [r1]
+			str r1, [sp, #4]
+
 		;FS:Initialize
 			mrc p15, 0, r8, c13, c0, 3
 			add r8, #0x80
@@ -221,17 +249,38 @@
 			ldrne r1, =0xCAFE007F
 			ldrne r1, [r1]
 
-		;hb:SendHandle
+		;hb:SendHandle(fs:USER)
 			mrc p15, 0, r8, c13, c0, 3
 			add r8, #0x80
 
 			ldr r0, =0x00030042
 			str r0, [r8], #4
-			ldr r0, =0x00000000
+			ldr r0, =0x00000000 ; index
 			str r0, [r8], #4
 			ldr r0, =0x00000000
 			str r0, [r8], #4
 			ldr r0, [sp, 0xC] ; fs:USER handle
+			str r0, [r8], #4
+
+			ldr r0, [sp, #4]
+			.word 0xEF000032 ; svc 0x32 (SendSyncRequest)
+
+			;induce crash if there's an error
+			cmp r0, #0
+			ldrne r1, =0xCAFE0083
+			ldrne r1, [r1]
+
+		;hb:SendHandle(csnd:SND)
+			mrc p15, 0, r8, c13, c0, 3
+			add r8, #0x80
+
+			ldr r0, =0x00030042
+			str r0, [r8], #4
+			ldr r0, =0x00000001 ; index
+			str r0, [r8], #4
+			ldr r0, =0x00000000
+			str r0, [r8], #4
+			ldr r0, [sp, 0x10] ; csnd:SND handle
 			str r0, [r8], #4
 
 			ldr r0, [sp, #4]
@@ -303,6 +352,10 @@
 			ldr r0, [sp, #8]
 			.word 0xEF000023 ; svc 0x23 (CloseHandle)
 
+
+		;close handle (csnd:SND)
+			ldr r0, [sp, #0x10]
+			.word 0xEF000023 ; svc 0x23 (CloseHandle)
 
 		;close handle (fs:USER)
 			ldr r0, [sp, #0xC]
