@@ -9,6 +9,9 @@
 #include "svc.h"
 #include "3dsx.h"
 
+// TODO : find a better place to put this
+#define RUNFLAG_APTWORKAROUND (1)
+
 //code by fincs
 
 #define RELOCBUFSIZE 512
@@ -192,6 +195,8 @@ int Load3DSX(Handle file, Handle process, void* baseAddr)
 		// prmStruct[3] <-- __heap_size (default: 24*1024*1024)
 		// prmStruct[4] <-- __gsp_heap_size (default: 32*1024*1024)
 		// prmStruct[5] <-- __system_arglist (default: NULL)
+
+		prmStruct[6] = RUNFLAG_APTWORKAROUND; //__system_runflags
 
 		// XXX: Notes on __system_arglist:
 		//     Contains a pointer to a u32 specifying the number of arguments immediately followed
