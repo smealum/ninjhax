@@ -580,7 +580,7 @@ int main(u32 size, char** argv)
 	
 	svc_controlMemory(&out, 0x14000000, 0x00000000, 0x02000000, MEMOP_FREE, 0x0);
 
-	void (*callBootloader)(Handle hb, Handle file)=(void*)0x000F0000;
+	void (*callBootloader)(Handle hb, Handle file)=(void*)CN_BOOTLOADER_LOC;
 	_GSPGPU_ReleaseRight(*gspHandle); //disable GSP module access
 	svc_closeHandle(*gspHandle);
 
