@@ -16,6 +16,6 @@ This is a (probably non-exhaustive) list of what remains to be done on the explo
  - ~~audit/make 3dsx loading code secure~~
  - write ctrulib APT workaround
  - improve fsInit
- - fix framebuffer handling code in hbmenu, examples etc.
+ - ~~fix framebuffer handling code in hbmenu, examples etc.~~
  - ~~pass CSND handle~~
  - garble URL
