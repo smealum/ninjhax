@@ -575,7 +575,7 @@ int main(u32 size, char** argv)
 	FS_path filePath=(FS_path){PATH_CHAR, 11, (u8*)"/boot.3dsx"};
 	if((ret=FSUSER_OpenFileDirectly(fsHandle, &fileHandle, sdmcArchive, filePath, FS_OPEN_READ, FS_ATTRIBUTE_NONE))!=0)
 	{
-		errorScreen("   failed to open sd:/boot.3dsx.\n    does it exist ?", &ret, 1);
+		errorScreen("   failed to open sd:/boot.3dsx.\n    does it exist ?", (u32*)&ret, 1);
 	}
 	
 	svc_controlMemory(&out, 0x14000000, 0x00000000, 0x02000000, MEMOP_FREE, 0x0);

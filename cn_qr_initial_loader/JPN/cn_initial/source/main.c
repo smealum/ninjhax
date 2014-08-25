@@ -235,19 +235,11 @@ int _main()
 		patchMem(gspHandle, 0x14000000+CN_TEXTPAOFFSET+0x0019BD00, 0x200, 0xB, 0x41);
 		patchMem(gspHandle, 0x14000000+CN_TEXTPAOFFSET+0x0019C000, 0x200, 0x39, 0x45);
 		patchMem(gspHandle, 0x14000000+CN_TEXTPAOFFSET+0x001D3700, 0x200, 0x7, 0x1A);
-		patchMem(gspHandle, 0x14000000+CN_TEXTPAOFFSET+0x001C9100, 0x200, 0x2E, 0x44);
+		// patchMem(gspHandle, 0x14000000+CN_TEXTPAOFFSET+0x001C9100, 0x200, 0x2E, 0x44);
+		*(u8*)0x3664E5=0x00; //kill thread5 without panicking the kernel...
 
 		//patch arbitrateAddress
 		patchMem(gspHandle, 0x14000000+CN_TEXTPAOFFSET+0x001D3300, 0x200, 0x10, 0x3C);
-
-// //TODO ? (unnecessary with the bruteforce handle closing in secondary payload)
-// 		//close handles
-// 		ret=svc_closeHandle(*((Handle*)0x359938));
-// 		ret=svc_closeHandle(*((Handle*)0x34FEA4));
-// 		ret=svc_closeHandle(*((Handle*)0x356274));
-// 		ret=svc_closeHandle(*((Handle*)0x334730));
-// 		ret=svc_closeHandle(*((Handle*)0x334F64));
-
 
 		//wake threads
 		svc_arbitrateAddress(*addressArbiterHandle, 0x364ccc, 0, -1, 0);
