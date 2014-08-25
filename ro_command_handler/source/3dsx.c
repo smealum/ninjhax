@@ -104,10 +104,10 @@ int Load3DSX(Handle file, Handle process, void* baseAddr)
 
 	d.segPtrs[0] = baseAddr;
 	d.segPtrs[1] = (char*)d.segPtrs[0] + d.segSizes[0];
-	SEC_ASSERT(d.segPtrs[1] >= d.segSizes[0]); // int overflow
+	SEC_ASSERT((u32)d.segPtrs[1] >= d.segSizes[0]); // int overflow
 	d.segPtrs[2] = (char*)d.segPtrs[1] + d.segSizes[1];
-	SEC_ASSERT(d.segPtrs[2] >= d.segSizes[1]); // int overflow
-	SEC_ASSERT(((u32) d.segPtrs[2]) < END_ADDR); // within user memory
+	SEC_ASSERT((u32)d.segPtrs[2] >= d.segSizes[1]); // int overflow
+	SEC_ASSERT((u32)d.segPtrs[2] < END_ADDR); // within user memory
 
 	// Skip header for future compatibility.
 	_fseek(file, hdr.headerSize, SEEK_SET);
@@ -115,13 +115,13 @@ int Load3DSX(Handle file, Handle process, void* baseAddr)
 	// Read the relocation headers
 	SEC_ASSERT(hdr.dataSegSize >= hdr.bssSize); // int underflow
 	u32* relocs = (u32*)((char*)d.segPtrs[2] + hdr.dataSegSize - hdr.bssSize);
-	SEC_ASSERT(((u32) relocs) >= d.segPtrs[2]); // int overflow
-	SEC_ASSERT(((u32) relocs) < END_ADDR); // within user memory
+	SEC_ASSERT((u32)relocs >= (u32)d.segPtrs[2]); // int overflow
+	SEC_ASSERT((u32)relocs < END_ADDR); // within user memory
 	u32 nRelocTables = hdr.relocHdrSize/4;
  
 	u32 relocsEnd = (u32)(relocs + 3*nRelocTables);
-	SEC_ASSERT(relocsEnd >= relocs); // int overflow
-	SEC_ASSERT(((u32) relocsEnd) < END_ADDR); // within user memory
+	SEC_ASSERT((u32)relocsEnd >= (u32)relocs); // int overflow
+	SEC_ASSERT((u32)relocsEnd < END_ADDR); // within user memory
 
 	// XXX: Ensure enough RW pages exist at baseAddr to hold a memory block of length "totalSize".
 	//    This also checks whether the memory region overflows into IPC data or loader data.
