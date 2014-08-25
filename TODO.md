@@ -11,10 +11,11 @@ This is a (probably non-exhaustive) list of what remains to be done on the explo
  - ~~"boot.3dsx not found" screen~~
  - "couldn't retrieve HTTP payload" thing
  - savedata uninstaller
- - return to hbmenu (LR)
+ - ~~return to hbmenu (LR)~~
  - ~~allocate more memory to CN + clear it before jumping to menu~~
  - ~~audit/make 3dsx loading code secure~~
  - write ctrulib APT workaround
- - improve fsInit
+ - ~~improve fsInit~~
+ - ~~fix framebuffer handling code in hbmenu, examples etc.~~
  - ~~pass CSND handle~~
  - garble URL
