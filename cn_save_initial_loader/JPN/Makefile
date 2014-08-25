@@ -10,16 +10,23 @@ ifeq ($(filter $(DEVKITARM)/bin,$(PATH)),)
 export PATH:=$(DEVKITARM)/bin:$(PATH)
 endif
 
-SCRIPTS = "../scripts"
+SCRIPTS = "../../scripts"
+NAME = cn_save_initial_loader
 
-all: cn_save_initial_loader.bin
+.PHONY: all cn_initial/cn_initial.bin
+
+all: $(NAME).bin
 
 clean:
-	@rm -f cn_save_initial_loader.bin
-	@cd WEST && make clean
-	@cd JPN && make clean
+	@cd cn_initial && make clean
+	@rm -f $(NAME).bin $(NAME).bin.png
 	@echo "all cleaned up !"
 
-cn_save_initial_loader.bin:
-	@cd $(CNVERSION) && make
-	@cp $(CNVERSION)/$@ ./
+-include $(DFILES)
+
+$(NAME).bin: sploit_proto.bin sploit.s cn_initial/cn_initial.bin
+	@armips sploit.s
+	@python $(SCRIPTS)/obfuscator5000.py $<
+
+cn_initial/cn_initial.bin:
+	$(MAKE) -C cn_initial

@@ -1,6 +1,6 @@
 .nds
 
-.include "../build/constants.s"
+.include "../../build/constants.s"
 
 .open "sploit_proto.bin","cn_save_initial_loader.bin",0x0
 

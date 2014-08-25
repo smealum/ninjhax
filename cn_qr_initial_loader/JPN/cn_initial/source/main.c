@@ -246,7 +246,7 @@ int _main()
 		svc_signalEvent(((Handle*)0x354ba8)[2]);
 		s32 out; svc_releaseSemaphore(&out, *(Handle*)0x341AB0, 1); //CHECK !
 
-
+	svc_sleepThread(0x10000000);
 
 	Handle httpcHandle;
 	ret=_srv_getServiceHandle(srvHandle, &httpcHandle, "http:C");
