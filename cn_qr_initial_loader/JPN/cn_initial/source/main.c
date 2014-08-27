@@ -202,11 +202,28 @@ void doGspwn(u32* src, u32* dst, u32 size)
 	nn__gxlow__CTR__CmdReqQueueTx__TryEnqueue(sharedGspCmdBuf, gxCommand);
 }
 
+Result _GSPGPU_InvalidateDataCache(Handle* handle, Handle kprocess, u32* addr, u32 size)
+{
+	u32* cmdbuf=getThreadCommandBuffer();
+
+	cmdbuf[0]=0x00090082;
+	cmdbuf[1]=(u32)addr;
+	cmdbuf[2]=size;
+	cmdbuf[3]=0x00000000;
+	cmdbuf[4]=(u32)kprocess;
+
+	Result ret=0;
+	if((ret=svc_sendSyncRequest(*handle)))return ret;
+
+	return cmdbuf[1];
+}
+
 void patchMem(Handle* gspHandle, u32 dst, u32 size, u32 start, u32 end)
 {
 	Result (*_GSPGPU_FlushDataCache)(Handle* handle, Handle kprocess, u32* addr, u32 size)=(void*)CN_GSPGPU_FlushDataCache_ADR;
 
 	int i;
+	_GSPGPU_InvalidateDataCache(gspHandle, 0xFFFF8001, (u32*)0x14100000, 0x200);
 	doGspwn((u32*)(dst), (u32*)(0x14100000), 0x200);
 	svc_sleepThread(0x100000);
 	for(i=start;i<end;i++)((u32*)0x14100000)[i]=0xEF000009;

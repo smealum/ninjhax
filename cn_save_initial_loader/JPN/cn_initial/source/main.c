@@ -65,7 +65,7 @@ Result _srv_getServiceHandle(Handle* handleptr, Handle* out, char* server)
 
 void doGspwn(u32* src, u32* dst, u32 size)
 {
-	Result (*nn__gxlow__CTR__CmdReqQueueTx__TryEnqueue)(u32** sharedGspCmdBuf, u32* cmdAdr)=(void*)0x001C2B54;
+	Result (*nn__gxlow__CTR__CmdReqQueueTx__TryEnqueue)(u32** sharedGspCmdBuf, u32* cmdAdr)=(void*)CN_nn__gxlow__CTR__CmdReqQueueTx__TryEnqueue;
 	u32 gxCommand[]=
 	{
 		0x00000004, //command header (SetTextureCopy)
@@ -78,7 +78,7 @@ void doGspwn(u32* src, u32* dst, u32 size)
 		0x00000000, //unused
 	};
 
-	u32** sharedGspCmdBuf=(u32**)(0x356208+0x58);
+	u32** sharedGspCmdBuf=(u32**)(CN_GSPSHAREDBUF_ADR);
 	nn__gxlow__CTR__CmdReqQueueTx__TryEnqueue(sharedGspCmdBuf, gxCommand);
 }
 
@@ -100,16 +100,16 @@ Result _GSPGPU_InvalidateDataCache(Handle* handle, Handle kprocess, u32* addr, u
 
 void patchMem(Handle* gspHandle, u32 dst, u32 size, u32 start, u32 end)
 {
-	Result (*_GSPGPU_FlushDataCache)(Handle* handle, Handle kprocess, u32* addr, u32 size)=(void*)0x002D15D4;
+	Result (*_GSPGPU_FlushDataCache)(Handle* handle, Handle kprocess, u32* addr, u32 size)=(void*)CN_GSPGPU_FlushDataCache_ADR;
 
 	int i;
 	_GSPGPU_InvalidateDataCache(gspHandle, 0xFFFF8001, (u32*)0x14100000, 0x200);
 	doGspwn((u32*)(dst), (u32*)(0x14100000), 0x200);
-	svc_sleepThread(0x1000000);
+	svc_sleepThread(0x100000);
 	for(i=start;i<end;i++)((u32*)0x14100000)[i]=0xEF000009;
 	_GSPGPU_FlushDataCache(gspHandle, 0xFFFF8001, (u32*)0x14100000, 0x200);
 	doGspwn((u32*)(0x14100000), (u32*)(dst), 0x200);
-	svc_sleepThread(0x1000000);
+	svc_sleepThread(0x100000);
 }
 
 Result _FSUSER_OpenFileDirectly(Handle* handle, Handle* out, FS_archive archive, FS_path fileLowPath, u32 openflags, u32 attributes) //no need to have archive opened
@@ -221,15 +221,15 @@ int _main()
 
 	//decrypt it
 	{
-		Result (*blowfishKeyScheduler)(u32* dst)=(void*)0x001A44BC;
-		Result (*blowfishDecrypt)(u32* blowfishKeyData, u32* src, u32* dst, u32 size)=(void*)0x001A4B04;
+		Result (*blowfishKeyScheduler)(u32* dst)=(void*)0x001A5900;
+		Result (*blowfishDecrypt)(u32* blowfishKeyData, u32* src, u32* dst, u32 size)=(void*)0x001A5F48;
 
 		blowfishKeyScheduler((u32*)0x14200000);
 		blowfishDecrypt((u32*)0x14200000, (u32*)0x14100000, (u32*)0x14100000, secondaryPayloadSize);
 	}
 
-	Result (*_DSP_UnloadComponent)(Handle* handle)=(void*)0x002BA368;
-	Handle** dspHandle=(Handle**)0x334EFC;
+	Result (*_DSP_UnloadComponent)(Handle* handle)=(void*)0x002C3A78;
+	Handle** dspHandle=(Handle**)0x341A4C;
 
 	_DSP_UnloadComponent(*dspHandle);
 
