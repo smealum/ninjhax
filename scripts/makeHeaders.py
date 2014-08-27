@@ -1,3 +1,4 @@
+from datetime import datetime
 import sys
 import ast
 
@@ -32,6 +33,7 @@ l+=[("FIRM_VERSION", "\""+sys.argv[1]+"\""),
 	("CN_VERSION", "\""+sys.argv[2]+"\""),
 	("SPIDER_VERSION", "\""+sys.argv[3]+"\""),
 	("RO_VERSION", "\""+sys.argv[4]+"\"")]
+l+=[("BUILDTIME", "\""+datetime.now().strftime("%Y-%m-%d %H:%M:%S")+"\"")]
 
 for fn in sys.argv[6:]:
 	s=open(fn,"r").read()

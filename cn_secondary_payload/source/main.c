@@ -47,6 +47,11 @@ void _strcpy(char* dst, char* src)
 	*dst=0x00;
 }
 
+void _strappend(char* str1, char* str2)
+{
+	_strcpy(&str1[_strlen(str1)], str2);
+}
+
 Result _srv_RegisterClient(Handle* handleptr)
 {
 	u32* cmdbuf=getThreadCommandBuffer();
@@ -102,6 +107,17 @@ void renderString(char* str, int x, int y)
 {
 	Handle* gspHandle=(Handle*)CN_GSPHANDLE_ADR;
 	Result (*_GSPGPU_FlushDataCache)(Handle* handle, Handle kprocess, u8* addr, u32 size)=(void*)CN_GSPGPU_FlushDataCache_ADR;
+	drawString(TOPFBADR1,str,x,y);
+	drawString(TOPFBADR2,str,x,y);
+	_GSPGPU_FlushDataCache(gspHandle, 0xFFFF8001, TOPFBADR1, 240*400*3);
+	_GSPGPU_FlushDataCache(gspHandle, 0xFFFF8001, TOPFBADR2, 240*400*3);
+}
+
+void centerString(char* str, int y)
+{
+	Handle* gspHandle=(Handle*)CN_GSPHANDLE_ADR;
+	Result (*_GSPGPU_FlushDataCache)(Handle* handle, Handle kprocess, u8* addr, u32 size)=(void*)CN_GSPGPU_FlushDataCache_ADR;
+	int x=400-(_strlen(str)*4);
 	drawString(TOPFBADR1,str,x,y);
 	drawString(TOPFBADR2,str,x,y);
 	_GSPGPU_FlushDataCache(gspHandle, 0xFFFF8001, TOPFBADR1, 240*400*3);
@@ -334,10 +350,19 @@ void errorScreen(char* str, u32* dv, u8 n)
 	while(1);
 }
 
-void installerScreen(u32 size)
+void drawTitleScreen(char* str)
 {
 	clearScreen(0x00);
-	renderString("install the exploit to your savegame ?\nthis operation is reversible.\n    A : Yes \n    B : No  ",0,0);
+	centerString("NINJHAX",0);
+	centerString(BUILDTIME,10);
+	centerString("http://smealum.net/ninjhax/",20);
+	renderString(str, 0, 40);
+}
+
+void installerScreen(u32 size)
+{
+	char str[512]="install the exploit to your savegame ?\nthis operation is reversible.\n    A : Yes \n    B : No  ";
+	drawTitleScreen(str);
 
 	while(1)
 	{
@@ -353,7 +378,7 @@ void installerScreen(u32 size)
 			u32 totalWritten;
 			Handle fileHandle;
 
-			renderString("installing...",0,50);
+			_strappend(str, "installing..."); drawTitleScreen(str);
 
 			ret=FSUSER_OpenArchive(fsuHandle, &saveArchive);
 			state++; if(ret)goto installEnd;
@@ -387,7 +412,7 @@ void installerScreen(u32 size)
 				errorScreen("   installation process failed.\n   please report the below information by\n   email to sme@lum.sexy", v, 2);
 			}
 
-			renderString("installing... done.\nloading menu...",0,50);
+			_strappend(str, " done.\nloading menu..."); drawTitleScreen(str);
 
 			break;
 		}else if(PAD&PAD_B)break;
@@ -397,7 +422,7 @@ void installerScreen(u32 size)
 int main(u32 size, char** argv)
 {
 	int line=10;
-	renderString("spiderto",0,line+=10);
+	drawTitleScreen("");
 
 	Handle* srvHandle=(Handle*)CN_SRVHANDLE_ADR;
 	Handle* gspHandle=(Handle*)CN_GSPHANDLE_ADR;
@@ -420,13 +445,12 @@ int main(u32 size, char** argv)
 		_aptOpenSession();
 			ret=_APT_PrepareToStartSystemApplet(aptuHandle, APPID_WEB);
 		_aptCloseSession();
-		drawHex(ret,0,line+=10);
+		drawTitleScreen("running exploit... 000%");
 
 		_aptOpenSession();
 			ret=_APT_StartSystemApplet(aptuHandle, APPID_WEB, &buf, 0, 0);
 		_aptCloseSession();
-		drawHex(ret,0,line+=10);
-		drawHex(size,0,line+=10);
+		drawTitleScreen("running exploit... 020%");
 
 		svc_sleepThread(100000000); //sleep just long enough for menu to grab rights
 
@@ -505,12 +529,16 @@ int main(u32 size, char** argv)
 			svc_controlMemory(&out, 0x08000000, 0x00000000, CN_HEAPSIZE, MEMOP_FREE, 0x0);
 		}
 
+		drawTitleScreen("running exploit... 040%");
+
 		_GSPGPU_ReleaseRight(*gspHandle); //disable GSP module access
 	}
 
 	svc_sleepThread(100000000); //sleep just long enough for spider to grab rights
 
 	_GSPGPU_AcquireRight(*gspHandle, 0x0); //get in line for gsp rights
+
+	drawTitleScreen("running exploit... 070%");
 
 	u32* debug=(u32*)CN_DATABSS_START;
 	debug[6]=0xDEADBABE;
@@ -543,31 +571,15 @@ int main(u32 size, char** argv)
 	//allocate some memory for homebrew .text/rodata/data/bss... (will be remapped)
 	ret=svc_controlMemory(&out, CN_ALLOCPAGES_ADR, 0x00000000, CN_ADDPAGES*0x1000, MEMOP_COMMIT, 0x3);
 
-	int i;
-	for(i=0;i<0x10;i++)
-	{
-		drawHex(line++,0,40);
-		drawHex(0x00DEAD01,0,50);
-		_GSPGPU_FlushDataCache(gspHandle, 0xFFFF8001, (u32*)TOPFBADR1, 0x46500*2);
-	}
+	drawTitleScreen("running exploit... 080%");
 
 	memcpy((u8*)0x13FF0000, cn_bootloader_bin, cn_bootloader_bin_size);
 
-	for(i=0;i<0x10;i++)
-	{
-		drawHex(line++,0,40);
-		drawHex(0x00DEAD02,0,50);
-		_GSPGPU_FlushDataCache(gspHandle, 0xFFFF8001, (u32*)TOPFBADR1, 0x46500*2);
-	}
+	drawTitleScreen("running exploit... 090%");
 	
 	if(_HB_SetupBootloader(hbHandle, 0x13FF0000))*((u32*)NULL)=0xBABE0061;
 
-	for(i=0;i<0x10;i++)
-	{
-		drawHex(line++,0,40);
-		drawHex(0x00DEAD03,0,50);
-		_GSPGPU_FlushDataCache(gspHandle, 0xFFFF8001, (u32*)TOPFBADR1, 0x46500*2);
-	}
+	drawTitleScreen("running exploit... 100%");
 
 	//open sdmc 3dsx file
 	Handle fileHandle;
