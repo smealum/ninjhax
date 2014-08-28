@@ -117,7 +117,7 @@ void centerString(char* str, int y)
 {
 	Handle* gspHandle=(Handle*)CN_GSPHANDLE_ADR;
 	Result (*_GSPGPU_FlushDataCache)(Handle* handle, Handle kprocess, u8* addr, u32 size)=(void*)CN_GSPGPU_FlushDataCache_ADR;
-	int x=400-(_strlen(str)*4);
+	int x=200-(_strlen(str)*4);
 	drawString(TOPFBADR1,str,x,y);
 	drawString(TOPFBADR2,str,x,y);
 	_GSPGPU_FlushDataCache(gspHandle, 0xFFFF8001, TOPFBADR1, 240*400*3);

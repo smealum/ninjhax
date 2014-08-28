@@ -188,7 +188,7 @@ int Load3DSX(Handle file, Handle process, void* baseAddr)
 	{
 		// Write service handle table pointer
 		// the actual structure has to be filled out by cn_bootloader
-		prmStruct[1]=(u32)__service_ptr;
+		prmStruct[1] = (u32)__service_ptr;
 
 		// XXX: other fields that need filling:
 		// prmStruct[2] <-- __apt_appid (default: 0x300)
