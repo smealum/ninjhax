@@ -361,7 +361,7 @@ void drawTitleScreen(char* str)
 
 void installerScreen(u32 size)
 {
-	char str[512]="install the exploit to your savegame ?\nthis operation is reversible.\n    A : Yes \n    B : No  ";
+	char str[512]="install the exploit to your savegame ?\nthis will overwrite your custom levels\nand make some of the game inoperable.\nthe exploit can later be uninstalled.\n    A : Yes \n    B : No  ";
 	drawTitleScreen(str);
 
 	while(1)
@@ -378,7 +378,7 @@ void installerScreen(u32 size)
 			u32 totalWritten;
 			Handle fileHandle;
 
-			_strappend(str, "installing..."); drawTitleScreen(str);
+			_strappend(str, "\n\n   installing..."); drawTitleScreen(str);
 
 			ret=FSUSER_OpenArchive(fsuHandle, &saveArchive);
 			state++; if(ret)goto installEnd;
@@ -412,7 +412,7 @@ void installerScreen(u32 size)
 				errorScreen("   installation process failed.\n   please report the below information by\n   email to sme@lum.sexy", v, 2);
 			}
 
-			_strappend(str, " done.\nloading menu..."); drawTitleScreen(str);
+			_strappend(str, " done.\n   loading menu..."); drawTitleScreen(str);
 
 			break;
 		}else if(PAD&PAD_B)break;

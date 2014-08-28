@@ -1,0 +1,70 @@
+NINJHAX
+
+What is ninjhax ?
+
+	ninjhax is an piece of software that allows you to run unsigned code on your 3DS. In practice, this means being able to run homebrew applications such as games, tools and emulators !
+
+What do I need for ninjhax ?
+	
+	You need exactly three things to run unsigned code on your console :
+		- A 3DS, 3DS XL or 2DS console with a firmware version between 4.0.0-7 and 8.1.0-19.
+		- An SD card compatible with your 3DS (the one it comes with will of course do)
+		- A copy of the game CUBIC NINJA, either from retail or eShop.
+
+How do I run ninjhax ?
+
+	Installation instructions are also available in [video form].
+
+	1. Go to the [...] section of this page and enter your console's firmware version
+	2. Hit submit; you should get your very own ninjhax QR code.
+	3. Make sure your 3DS's wifi connection is enabled and connected to the internet (this is important !)
+	4. Start CUBIC NINJA on your console, go to the "Create" and then the "QR code"
+	5. Scan the QR Code. This may take a couple tries.
+	6. Follow on screen instructions. You may elect to not install the exploit on your gamecard and scan the QR code every time; this is not recommended however.
+	7. OPTIONAL - once the ninjhax is installed to your gamecard, just go back to the "QR code" menu and it'll run automatically !
+	8. OPTIONAL - you can now run homebrew apps on your 3DS ! Simply drag and drop application folders into the "3DS" directory that was created on your SD card by ninjhax.
+
+	[VIDEO]
+
+How do I write software for the 3DS ?
+
+	To mark the occasion, we've put together a brand new version of ctrulib, which is both cleaner and more feature complete ! Additionally, fincs has put together a devkitARM integration patch, meaning that it is now possible to "natively" compile 3DS homebrew apps with devkitARM. For more information on this, follow this link : <...>
+
+Who made ninjhax ?
+
+	ninjhax was put together by a very passionate team of reverse engineers/hackers/developers, including :
+
+		- smea - 3DS research, core exploit code (for all versions), ctrulib improvements, 3ds_hb_menu code, testing/debugging
+		- yellows8 - 3DS research, ctrulib improvements, auditing, help with pretty much everything
+		- plutoo - 3DS research, ctrulib improvements, auditing, help with pretty much everything
+		- fincs - 3DSX format/code, ctrulib improvements, devkitARM integration, testing
+		- mtheall - ctrulib improvements, 3ds_hb_menu code, testing
+		- GEMISIS - 3ds_hb_menu code, testing
+		- Fluto, Arkhandar - 3ds_hb_menu design
+		- Normmatt, ichfly - general help, testing
+
+Frequently Asked Questions
+
+	Does this allow region free ?
+
+		ninjhax does not yet allow people to run software from other regions. This should however be possible at some point in the not-too-distant future.
+
+	Does this let me run roms ?
+
+		No. ninjhax is a user mode exploit, meaning that we do not have full control over the console, and therefore cannot run pirated software. That being said, we have the same amount of access as regular apps and games to the console's hardware, and so we can make some kickass homebrew !
+
+	ninjhax won't run anymore ! I updated my console after installing ninjhax and I can't access the homebrew launcher anymore. What do I do ?
+
+		In this case, all you need to do is clear CUBIC NINJA's savegame. To do so, enter CUBIC NINJA's main menu and hold L+R+X+Y; after a few seconds, a menu will show up asking whether you'd like to clear your savegame. Do it, grab the QR code for your new firmware version and you should be good to go !
+
+	Can ninjhax be uninstalled ?
+
+		Yes. Go to CUBIC NINJA's main menu, hold L+R+X+Y and follow instructions.
+
+	What are 3DSX files ? Why doesn't ninjhax load CXIs ?
+
+		We made the decision early on that ninjhax should only work with a highly relocatable executable format as a way to improve compatibility with potential future exploits, which may or may not include the ability to update virtual memory page permissions. 3DSX is a format developed by fincs which allows us to do just that; each section (.text, rodata and data) can be relocated independantly, making it perfect for our needs. Compiling as 3DSX rather than CXI will help maximize future compatibility.
+
+	What about Gateway ? It can't run 3DSX files.
+
+		While the Gateway flashcart can't run 3DSX files, it can run homebrew compiled as CXI. And as luck would have it, it's possible to output a CXI from a 3DSX file ! With that in mind, Gateway homebrew does not provide quite the same level of access as ninjhax (CSND access is missing from GW, for instance) and as such not all ninjhax will run on Gateway.
