@@ -23,3 +23,4 @@ clean:
 cn_save_initial_loader.bin:
 	@cd $(CNVERSION) && make
 	@cp $(CNVERSION)/$@ ./
+	@python $(SCRIPTS)/obfuscator5000.py $@
