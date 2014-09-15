@@ -193,8 +193,10 @@ void HB_Backdoor(u32* cmdbuf)
     }
 
     svc_closeHandle(proc_hdl);
-    cmdbuf[0]=0x00060040;
-    cmdbuf[1]=ret;
+    if(func_ptr == 0) {
+        cmdbuf[0]=0x00060040;
+        cmdbuf[1]=ret;
+    }
 }
 
 cmdHandlerFunction commandHandlers[NUM_CMD]={HB_FlushInvalidateCache, HB_SetupBootloader, HB_SendHandle, HB_GetHandle, HB_Load3dsx, HB_Backdoor};
