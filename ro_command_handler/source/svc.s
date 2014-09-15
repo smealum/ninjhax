@@ -44,3 +44,13 @@ svc_acceptSession:
               STR   R1, [R2]
               ADD   SP, SP, #4
               BX    LR
+
+.global svc_duplicateHandle
+.type svc_duplicateHandle, %function
+svc_duplicateHandle:
+        str r0, [sp,#-0x4]!
+        svc 0x27
+        ldr r3, [sp], #4
+        str r1, [r3]
+        bx lr
+        

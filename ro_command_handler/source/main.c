@@ -10,7 +10,7 @@
 #include "svc.h"
 #include "3dsx.h"
 
-#define NUM_CMD (5)
+#define NUM_CMD (6)
 
 int* numSessionHandles=(int*)RO_SESSIONHANDLECNT_ADR;
 Handle* sessionHandles=(Handle*)RO_SESSIONHANDLES_ADR;
@@ -164,7 +164,40 @@ void HB_Load3dsx(u32* cmdbuf)
 	cmdbuf[1]=ret;
 }
 
-cmdHandlerFunction commandHandlers[NUM_CMD]={HB_FlushInvalidateCache, HB_SetupBootloader, HB_SendHandle, HB_GetHandle, HB_Load3dsx};
+void HB_Backdoor(u32* cmdbuf)
+{
+    // parameters
+    // u32 func_ptr
+    // u32 proc_size
+    // u32 translate (0)
+    // u32 process_handle
+
+    u32 func_ptr = cmdbuf[1];
+    u32 proc_size= cmdbuf[2];
+    u32 proc_hdl = cmdbuf[4];
+
+    u32 cur_proc = 0;
+    svc_duplicateHandle(&cur_proc, 0xffff8001);
+
+    Result ret;
+    ret=svc_mapProcessMemory(proc_hdl, 0x00100000, 0x02000000);
+    if(!ret) {
+        ret=svc_controlProcessMemory(cur_proc, 0x00100000, 0, proc_size, MEMOP_PROTECT, 0x7);
+        if(!ret) {
+            if(func_ptr != 0) {
+                void(*fn)() = func_ptr;
+                fn();
+            }
+        }
+        ret=svc_unmapProcessMemory(proc_hdl, 0x00100000, 0x02000000);
+    }
+
+    svc_closeHandle(proc_hdl);
+    cmdbuf[0]=0x00060040;
+    cmdbuf[1]=ret;
+}
+
+cmdHandlerFunction commandHandlers[NUM_CMD]={HB_FlushInvalidateCache, HB_SetupBootloader, HB_SendHandle, HB_GetHandle, HB_Load3dsx, HB_Backdoor};
 
 int _main(Result ret, int currentHandleIndex)
 {
