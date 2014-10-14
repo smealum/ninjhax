@@ -35,8 +35,9 @@ void HB_FlushInvalidateCache(u32* cmdbuf)
 
 	const Handle processHandle=cmdbuf[3];
 
-	svc_mapProcessMemory(processHandle, 0x00100000, 0x00200000);
-	svc_unmapProcessMemory(processHandle, 0x00100000, 0x00200000);
+	Result rc = svc_mapProcessMemory(processHandle, 0x00100000, 0x00200000);
+	if(rc == 0)
+		svc_unmapProcessMemory(processHandle, 0x00100000, 0x00200000);
 
 	svc_closeHandle(processHandle);
 
@@ -153,9 +154,11 @@ void HB_Load3dsx(u32* cmdbuf)
 
 	Result ret;
 	ret=svc_mapProcessMemory(targetProcessHandle, 0x00100000, 0x02000000);
-	if(!ret)memset((void*)0x00100000, 0x00, CN_NEWTOTALPAGES*0x1000);
-	if(!ret)ret=Load3DSX(fileHandle, targetProcessHandle, (void*)baseAddr);
-	if(!ret)ret=svc_unmapProcessMemory(targetProcessHandle, 0x00100000, 0x02000000);
+	if(!ret) {
+		memset((void*)0x00100000, 0x00, CN_NEWTOTALPAGES*0x1000);
+		ret=Load3DSX(fileHandle, targetProcessHandle, (void*)baseAddr);
+		svc_unmapProcessMemory(targetProcessHandle, 0x00100000, 0x02000000);
+	}
 
 	cmdbuf[0]=0x00050040;
 	cmdbuf[1]=ret;
