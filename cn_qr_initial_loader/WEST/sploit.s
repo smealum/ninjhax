@@ -86,10 +86,10 @@ endROP:
 
 .align 4
 gxCommand:
-	.word 0x00000004 ;command header (SetTextureCopy)
-	.word CN_CODELOCATIONGSP ;source address
-	.word CN_GSPHEAP+CN_TEXTPAOFFSET+0x001D9700 ;destination address (put it at the end to avoid cache issues)
-	.word 0x00010000 ;size
+	.word 0x00000004 ; command header (SetTextureCopy)
+	.word CN_CODELOCATIONGSP ; source address
+	.word CN_GSPHEAP+CN_TEXTPAOFFSET+0x001D9700 ; destination address (put it at the end to avoid cache issues)
+	.word 0x00010000 ; size
 	.word 0xFFFFFFFF ; dim in
 	.word 0xFFFFFFFF ; dim out
 	.word 0x00000008 ; flags

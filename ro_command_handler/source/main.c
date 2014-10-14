@@ -180,7 +180,7 @@ int _main(Result ret, int currentHandleIndex)
 			switch(currentHandleIndex)
 			{
 				case 0:
-					// ???
+					svc_exitProcess();
 					break;
 				case 1:
 					{
