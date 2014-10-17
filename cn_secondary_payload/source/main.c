@@ -345,7 +345,7 @@ void errorScreen(char* str, u32* dv, u8 n)
 	if(dv && n)
 	{
 		int i;
-		for(i=0;i<n;i++)drawHex(dv[i], 8, 50+n*10);
+		for(i=0;i<n;i++)drawHex(dv[i], 8, 50+i*10);
 	}
 	while(1);
 }
@@ -361,7 +361,13 @@ void drawTitleScreen(char* str)
 
 void installerScreen(u32 size)
 {
-	char str[512]="install the exploit to your savegame ?\nthis will overwrite your custom levels\nand make some of the game inoperable.\nthe exploit can later be uninstalled.\n    A : Yes \n    B : No  ";
+	char str[512] =
+		"install the exploit to your savegame ?\n"
+		"this will overwrite your custom levels\n"
+		"and make some of the game inoperable.\n"
+		"the exploit can later be uninstalled.\n"
+		"    A : Yes \n"
+		"    B : No  ";
 	drawTitleScreen(str);
 
 	while(1)

