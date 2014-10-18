@@ -10,19 +10,11 @@ ifeq ($(filter $(DEVKITARM)/bin,$(PATH)),)
 export PATH:=$(DEVKITARM)/bin:$(PATH)
 endif
 
-SCRIPTS = "../scripts"
-
-all: spider_hook_rop.bin
+all: spider_thread0_rop.bin
 
 clean:
-	@rm -f spider_hook_rop.bin
-	@cd 2050 && make clean
-	@cd 3074 && make clean
-	@cd 4096 && make clean
-	@cd SKATER_10 && make clean
+	@rm -f spider_thread0_rop.bin
 	@echo "all cleaned up !"
 
-spider_hook_rop.bin:
-	@cd $(SPIDERVERSION) && make
-	@cp $(SPIDERVERSION)/$@ ./
-	@python $(SCRIPTS)/obfuscator5000.py $@
+%.bin: %.s
+	@armips $<

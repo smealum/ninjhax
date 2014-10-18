@@ -27,8 +27,8 @@ if len(sys.argv)<6:
 	print("use : "+sys.argv[0]+" <firmver> <cnver> <spiderver> <rover> <extensionless_output_name> <input_file1> <input_file2> ...")
 	exit()
 
-l=[("_SPIDER_VERSION", sys.argv[3]),
-	("_RO_VERSION", sys.argv[4])]
+# l=[("_SPIDER_VERSION", sys.argv[3]),
+l=[("_RO_VERSION", sys.argv[4])]
 l+=[("FIRM_VERSION", "\""+sys.argv[1]+"\""),
 	("CN_VERSION", "\""+sys.argv[2]+"\""),
 	("SPIDER_VERSION", "\""+sys.argv[3]+"\""),

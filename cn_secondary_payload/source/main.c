@@ -467,19 +467,20 @@ int main(u32 size, char** argv)
 
 		//read spider memory
 		{
-			_GSPGPU_FlushDataCache(gspHandle, 0xFFFF8001, (u32*)0x14100000, 0x00000200);
-			doGspwn((u32*)(SPIDER_HOOKROP_PADR-0x0C000000), (u32*)0x14100000, 0x00000200);
+			_GSPGPU_FlushDataCache(gspHandle, 0xFFFF8001, (u32*)0x14100000, 0x00000300);
+			
+			doGspwn((u32*)(SPIDER_HOOKROP_PADR+FIRM_LINEAROFFSET), (u32*)0x14100000, 0x00000300);
 		}
 
 		svc_sleepThread(1000000); //sleep long enough for memory to be read
 
 		//patch memdump and write it
 		{
-			((u8*)0x14100000)[0x14]=0xFF;
+			((u8*)0x14100000)[SPIDER_HOOKROP_KILLOFFSET]=0xFF;
 			memcpy(((u8*)(0x14100000+SPIDER_HOOKROP_OFFSET)), spider_hook_rop_bin, 0xC);
-			_GSPGPU_FlushDataCache(gspHandle, 0xFFFF8001, (u32*)0x14100000, 0x00000200);
+			_GSPGPU_FlushDataCache(gspHandle, 0xFFFF8001, (u32*)0x14100000, 0x00000300);
 
-			doGspwn((u32*)0x14100000, (u32*)(SPIDER_HOOKROP_PADR-0x0C000000), 0x00000200);
+			doGspwn((u32*)0x14100000, (u32*)(SPIDER_HOOKROP_PADR+FIRM_LINEAROFFSET), 0x00000300);
 		}
 
 		svc_sleepThread(100000000);
