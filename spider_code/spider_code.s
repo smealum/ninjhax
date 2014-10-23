@@ -6,6 +6,7 @@
 
 ;spider code
 .arm
+
 	;closeThread text spray
 	ldr r0, =0xEF000009 ; svc 0x09 (ExitThread)
 	ldr r1, =0x00100000

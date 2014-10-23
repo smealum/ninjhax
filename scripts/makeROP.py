@@ -11,6 +11,7 @@ def putWord(b, k, v, n=4):
 		b[k+c]=(v>>(c*8))&0xFF
 
 def writeRelocationPatch(b, i, a, v, s=0x1):
+	s+=CRO_SEGMENT_OFFSET
 	k=CRO_PATCH4_OFFSET+i*0xC
 	putWord(b, k+0x0, (a<<4)|s)
 	putWord(b, k+0x4, 0x00000302)
