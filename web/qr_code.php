@@ -20,15 +20,20 @@ function getRoVersion($v)
 
 function getSpiderVersion($v)
 {
-	if($v[3]<7)
+	if($v[5]=="N")
 	{
-		return "1024";
-	}else if($v[3]<11){
-		return "2050";
-	}else if($v[3]<16){
-		return "3074";
+		return "SKATER_10";
 	}else{
-		return "4096";
+		if($v[3]<7)
+		{
+			return "1024";
+		}else if($v[3]<11){
+			return "2050";
+		}else if($v[3]<16){
+			return "3074";
+		}else{
+			return "4096";
+		}
 	}
 }
 
@@ -44,11 +49,16 @@ function getCnVersion($v)
 
 function getFirmVersion($v)
 {
-	if($v[0]<5)
+	if($v[5]=="N")
 	{
-		return "PRE5";
+		return "N3DS";
 	}else{
-		return "POST5";
+		if($v[0]<5)
+		{
+			return "PRE5";
+		}else{
+			return "POST5";
+		}
 	}
 }
 
@@ -57,7 +67,8 @@ $version = array(
 		1 => $_POST['one'],
 		2 => $_POST['two'],
 		3 => $_POST['three'],
-		4 => $_POST['four']
+		4 => $_POST['four'],
+		5 => $_POST['five']
 	);
 
 $filename="./unsupported.png";

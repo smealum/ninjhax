@@ -103,7 +103,7 @@ window.onload=function(){
         '0' : NUPs_4
     }
 
-    var options = {
+    var oldOptions = {
         '4': {
             '0': zeroMicro_1,
             '1': zeroMicro_1,
@@ -132,6 +132,34 @@ window.onload=function(){
             '0': zeroMicro_4,
             '1': zeroMicro_4,
         }
+    }
+
+    var newRegions = {
+        'J' : {}
+    }
+
+    var newNUPs_4 = {
+        '20' : newRegions
+    }
+
+    var newZeroMicro_4 = {
+        '0' : newNUPs_4
+    }
+
+    var newOptions = {
+        '8': {
+            '0': newZeroMicro_4,
+            '1': newZeroMicro_4,
+        },
+        '9': {
+            '0': newZeroMicro_4,
+            '1': newZeroMicro_4,
+        }
+    }
+
+    var options = {
+        'O': oldOptions,
+        'N': newOptions
     }
 
     var state = {};
@@ -197,11 +225,12 @@ window.onload=function(){
 </head>
 <body>
     <form class="firmware-form" action="qr_code.png" method="post">
-        <select data-id="0" name="zero"></select>.
-        <select data-id="1" name="one"></select>.
-        <select data-id="2" name="two"></select>-
-        <select data-id="3" name="three"></select>
-        <select data-id="4" name="four"></select>
+        <select data-id="0" name="five"></select> 
+        <select data-id="1" name="zero"></select>.
+        <select data-id="2" name="one"></select>.
+        <select data-id="3" name="two"></select>-
+        <select data-id="4" name="three"></select>
+        <select data-id="5" name="four"></select>
         <button type="submit" >Submit</button>
     </form>
 </body>
