@@ -116,29 +116,29 @@
 				ldrne r1, =0xBABE0084
 				ldrne r1, [r1]
 
-			;hb:GetHandle(csnd:SND)
-				mrc p15, 0, r8, c13, c0, 3
-				add r8, #0x80
+			; ;hb:GetHandle(csnd:SND)
+			; 	mrc p15, 0, r8, c13, c0, 3
+			; 	add r8, #0x80
 
-				ldr r0, =0x00040040
-				str r0, [r8], #4
-				ldr r0, =0x00000001 ; index
-				str r0, [r8], #4
+			; 	ldr r0, =0x00040040
+			; 	str r0, [r8], #4
+			; 	ldr r0, =0x00000001 ; index
+			; 	str r0, [r8], #4
 
-				mov r0, r10
-				.word 0xEF000032 ; svc 0x32 (SendSyncRequest)
+			; 	mov r0, r10
+			; 	.word 0xEF000032 ; svc 0x32 (SendSyncRequest)
 
-				;[sp, #4] is csnd:SND handle
-				ldr r12, [r8, #4]
-				str r12, [sp, #4]
+			; 	;[sp, #4] is csnd:SND handle
+			; 	ldr r12, [r8, #4]
+			; 	str r12, [sp, #4]
 
-				;induce crash if there's an error
-				cmp r0, #0
-				mrceq p15, 0, r8, c13, c0, 3
-				ldreq r0, [r8, #0x84]
-				cmpeq r0, #0
-				ldrne r1, =0xBABE008C
-				ldrne r1, [r1]
+			; 	;induce crash if there's an error
+			; 	cmp r0, #0
+			; 	mrceq p15, 0, r8, c13, c0, 3
+			; 	ldreq r0, [r8, #0x84]
+			; 	cmpeq r0, #0
+			; 	ldrne r1, =0xBABE008C
+			; 	ldrne r1, [r1]
 
 			;fill out service override structure
 				ldr r0, =CN_SERVICESTRUCT_LOC

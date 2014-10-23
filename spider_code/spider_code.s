@@ -7,70 +7,70 @@
 ;spider code
 .arm
 
-	;closeThread text spray
-	ldr r0, =0xEF000009 ; svc 0x09 (ExitThread)
-	ldr r1, =0x00100000
-	ldr r2, =0x00100000+SPIDER_TEXT_LENGTH
-	exitThreadLoop:
-		ldr r3, [r1]
-		mov r3, r3, lsr #28
-		;heuristic to mostly overwrite ARM instructions
-		cmp r3, #0xE
-		streq r0, [r1]
-		add r1, #4
-		cmp r1, r2
-		blt exitThreadLoop
+	; ;closeThread text spray
+	; ldr r0, =0xEF000009 ; svc 0x09 (ExitThread)
+	; ldr r1, =0x00100000
+	; ldr r2, =0x00100000+SPIDER_TEXT_LENGTH
+	; exitThreadLoop:
+	; 	ldr r3, [r1]
+	; 	mov r3, r3, lsr #28
+	; 	;heuristic to mostly overwrite ARM instructions
+	; 	cmp r3, #0xE
+	; 	streq r0, [r1]
+	; 	add r1, #4
+	; 	cmp r1, r2
+	; 	blt exitThreadLoop
 
-	;wake thread1
-	ldr r1, =SPIDER_PROCSEMAPHORE_ADR
-	ldr r1, [r1]
-	mov r2, #1
-	.word 0xEF000016 ; svc 0x16 (ReleaseSemaphore)
+	; ;wake thread1
+	; ldr r1, =SPIDER_PROCSEMAPHORE_ADR
+	; ldr r1, [r1]
+	; mov r2, #1
+	; .word 0xEF000016 ; svc 0x16 (ReleaseSemaphore)
 
-	;wake thread2
-	ldr r0, =SPIDER_APTHANDLES_ADR+8
-	ldr r0, [r0]
-	.word 0xEF000018 ; svc 0x18 (SignalEvent)
+	; ;wake thread2
+	; ldr r0, =SPIDER_APTHANDLES_ADR+8
+	; ldr r0, [r0]
+	; .word 0xEF000018 ; svc 0x18 (SignalEvent)
 
-	;wake thread3 and thread4
-	ldr r0, =SPIDER_ADDRESSARBITER_ADR
-	ldr r0, [r0] ; handle
-	ldr r1, =SPIDER_ARBADDRESS_1 ;addr
-	ldr r2, =0x00000000 ; arbitration type
-	ldr r3, =0xFFFFFFFF ; value (-1)
-	ldr r4, =0x00000000 ; nanoseconds
-	ldr r5, =0x00000000 ; nanoseconds
-	.word 0xEF000022 ; svc 0x22 (ArbitrateAddress)
+	; ;wake thread3 and thread4
+	; ldr r0, =SPIDER_ADDRESSARBITER_ADR
+	; ldr r0, [r0] ; handle
+	; ldr r1, =SPIDER_ARBADDRESS_1 ;addr
+	; ldr r2, =0x00000000 ; arbitration type
+	; ldr r3, =0xFFFFFFFF ; value (-1)
+	; ldr r4, =0x00000000 ; nanoseconds
+	; ldr r5, =0x00000000 ; nanoseconds
+	; .word 0xEF000022 ; svc 0x22 (ArbitrateAddress)
 
-	;wake thread7
-	ldr r0, =SPIDER_ADDRESSARBITER_ADR
-	ldr r0, [r0] ; handle
-	ldr r1, =SPIDER_ARBADDRESS_2 ;addr
-	ldr r2, =0x00000000 ; arbitration type
-	ldr r3, =0xFFFFFFFF ; value (-1)
-	ldr r4, =0x00000000 ; nanoseconds
-	ldr r5, =0x00000000 ; nanoseconds
-	.word 0xEF000022 ; svc 0x22 (ArbitrateAddress)
+	; ;wake thread7
+	; ldr r0, =SPIDER_ADDRESSARBITER_ADR
+	; ldr r0, [r0] ; handle
+	; ldr r1, =SPIDER_ARBADDRESS_2 ;addr
+	; ldr r2, =0x00000000 ; arbitration type
+	; ldr r3, =0xFFFFFFFF ; value (-1)
+	; ldr r4, =0x00000000 ; nanoseconds
+	; ldr r5, =0x00000000 ; nanoseconds
+	; .word 0xEF000022 ; svc 0x22 (ArbitrateAddress)
 
-	;wake thread8
-	ldr r0, =SPIDER_ADDRESSARBITER_ADR
-	ldr r0, [r0] ; handle
-	ldr r1, =SPIDER_ARBADDRESS_3 ;addr
-	ldr r2, =0x00000000 ; arbitration type
-	ldr r3, =0xFFFFFFFF ; value (-1)
-	ldr r4, =0x00000000 ; nanoseconds
-	ldr r5, =0x00000000 ; nanoseconds
-	.word 0xEF000022 ; svc 0x22 (ArbitrateAddress)
+	; ;wake thread8
+	; ldr r0, =SPIDER_ADDRESSARBITER_ADR
+	; ldr r0, [r0] ; handle
+	; ldr r1, =SPIDER_ARBADDRESS_3 ;addr
+	; ldr r2, =0x00000000 ; arbitration type
+	; ldr r3, =0xFFFFFFFF ; value (-1)
+	; ldr r4, =0x00000000 ; nanoseconds
+	; ldr r5, =0x00000000 ; nanoseconds
+	; .word 0xEF000022 ; svc 0x22 (ArbitrateAddress)
 
-	;wake thread10
-	ldr r0, =SPIDER_ADDRESSARBITER_ADR
-	ldr r0, [r0] ; handle
-	ldr r1, =SPIDER_ARBADDRESS_4 ;addr
-	ldr r2, =0x00000000 ; arbitration type
-	ldr r3, =0xFFFFFFFF ; value (-1)
-	ldr r4, =0x00000000 ; nanoseconds
-	ldr r5, =0x00000000 ; nanoseconds
-	.word 0xEF000022 ; svc 0x22 (ArbitrateAddress)
+	; ;wake thread10
+	; ldr r0, =SPIDER_ADDRESSARBITER_ADR
+	; ldr r0, [r0] ; handle
+	; ldr r1, =SPIDER_ARBADDRESS_4 ;addr
+	; ldr r2, =0x00000000 ; arbitration type
+	; ldr r3, =0xFFFFFFFF ; value (-1)
+	; ldr r4, =0x00000000 ; nanoseconds
+	; ldr r5, =0x00000000 ; nanoseconds
+	; .word 0xEF000022 ; svc 0x22 (ArbitrateAddress)
 
 	;sleep for a second
 	ldr r0, =0x3B9ACA00
@@ -127,34 +127,34 @@
 
 	;hand-closing handles stored on the heap
 
-		;stray event
-		ldr r0, =0x09a6c000+0x1BC
-		ldr r0, [r0]
-		.word 0xEF000023 ; svc 0x23 (CloseHandle)
+		; ;stray event
+		; ldr r0, =0x09a6c000+0x1BC
+		; ldr r0, [r0]
+		; .word 0xEF000023 ; svc 0x23 (CloseHandle)
 
-		;stray mutex
-		ldr r0, =0x080493f4
-		ldr r0, [r0]
-		.word 0xEF000023 ; svc 0x23 (CloseHandle)
+		; ;stray mutex
+		; ldr r0, =0x080493f4
+		; ldr r0, [r0]
+		; .word 0xEF000023 ; svc 0x23 (CloseHandle)
 
-		;stray timer
-		ldr r0, =0x0804a9e0
-		ldr r0, [r0]
-		.word 0xEF000023 ; svc 0x23 (CloseHandle)
+		; ;stray timer
+		; ldr r0, =0x0804a9e0
+		; ldr r0, [r0]
+		; .word 0xEF000023 ; svc 0x23 (CloseHandle)
 
-	;free GSP heap
-		ldr r0, =0x00000001 ; type (FREE)
-		ldr r1, =SPIDER_GSPHEAPSTART ; addr0
-		ldr r2, =0x00000000 ; addr1
-		ldr r3, =SPIDER_GSPHEAPSIZE ; size
-		ldr r4, =0x00000000 ; permissions (RW)
+	; ;free GSP heap
+	; 	ldr r0, =0x00000001 ; type (FREE)
+	; 	ldr r1, =SPIDER_GSPHEAPSTART ; addr0
+	; 	ldr r2, =0x00000000 ; addr1
+	; 	ldr r3, =SPIDER_GSPHEAPSIZE ; size
+	; 	ldr r4, =0x00000000 ; permissions (RW)
 
-		.word 0xEF000001 ; svc 0x01 (ControlMemory)
+	; 	.word 0xEF000001 ; svc 0x01 (ControlMemory)
 
-		;induce crash if there's an error
-		cmp r0, #0
-		ldrne r1, =0xCAFE0061
-		ldrne r1, [r1]
+	; 	;induce crash if there's an error
+	; 	cmp r0, #0
+	; 	ldrne r1, =0xCAFE0061
+	; 	ldrne r1, [r1]
 
 	;reconnect to ro
 		sub sp, #0x20
@@ -211,29 +211,29 @@
 			ldr r1, [r1]
 			str r1, [sp, #4]
 
-		;srv:GetServiceHandle("csnd:SND")
-			mrc p15, 0, r8, c13, c0, 3
-			add r8, #0x80
-			ldr r0, =0x00050100
-			str r0, [r8], #4
-			ldr r0, =0x646E7363   ;csnd
-			str r0, [r8], #4
-			ldr r0, =0x444E533A   ;:SND
-			str r0, [r8], #4
-			ldr r0, =0x00000008 ;strlen
-			str r0, [r8], #4
-			ldr r0, =0x00000000 ;0x0
-			str r0, [r8], #4
+		; ;srv:GetServiceHandle("csnd:SND")
+		; 	mrc p15, 0, r8, c13, c0, 3
+		; 	add r8, #0x80
+		; 	ldr r0, =0x00050100
+		; 	str r0, [r8], #4
+		; 	ldr r0, =0x646E7363   ;csnd
+		; 	str r0, [r8], #4
+		; 	ldr r0, =0x444E533A   ;:SND
+		; 	str r0, [r8], #4
+		; 	ldr r0, =0x00000008 ;strlen
+		; 	str r0, [r8], #4
+		; 	ldr r0, =0x00000000 ;0x0
+		; 	str r0, [r8], #4
 
-			ldr r0, [sp]
-			.word 0xEF000032 ; svc 0x32 (SendSyncRequest)
-			ldr r1, [r8, #-0x8]
-			str r1, [sp, #0x10]
+		; 	ldr r0, [sp]
+		; 	.word 0xEF000032 ; svc 0x32 (SendSyncRequest)
+		; 	ldr r1, [r8, #-0x8]
+		; 	str r1, [sp, #0x10]
 
-			;induce crash if there's an error
-			cmp r0, #0
-			ldrne r1, =0xCAFE008C
-			ldrne r1, [r1]
+		; 	;induce crash if there's an error
+		; 	cmp r0, #0
+		; 	ldrne r1, =0xCAFE008C
+		; 	ldrne r1, [r1]
 
 			ldr r1, =SPIDER_ROHANDLE_ADR
 			ldr r1, [r1]
@@ -277,26 +277,26 @@
 			ldrne r1, =0xCAFE0083
 			ldrne r1, [r1]
 
-		;hb:SendHandle(csnd:SND)
-			mrc p15, 0, r8, c13, c0, 3
-			add r8, #0x80
+		; ;hb:SendHandle(csnd:SND)
+		; 	mrc p15, 0, r8, c13, c0, 3
+		; 	add r8, #0x80
 
-			ldr r0, =0x00030042
-			str r0, [r8], #4
-			ldr r0, =0x00000001 ; index
-			str r0, [r8], #4
-			ldr r0, =0x00000000
-			str r0, [r8], #4
-			ldr r0, [sp, 0x10] ; csnd:SND handle
-			str r0, [r8], #4
+		; 	ldr r0, =0x00030042
+		; 	str r0, [r8], #4
+		; 	ldr r0, =0x00000001 ; index
+		; 	str r0, [r8], #4
+		; 	ldr r0, =0x00000000
+		; 	str r0, [r8], #4
+		; 	ldr r0, [sp, 0x10] ; csnd:SND handle
+		; 	str r0, [r8], #4
 
-			ldr r0, [sp, #4]
-			.word 0xEF000032 ; svc 0x32 (SendSyncRequest)
+		; 	ldr r0, [sp, #4]
+		; 	.word 0xEF000032 ; svc 0x32 (SendSyncRequest)
 
-			;induce crash if there's an error
-			cmp r0, #0
-			ldrne r1, =0xCAFE0083
-			ldrne r1, [r1]
+		; 	;induce crash if there's an error
+		; 	cmp r0, #0
+		; 	ldrne r1, =0xCAFE0083
+		; 	ldrne r1, [r1]
 
 
 		;srv:GetServiceHandle("APT:U")
@@ -376,7 +376,6 @@
 			ldr r0, [sp]
 			.word 0xEF000023 ; svc 0x23 (CloseHandle)
 		add sp, #0x20
-
 
 	;GSPGPU_ReleaseRight
 		mrc p15, 0, r8, c13, c0, 3

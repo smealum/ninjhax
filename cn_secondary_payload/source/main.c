@@ -539,7 +539,6 @@ int main(u32 size, char** argv)
 		drawTitleScreen("running exploit... 040%");
 
 		_GSPGPU_ReleaseRight(*gspHandle); //disable GSP module access
-		while(1);
 	}
 
 	svc_sleepThread(100000000); //sleep just long enough for spider to grab rights

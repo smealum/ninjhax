@@ -137,7 +137,7 @@
 		; 	ldr r0, =RO_SPIDERHANDLE_LOCATION
 		; 	ldr r0, [r0]
 		; 	.word 0xEF000023 ; svc 0x23 (CloseHandle)
-
+		
 		;reply to spider
 			ldr r1, =0x00040040
 			str r1, [r8]
