@@ -234,8 +234,7 @@ void patchMem(Handle* gspHandle, u32 dst, u32 size, u32 start, u32 end)
 
 u32 computeCodeAddress(u32 offset)
 {
-	// return CN_GSPHEAP+CN_TEXTPA_OFFSET_FROMEND+*((u32*)0x1FF80040)+offset;
-	return CN_GSPHEAP+CN_TEXTPA_OFFSET_FROMEND+0x07C00000+offset;
+	return CN_GSPHEAP+CN_TEXTPA_OFFSET_FROMEND+FIRM_APPMEMALLOC+offset;
 }
 
 int _main()

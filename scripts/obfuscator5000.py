@@ -31,8 +31,8 @@ def obfuscate(d,l):
 data=bytearray(open(sys.argv[1],"rb").read())
 
 words=findWords(data)
-# obfuscate(data,words)
-print("OBFUSCATOR 5000 TEMPORARILY DISABLED")
-print("DO NOT FORGET TO REENABLE")
+obfuscate(data,words)
+# print("OBFUSCATOR 5000 TEMPORARILY DISABLED")
+# print("DO NOT FORGET TO REENABLE")
 
 open(sys.argv[1], "wb").write(data)

@@ -59,8 +59,9 @@ Result _srv_getServiceHandle(Handle* handleptr, Handle* out, char* server)
 // 	char str[9];
 
 // 	hex2str(str,val);
-// 	drawString(CN_TOPFBADR1,str,x,y);
-// 	drawString(CN_TOPFBADR2,str,x,y);
+// 	drawString((u8*)CN_CN_TOPFBADR1,str,x,y);
+// 	drawString((u8*)CN_CN_TOPFBADR2,str,x,y);
+// _GSPGPU_FlushDataCache(gspHandle, 0xFFFF8001, CN_TOPFBADR1, 0x46500*2);
 // }
 
 void doGspwn(u32* src, u32* dst, u32 size)
@@ -171,7 +172,7 @@ Result _FSFILE_Read(Handle handle, u32 *bytesRead, u64 offset, u32 *buffer, u32 
 
 u32 computeCodeAddress(u32 offset)
 {
-	return CN_GSPHEAP+CN_TEXTPA_OFFSET_FROMEND+*((u32*)0x1FF80040)+offset;
+	return CN_GSPHEAP+CN_TEXTPA_OFFSET_FROMEND+FIRM_APPMEMALLOC+offset;
 }
 
 int _main()
@@ -179,8 +180,8 @@ int _main()
 	Handle* gspHandle=(Handle*)CN_GSPHANDLE_ADR;
 	Result (*_GSPGPU_FlushDataCache)(Handle* handle, Handle kprocess, u32* addr, u32 size)=(void*)CN_GSPGPU_FlushDataCache_ADR;
 
-	// drawString(TOPFBADR1,"ninjhaxx",0,0);
-	// drawString(TOPFBADR2,"ninjhaxx",0,0);
+	// drawString((u8*)CN_TOPFBADR1,"ninjhaxx",0,0);
+	// drawString((u8*)CN_TOPFBADR2,"ninjhaxx",0,0);
 
 	Handle* srvHandle=(Handle*)CN_SRVHANDLE_ADR;
 
@@ -205,6 +206,7 @@ int _main()
 		svc_signalEvent(((Handle*)0x354ba8)[2]);
 		s32 out; svc_releaseSemaphore(&out, *(Handle*)0x341AB0, 1); //CHECK !
 
+
 	svc_sleepThread(0x10000000);
 
 	//load secondary payload
@@ -214,7 +216,8 @@ int _main()
 		Handle* fsuHandle=(Handle*)CN_FSHANDLE_ADR;
 		FS_archive saveArchive=(FS_archive){0x00000004, (FS_path){PATH_EMPTY, 1, (u8*)""}};
 
-		//write secondary payload file
+
+		//read secondary payload file
 		Handle fileHandle;
 		ret=_FSUSER_OpenFileDirectly(fsuHandle, &fileHandle, saveArchive, FS_makePath(PATH_CHAR, "/edit/payload.bin"), FS_OPEN_READ, FS_ATTRIBUTE_NONE);
 		if(ret)*(u32*)NULL=0xC0DF0002;
@@ -243,7 +246,6 @@ int _main()
 	doGspwn((u32*)(0x14100000), (u32*)computeCodeAddress(0x0), 0x0000A000);
 
 	svc_sleepThread(0x3B9ACA00);
-
 
 	void (*reset)(int size)=(void*)0x00100000;
 	reset(0);
