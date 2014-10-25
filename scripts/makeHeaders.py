@@ -34,6 +34,7 @@ l+=[("FIRM_VERSION", "\""+sys.argv[1]+"\""),
 	("SPIDER_VERSION", "\""+sys.argv[3]+"\""),
 	("RO_VERSION", "\""+sys.argv[4]+"\"")]
 l+=[("BUILDTIME", "\""+datetime.now().strftime("%Y-%m-%d %H:%M:%S")+"\"")]
+l+=[("HB_NUM_HANDLES", "16")]
 
 for fn in sys.argv[6:]:
 	s=open(fn,"r").read()

@@ -11,7 +11,6 @@
 #include "3dsx.h"
 
 #define NUM_CMD (5)
-#define NUM_HANDLES (16)
 
 int* numSessionHandles=(int*)RO_SESSIONHANDLECNT_ADR;
 Handle* sessionHandles=(Handle*)RO_SESSIONHANDLES_ADR;
@@ -20,7 +19,7 @@ Handle* sessionHandles=(Handle*)RO_SESSIONHANDLES_ADR;
 struct {
 	u32 name[2];
 	Handle handle;
-} sentHandleTable[NUM_HANDLES];
+} sentHandleTable[HB_NUM_HANDLES];
 
 typedef void (*cmdHandlerFunction)(u32* cmdbuf);
 
@@ -99,7 +98,7 @@ void HB_SendHandle(u32* cmdbuf)
 
 	const u32 handleIndex=cmdbuf[1];
 	const Handle sentHandle=cmdbuf[5];
-	if(((cmdbuf[5] != 0) && (cmdbuf[4] != 0)) || handleIndex>=NUM_HANDLES)
+	if(((cmdbuf[5] != 0) && (cmdbuf[4] != 0)) || handleIndex>=HB_NUM_HANDLES)
 	{
 		//send error
 		cmdbuf[0]=0x00030040;
@@ -123,7 +122,7 @@ void HB_GetHandle(u32* cmdbuf)
 
 	const u32 handleIndex=cmdbuf[1];
 
-	if(handleIndex>=NUM_HANDLES || !sentHandleTable[handleIndex].handle)
+	if(handleIndex>=HB_NUM_HANDLES || !sentHandleTable[handleIndex].handle)
 	{
 		//send error
 		cmdbuf[0]=0x00040040;
@@ -170,7 +169,7 @@ cmdHandlerFunction commandHandlers[NUM_CMD]={HB_FlushInvalidateCache, HB_SetupBo
 
 int _main(Result ret, int currentHandleIndex)
 {
-	int i; for(i=0;i<NUM_HANDLES;i++)sentHandleTable[i].handle=0;
+	int i; for(i=0;i<HB_NUM_HANDLES;i++)sentHandleTable[i].handle=0;
 	targetProcessHandle=0x0;
 	while(1)
 	{

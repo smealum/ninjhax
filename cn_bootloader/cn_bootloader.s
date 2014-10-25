@@ -91,16 +91,17 @@
 			ldrne r1, =0xBABE0088
 			ldrne r1, [r1]
 
-		;grab handles from hb:
+		;grab all handles from hb:
 			bl initHandleTable
 
-			ldr r0, =0x00000000 ; handle index
-			mov r1, r10 ; hb handle
-			bl grabAndPushHandle
-
-			ldr r0, =0x00000001 ; handle index
-			mov r1, r10 ; hb handle
-			bl grabAndPushHandle
+			mov r4, #0
+			grabHandleLoop:
+				mov r0, r4 ; handle index
+				mov r1, r10 ; hb handle
+				bl grabAndPushHandle
+				add r4, #1
+				cmp r4, HB_NUM_HANDLES
+				blt grabHandleLoop
 
 		mov sp, #0x10000000
 

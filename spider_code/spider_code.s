@@ -4,6 +4,8 @@
 
 .Create "spider_code.bin",0x0
 
+NUM_OTHER_HANDLES equ 8
+
 ;spider code
 .arm
 
@@ -236,6 +238,25 @@
 			ldr r3, [sp, 0xC] ; fs:USER handle
 			bl sendHandle
 
+		;get and send other handles (at this point r0 is already set because of sendHandle)
+			mov r4, #0
+			ldr r5, =SPIDER_CROMAPADR+CRO_SPIDERCODE_OFFSET+otherHandleData
+			otherHandleLoop:
+				; r0 : handle index (already set)
+				; r1 : service name ptr
+				add r1, r5, r4
+				; r2 : hb handle
+				ldr r2, =SPIDER_ROHANDLE_ADR
+				ldr r2, [r2]
+				; r3 : srv handle
+				ldr r3, [sp]
+
+				bl getAndSendHandle
+
+				add r4, #0xC
+				cmp r4, NUM_OTHER_HANDLES*0xC
+				blt otherHandleLoop
+
 		;srv:GetServiceHandle("APT:U")
 			mrc p15, 0, r8, c13, c0, 3
 			add r8, #0x80
@@ -399,7 +420,6 @@
 
 			add r5, #1
 
-		sendHandleEnd:
 		mov r0, r5
 		ldmfd sp!, {r4-r8}
 		bx lr
@@ -409,20 +429,25 @@
 	; r2 : hb handle
 	; r3 : srv handle
 	getAndSendHandle:
-		stmfd sp!, {r4-r8}
+		stmfd sp!, {r4-r8,lr}
 			mov r7, r0
 
 			mrc p15, 0, r8, c13, c0, 3
 			add r8, #0x80
 
-			ldr r6, =0x00050100 ; cmd header
+			; cmd header
+			ldr r6, =0x00050100
 			str r6, [r8]
-			ldr r6, [r1] ; name part 1
+			; name part 1
+			ldr r6, [r1]
 			str r6, [r8, #0x4]
-			ldr r6, [r1, #4] ; name part 2
+			; name part 2
+			ldr r6, [r1, #4]
 			str r6, [r8, #0x8]
-			ldr r6, [r1, #8] ; strlen
+			; strlen
+			ldr r6, [r1, #8]
 			str r6, [r8, #0xC]
+			; 0
 			mov r6, #0
 			str r6, [r8, #0x10]
 
@@ -447,8 +472,7 @@
 
 		getAndSendHandleEnd:
 		mov r0, r7
-		ldmfd sp!, {r4-r8}
-		bx lr
+		ldmfd sp!, {r4-r8,pc}
 
 	.pool
 
@@ -461,5 +485,33 @@ fsHandleData:
 	.ascii "fs:USER"
 	.align 0x8
 	.word 0x7 ; strlen
+
+.align 0x8
+otherHandleData:
+	.ascii "ir:rst"
+	.align 0x4 ; be careful to align right for very short service names if any ever come along
+	.word 0x6
+	.ascii "csnd:SND"
+	.align 0x4
+	.word 0x8
+	.ascii "mvd:STD"
+	.align 0x4
+	.word 0x7
+	.ascii "am:app"
+	.align 0x4
+	.word 0x6
+	.ascii "l2b2:u"
+	.align 0x4
+	.word 0x6
+	.ascii "l2b:u"
+	.align 0x4
+	.word 0x5
+	.ascii "nim:aoc"
+	.align 0x4
+	.word 0x7
+	.ascii "y2r2:u"
+	.align 0x4
+	.word 0x6
+
 
 .close
