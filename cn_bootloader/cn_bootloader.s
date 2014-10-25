@@ -92,6 +92,8 @@
 			ldrne r1, [r1]
 
 		;grab handles from hb:
+			bl initHandleTable
+
 			ldr r0, =0x00000000 ; handle index
 			ldr r1, =0x553A7366 ; fs:U
 			ldr r2, =0x00524553 ; SER
@@ -137,33 +139,35 @@
 			add r8, #0x80
 
 			ldr r4, =0x00040040
-			str r4, [r8], #4
-			str r0, [r8], #4
+			str r4, [r8]
+			str r0, [r8, #0x4]
 
 			mov r0, r3
-			.word 0xEF000032 ; svc 0x32 (SendSyncRequest)
+			stmfd sp!, {r1-r2}
+				.word 0xEF000032 ; svc 0x32 (SendSyncRequest)
+			ldmfd sp!, {r1-r2}
 
-			;induce crash if there's an error
+			;exit if there's an error
 			cmp r0, #0
-			ldreq r0, [r8, #-0x8]
+			ldreq r0, [r8, #0x4]
 			cmpeq r0, #0
 			bne grabAndPushHandleEnd
 
 			;grab store the handle
-			ldr r4, [r8, #0x4]
+			ldr r4, [r8, #0xC]
 
 			ldr r0, =CN_SERVICESTRUCT_LOC
-			ldr r5, [r0], #4
+			ldr r5, [r0]
 
 			add r3, r0, r5, lsl 2
 			add r3, r3, r5, lsl 3
 
-			str r1, [r3], #4
-			str r2, [r3], #4
-			str r4, [r3], #4
+			str r1, [r3, #0x4]
+			str r2, [r3, #0x8]
+			str r4, [r3, #0xC]
 			
 			add r5, #1
-			str r5, [r0, #-4]
+			str r5, [r0]
 
 		grabAndPushHandleEnd:
 		ldmfd sp!, {r4-r5}
