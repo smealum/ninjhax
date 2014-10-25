@@ -216,7 +216,6 @@ int _main()
 		Handle* fsuHandle=(Handle*)CN_FSHANDLE_ADR;
 		FS_archive saveArchive=(FS_archive){0x00000004, (FS_path){PATH_EMPTY, 1, (u8*)""}};
 
-
 		//read secondary payload file
 		Handle fileHandle;
 		ret=_FSUSER_OpenFileDirectly(fsuHandle, &fileHandle, saveArchive, FS_makePath(PATH_CHAR, "/edit/payload.bin"), FS_OPEN_READ, FS_ATTRIBUTE_NONE);
