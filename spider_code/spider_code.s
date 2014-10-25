@@ -211,34 +211,6 @@
 			ldr r1, [r1]
 			str r1, [sp, #4]
 
-		; ;srv:GetServiceHandle("csnd:SND")
-		; 	mrc p15, 0, r8, c13, c0, 3
-		; 	add r8, #0x80
-		; 	ldr r0, =0x00050100
-		; 	str r0, [r8], #4
-		; 	ldr r0, =0x646E7363   ;csnd
-		; 	str r0, [r8], #4
-		; 	ldr r0, =0x444E533A   ;:SND
-		; 	str r0, [r8], #4
-		; 	ldr r0, =0x00000008 ;strlen
-		; 	str r0, [r8], #4
-		; 	ldr r0, =0x00000000 ;0x0
-		; 	str r0, [r8], #4
-
-		; 	ldr r0, [sp]
-		; 	.word 0xEF000032 ; svc 0x32 (SendSyncRequest)
-		; 	ldr r1, [r8, #-0x8]
-		; 	str r1, [sp, #0x10]
-
-		; 	;induce crash if there's an error
-		; 	cmp r0, #0
-		; 	ldrne r1, =0xCAFE008C
-		; 	ldrne r1, [r1]
-
-			ldr r1, =SPIDER_ROHANDLE_ADR
-			ldr r1, [r1]
-			str r1, [sp, #4]
-
 		;FS:Initialize
 			mrc p15, 0, r8, c13, c0, 3
 			add r8, #0x80
@@ -256,48 +228,13 @@
 			ldrne r1, =0xCAFE007F
 			ldrne r1, [r1]
 
-		;hb:SendHandle(fs:USER)
-			mrc p15, 0, r8, c13, c0, 3
-			add r8, #0x80
-
-			ldr r0, =0x00030042
-			str r0, [r8], #4
-			ldr r0, =0x00000000 ; index
-			str r0, [r8], #4
-			ldr r0, =0x00000000
-			str r0, [r8], #4
-			ldr r0, [sp, 0xC] ; fs:USER handle
-			str r0, [r8], #4
-
-			ldr r0, [sp, #4]
-			.word 0xEF000032 ; svc 0x32 (SendSyncRequest)
-
-			;induce crash if there's an error
-			cmp r0, #0
-			ldrne r1, =0xCAFE0083
-			ldrne r1, [r1]
-
-		; ;hb:SendHandle(csnd:SND)
-		; 	mrc p15, 0, r8, c13, c0, 3
-		; 	add r8, #0x80
-
-		; 	ldr r0, =0x00030042
-		; 	str r0, [r8], #4
-		; 	ldr r0, =0x00000001 ; index
-		; 	str r0, [r8], #4
-		; 	ldr r0, =0x00000000
-		; 	str r0, [r8], #4
-		; 	ldr r0, [sp, 0x10] ; csnd:SND handle
-		; 	str r0, [r8], #4
-
-		; 	ldr r0, [sp, #4]
-		; 	.word 0xEF000032 ; svc 0x32 (SendSyncRequest)
-
-		; 	;induce crash if there's an error
-		; 	cmp r0, #0
-		; 	ldrne r1, =0xCAFE0083
-		; 	ldrne r1, [r1]
-
+		;send fs:USER handle			
+			mov r0, #0 ; r0 : handle index (is modified and returned)
+			ldr r1, =SPIDER_CROMAPADR+CRO_SPIDERCODE_OFFSET+fsHandleData ; r1 : service name ptr
+			ldr r2, =SPIDER_ROHANDLE_ADR
+			ldr r2, [r2] ; r2 : hb handle
+			ldr r3, [sp, 0xC] ; fs:USER handle
+			bl sendHandle
 
 		;srv:GetServiceHandle("APT:U")
 			mrc p15, 0, r8, c13, c0, 3
@@ -359,10 +296,8 @@
 			ldr r0, [sp, #8]
 			.word 0xEF000023 ; svc 0x23 (CloseHandle)
 
-
 		;close handle (csnd:SND)
 			ldr r0, [sp, #0x10]
-			.word 0xEF000023 ; svc 0x23 (CloseHandle)
 
 		;close handle (fs:USER)
 			ldr r0, [sp, #0xC]
@@ -426,10 +361,105 @@
 	; inf2:
 	; 	b inf2
 
+	; r0 : handle index (is modified and returned)
+	; r1 : service name ptr
+	; r2 : hb handle
+	; r3 : handle
+	sendHandle:
+		stmfd sp!, {r4-r8}
+			mov r5, r0
+
+			mrc p15, 0, r8, c13, c0, 3
+			add r8, #0x80
+
+			; cmd header
+			ldr r6, =0x000300C2
+			str r6, [r8]
+			; index
+			str r5, [r8, #0x4]
+			; name (part 1)
+			ldr r6, [r1]
+			str r6, [r8, #0x8]
+			; name (part 2)
+			ldr r6, [r1, #0x4]
+			str r6, [r8, #0xC]
+			; value 0
+			mov r6, #0
+			str r6, [r8, #0x10]
+			; handle
+			str r3, [r8, #0x14]
+
+			mov r0, r2
+			.word 0xEF000032 ; svc 0x32 (SendSyncRequest)
+
+			; crash if there's an error
+			cmp r0, #0
+			ldrne r1, =0xCAFE0083
+			ldrne r1, [r1]
+
+			add r5, #1
+
+		sendHandleEnd:
+		mov r0, r5
+		ldmfd sp!, {r4-r8}
+		bx lr
+
+	; r0 : handle index (is modified and returned)
+	; r1 : service name ptr
+	; r2 : hb handle
+	; r3 : srv handle
+	getAndSendHandle:
+		stmfd sp!, {r4-r8}
+			mov r7, r0
+
+			mrc p15, 0, r8, c13, c0, 3
+			add r8, #0x80
+
+			ldr r6, =0x00050100 ; cmd header
+			str r6, [r8]
+			ldr r6, [r1] ; name part 1
+			str r6, [r8, #0x4]
+			ldr r6, [r1, #4] ; name part 2
+			str r6, [r8, #0x8]
+			ldr r6, [r1, #8] ; strlen
+			str r6, [r8, #0xC]
+			mov r6, #0
+			str r6, [r8, #0x10]
+
+			mov r0, r3
+			stmfd sp!, {r1-r2}
+				.word 0xEF000032 ; svc 0x32 (SendSyncRequest)
+			ldmfd sp!, {r1-r2}
+
+			; return if there's an error
+			cmp r0, #0
+			ldreq r0, [r8, #0x4]
+			cmpeq r0, #0
+			bne getAndSendHandleEnd
+
+			mov r0, r7
+			ldr r3, [r8, 0xC]
+			bl sendHandle
+			mov r7, r0
+
+			ldr r0, [r8, 0xC]
+			.word 0xEF000023 ; svc 0x23 (CloseHandle)
+
+		getAndSendHandleEnd:
+		mov r0, r7
+		ldmfd sp!, {r4-r8}
+		bx lr
+
 	.pool
 
 srvString:
 	.ascii "srv:"
 	.byte 0x00
+
+.align 0x8
+fsHandleData:
+	.ascii "fs:USER"
+	.align 0x8
+	.word 0x7 ; strlen
 
 .close

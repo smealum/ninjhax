@@ -290,7 +290,7 @@ Result _HB_GetHandle(Handle handle, u32 index, Handle* out)
 	Result ret=0;
 	if((ret=svc_sendSyncRequest(handle)))return ret;
 
-	if(out)*out=cmdbuf[3];
+	if(out)*out=cmdbuf[5];
 
 	return cmdbuf[1];
 }

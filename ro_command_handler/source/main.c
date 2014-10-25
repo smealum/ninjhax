@@ -11,11 +11,17 @@
 #include "3dsx.h"
 
 #define NUM_CMD (5)
+#define NUM_HANDLES (16)
 
 int* numSessionHandles=(int*)RO_SESSIONHANDLECNT_ADR;
 Handle* sessionHandles=(Handle*)RO_SESSIONHANDLES_ADR;
 
-Handle sentHandleTable[8];
+// slot 0 is reserved to FS, the others are FFA
+struct {
+	u32 name[2];
+	Handle handle;
+} sentHandleTable[NUM_HANDLES];
+
 typedef void (*cmdHandlerFunction)(u32* cmdbuf);
 
 service_list_t* __service_ptr=(service_list_t*)0x000F7000;
@@ -83,7 +89,7 @@ void HB_SetupBootloader(u32* cmdbuf)
 void HB_SendHandle(u32* cmdbuf)
 {
 	if(!cmdbuf)return;
-	if(cmdbuf[0] != 0x30042)	
+	if(cmdbuf[0] != 0x300C2)	
 	{
 		//send error
 		cmdbuf[0]=0x00030040;
@@ -92,25 +98,19 @@ void HB_SendHandle(u32* cmdbuf)
 	}
 
 	const u32 handleIndex=cmdbuf[1];
-	const Handle sentHandle=cmdbuf[3];
-	if((cmdbuf[3] != 0) && (cmdbuf[2] != 0))
+	const Handle sentHandle=cmdbuf[5];
+	if(((cmdbuf[5] != 0) && (cmdbuf[4] != 0)) || handleIndex>=NUM_HANDLES)
 	{
 		//send error
 		cmdbuf[0]=0x00030040;
-		cmdbuf[1]=0xFFFFFFFF;
+		cmdbuf[1]=0xFFFFFFFE;
 		return;
 	}
 
-	if(handleIndex>=8)
-	{
-		//response
-		cmdbuf[0]=0x00030040;
-		cmdbuf[1]=0xFFFFFFFF;
-		return;
-	}
-	
-	if(sentHandleTable[handleIndex])svc_closeHandle(sentHandleTable[handleIndex]);
-	sentHandleTable[handleIndex]=sentHandle;
+	if(sentHandleTable[handleIndex].handle)svc_closeHandle(sentHandleTable[handleIndex].handle);
+	sentHandleTable[handleIndex].name[0]=cmdbuf[2];
+	sentHandleTable[handleIndex].name[1]=cmdbuf[3];
+	sentHandleTable[handleIndex].handle=sentHandle;
 
 	//response
 	cmdbuf[0]=0x00030040;
@@ -123,19 +123,21 @@ void HB_GetHandle(u32* cmdbuf)
 
 	const u32 handleIndex=cmdbuf[1];
 
-	if(handleIndex>=8 || !sentHandleTable[handleIndex])
+	if(handleIndex>=NUM_HANDLES || !sentHandleTable[handleIndex].handle)
 	{
-		//response
+		//send error
 		cmdbuf[0]=0x00040040;
 		cmdbuf[1]=0xFFFFFFFF;
 		return;
 	}
 	
 	//response
-	cmdbuf[0]=0x00040042;
-	cmdbuf[1]=0x00000000;
-	cmdbuf[2]=0x00000000;
-	cmdbuf[3]=sentHandleTable[handleIndex];
+	cmdbuf[0]=0x000400C2;
+	cmdbuf[1]=0x00000000; // response code : no error
+	cmdbuf[2]=sentHandleTable[handleIndex].name[0];
+	cmdbuf[3]=sentHandleTable[handleIndex].name[1];
+	cmdbuf[4]=0x00000000;
+	cmdbuf[5]=sentHandleTable[handleIndex].handle;
 }
 
 void HB_Load3dsx(u32* cmdbuf)
@@ -168,7 +170,7 @@ cmdHandlerFunction commandHandlers[NUM_CMD]={HB_FlushInvalidateCache, HB_SetupBo
 
 int _main(Result ret, int currentHandleIndex)
 {
-	int i; for(i=0;i<8;i++)sentHandleTable[i]=0;
+	int i; for(i=0;i<NUM_HANDLES;i++)sentHandleTable[i].handle=0;
 	targetProcessHandle=0x0;
 	while(1)
 	{

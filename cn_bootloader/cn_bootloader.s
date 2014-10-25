@@ -95,15 +95,11 @@
 			bl initHandleTable
 
 			ldr r0, =0x00000000 ; handle index
-			ldr r1, =0x553A7366 ; fs:U
-			ldr r2, =0x00524553 ; SER
-			mov r3, r10 ; hb handle
+			mov r1, r10 ; hb handle
 			bl grabAndPushHandle
 
 			ldr r0, =0x00000001 ; handle index
-			ldr r1, =0x646E7363 ; csnd
-			ldr r2, =0x444E533A ; :SND
-			mov r3, r10 ; hb handle
+			mov r1, r10 ; hb handle
 			bl grabAndPushHandle
 
 		mov sp, #0x10000000
@@ -130,9 +126,7 @@
 	.pool
 
 	; r0 : handle index
-	; r1 : service name (part 1)
-	; r2 : service name (part 2)
-	; r3 : hb handle
+	; r1 : hb handle
 	grabAndPushHandle:
 		stmfd sp!, {r4-r5}
 			mrc p15, 0, r8, c13, c0, 3
@@ -142,28 +136,27 @@
 			str r4, [r8]
 			str r0, [r8, #0x4]
 
-			mov r0, r3
-			stmfd sp!, {r1-r2}
-				.word 0xEF000032 ; svc 0x32 (SendSyncRequest)
-			ldmfd sp!, {r1-r2}
+			mov r0, r1
+			.word 0xEF000032 ; svc 0x32 (SendSyncRequest)
 
-			;exit if there's an error
+			; return if there's an error
 			cmp r0, #0
 			ldreq r0, [r8, #0x4]
 			cmpeq r0, #0
 			bne grabAndPushHandleEnd
 
-			;grab store the handle
-			ldr r4, [r8, #0xC]
-
+			; store the handle
 			ldr r0, =CN_SERVICESTRUCT_LOC
 			ldr r5, [r0]
 
 			add r3, r0, r5, lsl 2
 			add r3, r3, r5, lsl 3
 
-			str r1, [r3, #0x4]
-			str r2, [r3, #0x8]
+			ldr r4, [r8, #0x8]
+			str r4, [r3, #0x4]
+			ldr r4, [r8, #0xC]
+			str r4, [r3, #0x8]
+			ldr r4, [r8, #0x14]
 			str r4, [r3, #0xC]
 			
 			add r5, #1
