@@ -186,20 +186,19 @@
 			add r8, #0x80
 
 			ldr r0, =0x00040040
-			str r0, [r8], #4
+			str r0, [r8]
 			ldr r0, =0x00000000 ; index
-			str r0, [r8], #4
+			str r0, [r8, #0x4]
 
 			mov r0, r10
 			.word 0xEF000032 ; svc 0x32 (SendSyncRequest)
 
 			;r11 is fs:USER handle
-			ldr r11, [r8, #4]
+			ldr r11, [r8, #0x14]
 
 			;induce crash if there's an error
 			cmp r0, #0
-			mrceq p15, 0, r8, c13, c0, 3
-			ldreq r0, [r8, #0x84]
+			ldreq r0, [r8, #0x4]
 			cmpeq r0, #0
 			ldrne r1, =0xBABE0084
 			ldrne r1, [r1]

@@ -425,6 +425,7 @@ void installerScreen(u32 size)
 				u32 PAD=((u32*)0x10000000)[7];
 				if(((PAD^oldPAD)&PAD_A) && (PAD&PAD_A))break;
 				drawHex(PAD,200,200);
+				oldPAD=PAD;
 			}
 
 			break;
