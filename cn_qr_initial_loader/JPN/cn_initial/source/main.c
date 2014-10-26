@@ -242,6 +242,7 @@ int _main()
 	Handle* gspHandle=(Handle*)CN_GSPHANDLE_ADR;
 	Result (*_GSPGPU_FlushDataCache)(Handle* handle, Handle kprocess, u32* addr, u32 size)=(void*)CN_GSPGPU_FlushDataCache_ADR;
 
+	for(int i=0; i<0x46500*2;i++)((u8*)CN_TOPFBADR1)[i]=0x00;
 	// drawString(TOPFBADR1,"ninjhaxx",0,0);
 	// drawString(TOPFBADR2,"ninjhaxx",0,0);
 
@@ -252,13 +253,21 @@ int _main()
 
 	Handle* addressArbiterHandle=(Handle*)0x003414B0;
 
+	Result (*_DSP_UnloadComponent)(Handle* handle)=(void*)0x002C3A78;
+	Handle** dspHandle=(Handle**)0x341A4C;
+
+	_DSP_UnloadComponent(*dspHandle);
+
 	//close threads
+		//patch gsp event handler addr to kill gsp thread ASAP
+		*((u32*)(0x362DA8+0x10+4*0x4))=0x002B5D14; //svc 0x9 addr
+
 		//patch waitSyncN
 		patchMem(gspHandle, computeCodeAddress(0x0019BD00), 0x200, 0xB, 0x41);
 		patchMem(gspHandle, computeCodeAddress(0x0019C000), 0x200, 0x39, 0x45);
 		patchMem(gspHandle, computeCodeAddress(0x001D3700), 0x200, 0x7, 0x1A);
-		// patchMem(gspHandle, computeCodeAddress(0x001C9100), 0x200, 0x2E, 0x44);
-		*(u8*)0x3664E5=0x00; //kill thread5 without panicking the kernel...
+		// patchMem(gspHandle, computeCodeAddress(0x000C9100), 0x200, 0x2E, 0x44);
+		// patchMem(gspHandle, computeCodeAddress(0x000EFE00), 0x200, 0x2C, 0x31);
 
 		//patch arbitrateAddress
 		patchMem(gspHandle, computeCodeAddress(0x001D3300), 0x200, 0x10, 0x3C);
@@ -267,6 +276,9 @@ int _main()
 		svc_arbitrateAddress(*addressArbiterHandle, 0x364ccc, 0, -1, 0);
 		svc_signalEvent(((Handle*)0x354ba8)[2]);
 		s32 out; svc_releaseSemaphore(&out, *(Handle*)0x341AB0, 1); //CHECK !
+
+		//kill thread5 without panicking the kernel...
+		*(u8*)(0x3664D8+0xd)=0x00;
 
 	svc_sleepThread(0x10000000);
 
@@ -317,11 +329,6 @@ int _main()
 
 	blowfishKeyScheduler((u32*)0x14200000);
 	blowfishDecrypt((u32*)0x14200000, (u32*)buffer0, (u32*)buffer1, secondaryPayloadSize);
-
-	Result (*_DSP_UnloadComponent)(Handle* handle)=(void*)0x002C3A78;
-	Handle** dspHandle=(Handle**)0x341A4C;
-
-	_DSP_UnloadComponent(*dspHandle);
 
 	ret=_GSPGPU_FlushDataCache(gspHandle, 0xFFFF8001, (u32*)buffer1, 0x300000);
 	// drawHex(ret,0,line+=10);

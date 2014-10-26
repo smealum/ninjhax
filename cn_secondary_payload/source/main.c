@@ -418,7 +418,14 @@ void installerScreen(u32 size)
 				errorScreen("   installation process failed.\n   please report the below information by\n   email to sme@lum.sexy", v, 2);
 			}
 
-			_strappend(str, " done.\n   loading menu..."); drawTitleScreen(str);
+			_strappend(str, " done.\n\n   press A to run the exploit."); drawTitleScreen(str);
+			u32 oldPAD=((u32*)0x10000000)[7];
+			while(1)
+			{
+				u32 PAD=((u32*)0x10000000)[7];
+				if(((PAD^oldPAD)&PAD_A) && (PAD&PAD_A))break;
+				drawHex(PAD,200,200);
+			}
 
 			break;
 		}else if(PAD&PAD_B)break;
