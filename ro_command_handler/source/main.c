@@ -161,6 +161,8 @@ void HB_Load3dsx(u32* cmdbuf)
 		svc_unmapProcessMemory(targetProcessHandle, 0x00100000, 0x02000000);
 	}
 
+	svc_closeHandle(fileHandle);
+
 	cmdbuf[0]=0x00050040;
 	cmdbuf[1]=ret;
 }
