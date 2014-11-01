@@ -169,6 +169,11 @@ Result _FSFILE_Read(Handle handle, u32 *bytesRead, u64 offset, u32 *buffer, u32 
 	return cmdbuf[1];
 }
 
+u32 computeCodeAddress(u32 offset)
+{
+	return CN_GSPHEAP+CN_TEXTPA_OFFSET_FROMEND+FIRM_APPMEMALLOC+offset;
+}
+
 int _main()
 {
 	Handle* gspHandle=(Handle*)CN_GSPHANDLE_ADR;
@@ -186,14 +191,14 @@ int _main()
 
 	//close threads
 		//patch waitSyncN
-		patchMem(gspHandle, 0x14000000+CN_TEXTPAOFFSET+0x00192200, 0x200, 0x19, 0x4F);
-		patchMem(gspHandle, 0x14000000+CN_TEXTPAOFFSET+0x00192600, 0x200, 0x7, 0x13);
-		patchMem(gspHandle, 0x14000000+CN_TEXTPAOFFSET+0x001CA200, 0x200, 0xB, 0x1E);
-		// patchMem(gspHandle, 0x14000000+CN_TEXTPAOFFSET+0x000C6100, 0x200, 0x3C, 0x52);
+		patchMem(gspHandle, computeCodeAddress(0x00192200), 0x200, 0x19, 0x4F);
+		patchMem(gspHandle, computeCodeAddress(0x00192600), 0x200, 0x7, 0x13);
+		patchMem(gspHandle, computeCodeAddress(0x001CA200), 0x200, 0xB, 0x1E);
+		// patchMem(gspHandle, computeCodeAddress(0x000C6100), 0x200, 0x3C, 0x52);
 		*(u8*)0x359935=0x00; //kill thread5 without panicking the kernel...
 
 		//patch arbitrateAddress
-		patchMem(gspHandle, 0x14000000+CN_TEXTPAOFFSET+0x001C9E00, 0x200, 0x14, 0x40);
+		patchMem(gspHandle, computeCodeAddress(0x001C9E00), 0x200, 0x14, 0x40);
 
 		//close handles
 		ret=svc_closeHandle(*((Handle*)0x359938));
@@ -242,7 +247,7 @@ int _main()
 
 	ret=_GSPGPU_FlushDataCache(gspHandle, 0xFFFF8001, (u32*)0x14100000, 0x300000);
 
-	doGspwn((u32*)(0x14100000), (u32*)(0x14000000+CN_TEXTPAOFFSET), 0x0000A000);
+	doGspwn((u32*)(0x14100000), (u32*)computeCodeAddress(0x0), 0x0000A000);
 
 	svc_sleepThread(0x3B9ACA00);
 
