@@ -1,4 +1,4 @@
-This is a (probably non-exhaustive) list of what remains to be done on the exploit codebase before release :
+This is a (probably non-exhaustive) list of what remains to be done on the exploit codebase before release (november 21st 2014) :
 
  - ~~support CN_JPN~~
  - ~~improve spider cleanup stability (filtered spray)~~
@@ -18,4 +18,8 @@ This is a (probably non-exhaustive) list of what remains to be done on the explo
  - ~~improve fsInit~~
  - ~~fix framebuffer handling code in hbmenu, examples etc.~~
  - ~~pass CSND handle~~
- - garble URL
+ - garble URL ?
+ - grab additional ram from spider/SKATER
+ - support argv/argc
+ - move bootloader
+ - test and improve spiderto stability (timing issues ?)
