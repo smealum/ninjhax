@@ -23,3 +23,4 @@ This is a (probably non-exhaustive) list of what remains to be done on the explo
  - support argv/argc
  - move bootloader
  - test and improve spiderto stability (timing issues ?)
+ - add HB:Reprotect for emu JIT/dynarec/whatever ?
