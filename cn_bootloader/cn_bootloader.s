@@ -180,6 +180,11 @@
 		ldr r10, =CN_HBHANDLE_LOC
 		ldr r10, [r10]
 
+	;set argc to 0
+		ldr r0, =CN_ARGCV_LOC
+		mov r1, #0
+		str r1, [r0]
+
 	;grab fs handle
 		;hb:GetHandle(fs:USER)
 			mrc p15, 0, r8, c13, c0, 3
@@ -267,5 +272,24 @@
 		.ascii "/boot.3dsx"
 		.byte 0x00
 	.pool
+
+
+.orga CN_ARGSETTER_LOC-CN_BOOTLOADER_LOC
+	;simply copy r1 bytes from r0 to CN_ARGCV_LOC
+	;might copy 3 bytes too many but tbh idgaf
+	;also no alignment no shoes no service
+	;also set CN_ARGCV_LOC[0] to 0 if r1=0
+	ldr r2, =CN_ARGCV_LOC
+	cmp r1, #0
+	streq r1, [r2]
+	beq argcpyret
+	add r1, r0
+	argcpyloop:
+		ldr r3, [r0], #4
+		str r3, [r2], #4
+		cmp r0, r1
+		blt argcpyloop
+	argcpyret:
+	bx lr
 
 .close

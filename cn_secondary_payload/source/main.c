@@ -608,9 +608,11 @@ int main(u32 size, char** argv)
 	svc_controlMemory(&out, 0x14000000, 0x00000000, 0x02000000, MEMOP_FREE, 0x0);
 
 	void (*callBootloader)(Handle hb, Handle file)=(void*)CN_BOOTLOADER_LOC;
+	void (*setArgs)(u32* src, u32 length)=(void*)CN_ARGSETTER_LOC;
 	_GSPGPU_ReleaseRight(*gspHandle); //disable GSP module access
 	svc_closeHandle(*gspHandle);
 
+	setArgs(NULL, 0);
 	callBootloader(hbHandle, fileHandle);
 
 	while(1);

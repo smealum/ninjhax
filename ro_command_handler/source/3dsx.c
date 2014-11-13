@@ -196,6 +196,10 @@ int Load3DSX(Handle file, Handle process, void* baseAddr)
 		// prmStruct[4] <-- __gsp_heap_size (default: 32*1024*1024)
 		// prmStruct[5] <-- __system_arglist (default: NULL)
 
+		prmStruct[2] = 0x300;
+		prmStruct[3] = 24*1024*1024;
+		prmStruct[4] = 32*1024*1024;
+		prmStruct[5] = CN_ARGCV_LOC;
 		prmStruct[6] = RUNFLAG_APTWORKAROUND; //__system_runflags
 
 		// XXX: Notes on __system_arglist:
