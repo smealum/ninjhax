@@ -100,16 +100,16 @@ Result _GSPGPU_InvalidateDataCache(Handle* handle, Handle kprocess, u32* addr, u
 
 void patchMem(Handle* gspHandle, u32 dst, u32 size, u32 start, u32 end)
 {
-	Result (*_GSPGPU_FlushDataCache)(Handle* handle, Handle kprocess, u32* addr, u32 size)=(void*)0x002D15D4;
+	Result (*_GSPGPU_FlushDataCache)(Handle* handle, Handle kprocess, u32* addr, u32 size)=(void*)CN_GSPGPU_FlushDataCache_ADR;
 
 	int i;
 	_GSPGPU_InvalidateDataCache(gspHandle, 0xFFFF8001, (u32*)0x14100000, 0x200);
 	doGspwn((u32*)(dst), (u32*)(0x14100000), 0x200);
-	svc_sleepThread(0x1000000);
+	svc_sleepThread(0x100000);
 	for(i=start;i<end;i++)((u32*)0x14100000)[i]=0xEF000009;
 	_GSPGPU_FlushDataCache(gspHandle, 0xFFFF8001, (u32*)0x14100000, 0x200);
 	doGspwn((u32*)(0x14100000), (u32*)(dst), 0x200);
-	svc_sleepThread(0x1000000);
+	svc_sleepThread(0x100000);
 }
 
 Result _FSUSER_OpenFileDirectly(Handle* handle, Handle* out, FS_archive archive, FS_path fileLowPath, u32 openflags, u32 attributes) //no need to have archive opened
@@ -189,28 +189,31 @@ int _main()
 
 	Handle* addressArbiterHandle=(Handle*)0x334960;
 
+	Result (*_DSP_UnloadComponent)(Handle* handle)=(void*)0x002BA368;
+	Handle** dspHandle=(Handle**)0x334EFC;
+
+	_DSP_UnloadComponent(*dspHandle);
+
 	//close threads
+		//patch gsp event handler addr to kill gsp thread ASAP
+		*((u32*)(0x356208+0x10+4*0x4))=0x002ABEDC; //svc 0x9 addr
+
 		//patch waitSyncN
 		patchMem(gspHandle, computeCodeAddress(0x00192200), 0x200, 0x19, 0x4F);
 		patchMem(gspHandle, computeCodeAddress(0x00192600), 0x200, 0x7, 0x13);
 		patchMem(gspHandle, computeCodeAddress(0x001CA200), 0x200, 0xB, 0x1E);
 		// patchMem(gspHandle, computeCodeAddress(0x000C6100), 0x200, 0x3C, 0x52);
-		*(u8*)0x359935=0x00; //kill thread5 without panicking the kernel...
 
 		//patch arbitrateAddress
 		patchMem(gspHandle, computeCodeAddress(0x001C9E00), 0x200, 0x14, 0x40);
-
-		//close handles
-		ret=svc_closeHandle(*((Handle*)0x359938));
-		ret=svc_closeHandle(*((Handle*)0x34FEA4));
-		ret=svc_closeHandle(*((Handle*)0x356274));
-		ret=svc_closeHandle(*((Handle*)0x334730));
-		ret=svc_closeHandle(*((Handle*)0x334F64));
 
 		//wake threads
 		svc_arbitrateAddress(*addressArbiterHandle, 0x35811c, 0, -1, 0);
 		svc_signalEvent(((Handle*)0x3480d0)[2]);
 		s32 out; svc_releaseSemaphore(&out, *(Handle*)0x357490, 1);
+
+		//kill thread5 without panicking the kernel...
+		*(u8*)0x359935=0x00;
 
 	svc_sleepThread(0x10000000);
 
@@ -240,17 +243,18 @@ int _main()
 		blowfishDecrypt((u32*)0x14200000, (u32*)0x14100000, (u32*)0x14100000, secondaryPayloadSize);
 	}
 
-	Result (*_DSP_UnloadComponent)(Handle* handle)=(void*)0x002BA368;
-	Handle** dspHandle=(Handle**)0x334EFC;
-
-	_DSP_UnloadComponent(*dspHandle);
-
 	ret=_GSPGPU_FlushDataCache(gspHandle, 0xFFFF8001, (u32*)0x14100000, 0x300000);
 
 	doGspwn((u32*)(0x14100000), (u32*)computeCodeAddress(0x0), 0x0000A000);
 
 	svc_sleepThread(0x3B9ACA00);
 
+	// //close thread handles
+	// ret=svc_closeHandle(*((Handle*)0x359938));
+	// ret=svc_closeHandle(*((Handle*)0x34FEA4));
+	// ret=svc_closeHandle(*((Handle*)0x356274));
+	// ret=svc_closeHandle(*((Handle*)0x334730));
+	// ret=svc_closeHandle(*((Handle*)0x334F64));
 
 	void (*reset)(int size)=(void*)0x00100000;
 	reset(0);
