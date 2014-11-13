@@ -20,8 +20,9 @@ This is a (probably non-exhaustive) list of what remains to be done on the explo
  - ~~pass CSND handle~~
  - garble URL ?
  - grab additional ram from spider/SKATER
- - support argv/argc
+ - ~~support argv/argc~~
  - move bootloader
- - test and improve spiderto stability (timing issues ?)
+ - ~~backport JPN CN cleanup to WEST~~ 
+ - test improved WEST spiderto stability on "all" firmware versions (done : 8.1.0-19E)
  - add HB:Reprotect for emu JIT/dynarec/whatever ?
  - option to download hbmenu if boot.3dsx is not found ?
