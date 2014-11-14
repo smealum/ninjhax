@@ -10,7 +10,7 @@ def isVersionPossible(v):
 	else:
 		return v[3]>=2049
 
-firmVersions=["PRE5", "POST5"]
+firmVersions=["PRE5", "POST5", "N3DS"]
 cnVersions=["WEST", "JPN"]
 spiderVersions=[2050, 3074, 4096]
 roVersions=[1024, 2049, 3074, 4096]
