@@ -94,6 +94,8 @@
 		;grab all handles from hb:
 			bl initHandleTable
 
+			bl pushHbHandle
+
 			mov r4, #0
 			grabHandleLoop:
 				mov r0, r4 ; handle index
@@ -104,22 +106,6 @@
 				blt grabHandleLoop
 
 		mov sp, #0x10000000
-
-		ldr r4, =0xDEADCAF3
-		str r4, [sp, #-4]!
-		str r4, [sp, #-4]!
-		str r4, [sp, #-4]!
-		str r4, [sp, #-4]!
-		str r4, [sp, #-4]!
-		str r4, [sp, #-4]!
-		str r4, [sp, #-4]!
-		str r4, [sp, #-4]!
-		str r4, [sp, #-4]!
-		str r4, [sp, #-4]!
-		str r4, [sp, #-4]!
-		str r4, [sp, #-4]!
-		str r4, [sp, #-4]!
-		str r4, [sp, #-4]!
 
 		ldr lr, =CN_MENULOADER_LOC
 		ldr pc, =0x00100000
@@ -168,9 +154,36 @@
 		bx lr
 
 	initHandleTable:
+		ldr r0, =CN_SERVICESTRUCT_LOC
+		mov r1, #0
+		str r1, [r0]
+		bx lr
+
+	pushHbHandle:
+		stmfd sp!, {r5}
+			
+			ldr r1, =CN_HBHANDLE_LOC
+			ldr r1, [r1]
+			.word 0xEF000027 ; svc 0x27 (duplicateHandle)
+			cmp r0, #0
+			bne pushHbHandleEnd
+			
 			ldr r0, =CN_SERVICESTRUCT_LOC
-			mov r1, #0
-			str r1, [r0]
+			ldr r5, [r0]
+
+			add r3, r0, r5, lsl 2
+			add r3, r3, r5, lsl 3
+
+			ldr r2, =0x483A6268
+			str r2, [r3, #0x4]
+			ldr r2, =0x00000042
+			str r2, [r3, #0x8]
+			str r1, [r3, #0xC]
+			
+			add r5, #1
+			str r5, [r0]
+		pushHbHandleEnd:
+		ldmfd sp!, {r5}
 		bx lr
 
 	.pool

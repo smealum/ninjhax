@@ -10,7 +10,7 @@
 #include "svc.h"
 #include "3dsx.h"
 
-#define NUM_CMD (5)
+#define NUM_CMD (6)
 
 int* numSessionHandles=(int*)RO_SESSIONHANDLECNT_ADR;
 Handle* sessionHandles=(Handle*)RO_SESSIONHANDLES_ADR;
@@ -167,7 +167,24 @@ void HB_Load3dsx(u32* cmdbuf)
 	cmdbuf[1]=ret;
 }
 
-cmdHandlerFunction commandHandlers[NUM_CMD]={HB_FlushInvalidateCache, HB_SetupBootloader, HB_SendHandle, HB_GetHandle, HB_Load3dsx};
+void HB_GetBootloaderAddresses(u32* cmdbuf)
+{
+	if(!cmdbuf)return;
+	if(cmdbuf[0] != 0x60000)
+	{
+		//send error
+		cmdbuf[0]=0x00060040;
+		cmdbuf[1]=0xFFFFFFFF;
+		return;
+	}
+
+	cmdbuf[0]=0x000600C0;
+	cmdbuf[1]=0x00000000;
+	cmdbuf[2]=CN_BOOTLOADER_LOC;
+	cmdbuf[3]=CN_ARGSETTER_LOC;
+}
+
+cmdHandlerFunction commandHandlers[NUM_CMD]={HB_FlushInvalidateCache, HB_SetupBootloader, HB_SendHandle, HB_GetHandle, HB_Load3dsx, HB_GetBootloaderAddresses};
 
 int _main(Result ret, int currentHandleIndex)
 {
