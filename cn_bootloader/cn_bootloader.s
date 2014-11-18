@@ -55,7 +55,7 @@
 
 			ldr r0, =0x00050042
 			str r0, [r8], #4
-			ldr r0, =0x00100000 ;baseAddr
+			ldr r0, =CN_3DSX_LOADADR ;baseAddr
 			str r0, [r8], #4
 			ldr r0, =0x00000000
 			str r0, [r8], #4
@@ -108,7 +108,7 @@
 		mov sp, #0x10000000
 
 		ldr lr, =CN_MENULOADER_LOC
-		ldr pc, =0x00100000
+		ldr pc, =CN_3DSX_LOADADR
 
 	.pool
 
@@ -304,5 +304,7 @@
 		blt argcpyloop
 	argcpyret:
 	bx lr
+
+	.pool
 
 .close

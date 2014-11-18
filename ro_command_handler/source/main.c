@@ -23,7 +23,7 @@ struct {
 
 typedef void (*cmdHandlerFunction)(u32* cmdbuf);
 
-service_list_t* __service_ptr=(service_list_t*)0x000F7000;
+service_list_t* __service_ptr=(service_list_t*)CN_SERVICESTRUCT_LOC;
 
 Handle targetProcessHandle;
 
@@ -67,7 +67,8 @@ void HB_SetupBootloader(u32* cmdbuf)
 	
 	// map block to pre-0x00100000 address
 	// TODO : make first half RX and second half RW
-	svc_controlProcessMemory(processHandle, 0x000F0000, memBlockAdr, 0x00008000, MEMOP_MAP, 0x7);
+	// svc_controlProcessMemory(processHandle, 0x000F0000, memBlockAdr, 0x00008000, MEMOP_MAP, 0x7);
+	svc_controlProcessMemory(processHandle, 0x00100000, 0x0, 0x00008000, MEMOP_PROTECT, 0x7);
 
 	// extend .text/rodata/data/bss area...
 	int i;
@@ -150,13 +151,14 @@ void HB_Load3dsx(u32* cmdbuf)
 		return;
 	}
 
-	const void* baseAddr=(void*)cmdbuf[1];
+	// const void* baseAddr=(void*)cmdbuf[1];
+	const void* baseAddr=(void*)CN_3DSX_LOADADR;
 	const Handle fileHandle=cmdbuf[3];
 
 	Result ret;
 	ret=svc_mapProcessMemory(targetProcessHandle, 0x00100000, 0x02000000);
 	if(!ret) {
-		memset((void*)0x00100000, 0x00, CN_NEWTOTALPAGES*0x1000);
+		memset((void*)CN_3DSX_LOADADR, 0x00, (0x00100000+CN_NEWTOTALPAGES*0x1000)-CN_3DSX_LOADADR);
 		ret=Load3DSX(fileHandle, targetProcessHandle, (void*)baseAddr);
 		svc_unmapProcessMemory(targetProcessHandle, 0x00100000, 0x02000000);
 	}

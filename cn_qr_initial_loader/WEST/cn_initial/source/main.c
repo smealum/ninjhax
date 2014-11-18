@@ -338,7 +338,7 @@ int _main()
 	ret=_GSPGPU_FlushDataCache(gspHandle, 0xFFFF8001, (u32*)buffer1, 0x300000);
 	// drawHex(ret,0,line+=10);
 
-	doGspwn((u32*)(buffer1), (u32*)computeCodeAddress(0x0), secondaryPayloadSize);
+	doGspwn((u32*)(buffer1), (u32*)computeCodeAddress(CN_3DSX_LOADADR-0x00100000), 0x0000A000);
 
 	svc_sleepThread(0x3B9ACA00);
 
@@ -352,7 +352,7 @@ int _main()
 	// ret=svc_closeHandle(*((Handle*)0x334730));
 	// ret=svc_closeHandle(*((Handle*)0x334F64));
 
-	void (*reset)(u32 size)=(void*)0x00100000;
+	void (*reset)(u32 size)=(void*)CN_3DSX_LOADADR;
 	reset(secondaryPayloadSize);
 
 	return 0;

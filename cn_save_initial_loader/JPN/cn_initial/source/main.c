@@ -239,7 +239,7 @@ int _main()
 		Handle fileHandle;
 		ret=_FSUSER_OpenFileDirectly(fsuHandle, &fileHandle, saveArchive, FS_makePath(PATH_CHAR, "/edit/payload.bin"), FS_OPEN_READ, FS_ATTRIBUTE_NONE);
 		if(ret)*(u32*)NULL=0xC0DF0002;
-		ret=_FSFILE_Read(fileHandle, &secondaryPayloadSize, 0x0, (u32*)0x14100000, 0xA000);
+		ret=_FSFILE_Read(fileHandle, &secondaryPayloadSize, 0x0, (u32*)0x14100000, 0x00011000);
 		if(ret)*(u32*)NULL=0xC0DF0003;
 		ret=_FSFILE_Close(fileHandle);
 		if(ret)*(u32*)NULL=0xC0DF0004;
@@ -256,11 +256,11 @@ int _main()
 
 	ret=_GSPGPU_FlushDataCache(gspHandle, 0xFFFF8001, (u32*)0x14100000, 0x300000);
 
-	doGspwn((u32*)(0x14100000), (u32*)computeCodeAddress(0x0), 0x0000A000);
+	doGspwn((u32*)(0x14100000), (u32*)computeCodeAddress(CN_3DSX_LOADADR-0x00100000), 0x0000A000);
 
 	svc_sleepThread(0x3B9ACA00);
 
-	void (*reset)(int size)=(void*)0x00100000;
+	void (*reset)(int size)=(void*)CN_3DSX_LOADADR;
 	reset(0);
 
 	while(1);

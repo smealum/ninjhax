@@ -581,18 +581,22 @@ int main(u32 size, char** argv)
 	Handle fsHandle;
 	debug[8]=_HB_GetHandle(hbHandle, 0x0, &fsHandle);
 
-	//allocate some memory for the bootloader code (will be remapped)
-	u32 out; ret=svc_controlMemory(&out, 0x13FF0000, 0x00000000, 0x00008000, MEMOP_COMMIT, 0x3);
+	// //allocate some memory for the bootloader code (will be remapped)
+	// u32 out; ret=svc_controlMemory(&out, 0x13FF0000, 0x00000000, 0x00008000, MEMOP_COMMIT, 0x3);
 	//allocate some memory for homebrew .text/rodata/data/bss... (will be remapped)
-	ret=svc_controlMemory(&out, CN_ALLOCPAGES_ADR, 0x00000000, CN_ADDPAGES*0x1000, MEMOP_COMMIT, 0x3);
+	u32 out; ret=svc_controlMemory(&out, CN_ALLOCPAGES_ADR, 0x00000000, CN_ADDPAGES*0x1000, MEMOP_COMMIT, 0x3);
 
 	drawTitleScreen("running exploit... 080%");
 
-	memcpy((u8*)0x13FF0000, cn_bootloader_bin, cn_bootloader_bin_size);
+	if(_HB_SetupBootloader(hbHandle, 0x13FF0000))*((u32*)NULL)=0xBABE0061;
 
 	drawTitleScreen("running exploit... 090%");
 	
-	if(_HB_SetupBootloader(hbHandle, 0x13FF0000))*((u32*)NULL)=0xBABE0061;
+	memcpy((u8*)0x00100000, cn_bootloader_bin, cn_bootloader_bin_size);
+	
+	drawTitleScreen("running exploit... 095%");
+
+	_HB_FlushInvalidateCache(hbHandle);
 
 	drawTitleScreen("running exploit... 100%");
 
