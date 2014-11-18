@@ -25,4 +25,5 @@ This is a (probably non-exhaustive) list of what remains to be done on the explo
  - ~~backport JPN CN cleanup to WEST~~ 
  - test improved WEST spiderto stability on "all" firmware versions (done : 8.1.0-19E)
  - add HB:Reprotect for emu JIT/dynarec/whatever ?
+ - ~~add HB_GetBootloaderAddresses~~
  - option to download hbmenu if boot.3dsx is not found ?
