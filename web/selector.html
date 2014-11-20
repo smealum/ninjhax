@@ -13,7 +13,7 @@
         font-size:26px;
     }
     .firmware-form select {
-        width:50px;
+        /*width:50px;*/
         height:50px;
         font-size:26px;
         text-align:center;
@@ -24,8 +24,6 @@
     }
   </style>
   
-
-
 <script type='text/javascript'>//<![CDATA[ 
 window.onload=function(){
 ;
@@ -96,7 +94,8 @@ window.onload=function(){
         '16' : regions,
         '17' : regions,
         '18' : regions,
-        '19' : regions
+        '19' : regions,
+        '20' : regions
     }
 
     var zeroMicro_4 = {
@@ -131,11 +130,17 @@ window.onload=function(){
         '8': {
             '0': zeroMicro_4,
             '1': zeroMicro_4,
+        },
+        '9': {
+            '0': zeroMicro_4,
+            '1': zeroMicro_4,
+            '2': zeroMicro_4,
         }
     }
 
     var newRegions = {
-        'J' : {}
+        'J' : {},
+        'E' : {}
     }
 
     var newNUPs_4 = {
@@ -147,19 +152,16 @@ window.onload=function(){
     }
 
     var newOptions = {
-        '8': {
-            '0': newZeroMicro_4,
-            '1': newZeroMicro_4,
-        },
         '9': {
             '0': newZeroMicro_4,
             '1': newZeroMicro_4,
+            '2': newZeroMicro_4,
         }
     }
 
     var options = {
-        'O': oldOptions,
-        'N': newOptions
+        'OLD': oldOptions,
+        'NEW': newOptions
     }
 
     var state = {};
