@@ -2,12 +2,12 @@ NINJHAX
 
 What is ninjhax ?
 
-	ninjhax is an piece of software that allows you to run unsigned code on your 3DS. In practice, this means being able to run homebrew applications such as games, tools and emulators!
+	ninjhax is a piece of software that allows you to run unsigned code on your 3DS. In practice, this means being able to run homebrew applications such as games, tools and emulators!
 
-What do I need for ninjhax ?
+What do I need to use ninjhax ?
 	
 	You need exactly three things to run unsigned code on your console :
-		- A 3DS, 3DS XL or 2DS console with a firmware version between 4.0.0-7 and 8.1.0-19.
+		- A 3DS, 3DS XL or 2DS console with a firmware version between 4.0.0-7 and 9.2.0-20. (NOTE : New 3DSs have to be on at least 9.0 to run ninjhax)
 		- An SD card compatible with your 3DS (the one it comes with will of course do).
 		- A copy of the game CUBIC NINJA, either from retail or eShop.
 

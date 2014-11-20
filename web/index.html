@@ -1,0 +1,432 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>HOMEBREW OR SOMETHING</title>
+<meta name="keywords" content="homebrew" />
+<meta name="description" content="ds" />
+<link href='http://fonts.googleapis.com/css?family=Homenaje' rel='stylesheet' type='text/css'>
+<link href="hbrew.css" rel="stylesheet" type="text/css" media="all" /><link rel="shortcut icon" href="images/icon.png"/>
+
+  <style type='text/css'>
+    .firmware-form {
+        /*margin-top:300px;*/
+        text-align:center;
+        font-size:26px;
+    }
+    .firmware-form select {
+        /*width:50px;*/
+        height:50px;
+        font-size:26px;
+        text-align:center;
+		border: 5px solid #ffffff;
+		background: #000000;
+		color: #ffffff;
+    }
+
+	.firmware-form button {
+		border: 5px solid #ffffff;
+		background: #000000;
+		border-radius: 0px;
+		box-shadow: rgba(255,255,255,0.4) 0 0px 0, inset rgba(255,255,255,0.4) 0 0px 0;
+		color: #ffffff;
+		font-family: helvetica, serif;
+        height:50px;
+        font-size:26px;
+		text-decoration: none;
+		vertical-align: middle;
+   }
+  </style>
+  
+<script type='text/javascript'>//<![CDATA[ 
+window.onload=function(){
+;
+(function () {
+    'use strict';
+
+    var regions = {
+        'E' : {},
+        'U' : {},
+        'J' : {}
+    }
+
+    var NUPs_1 = {
+        '7' : regions,
+        '8' : regions,
+        '9' : regions,
+        '10' : regions,
+        '11' : regions,
+    }
+
+    var zeroMicro_1 = {
+        '0' : NUPs_1
+    }
+
+    var NUPs_2 = {
+        '7' : regions,
+        '8' : regions,
+        '9' : regions,
+        '10' : regions,
+        '11' : regions,
+        '12' : regions,
+        '13' : regions,
+        '14' : regions,
+        '15' : regions,
+    }
+
+    var zeroMicro_2 = {
+        '0' : NUPs_2
+    }
+
+    var NUPs_3 = {
+        '7' : regions,
+        '8' : regions,
+        '9' : regions,
+        '10' : regions,
+        '11' : regions,
+        '12' : regions,
+        '13' : regions,
+        '14' : regions,
+        '15' : regions,
+        '16' : regions,
+    }
+
+    var zeroMicro_3 = {
+        '0' : NUPs_3
+    }
+
+    var NUPs_4 = {
+        '7' : regions,
+        '8' : regions,
+        '9' : regions,
+        '10' : regions,
+        '11' : regions,
+        '12' : regions,
+        '13' : regions,
+        '14' : regions,
+        '15' : regions,
+        '16' : regions,
+        '17' : regions,
+        '18' : regions,
+        '19' : regions,
+        '20' : regions
+    }
+
+    var zeroMicro_4 = {
+        '0' : NUPs_4
+    }
+
+    var oldOptions = {
+        '4': {
+            '0': zeroMicro_1,
+            '1': zeroMicro_1,
+            '2': zeroMicro_1,
+            '3': zeroMicro_1,
+            '4': zeroMicro_1,
+            '5': zeroMicro_1
+        },
+        '5': {
+            '0': zeroMicro_2,
+            '1': zeroMicro_2,
+            '2': zeroMicro_2,
+        },
+        '6': {
+            '0': zeroMicro_2,
+            '1': zeroMicro_2,
+            '2': zeroMicro_2,
+            '3': zeroMicro_2,
+        },
+        '7': {
+            '0': zeroMicro_2,
+            '1': zeroMicro_3,
+            '2': zeroMicro_4,
+        },
+        '8': {
+            '0': zeroMicro_4,
+            '1': zeroMicro_4,
+        },
+        '9': {
+            '0': zeroMicro_4,
+            '1': zeroMicro_4,
+            '2': zeroMicro_4,
+        }
+    }
+
+    var newRegions = {
+        'J' : {},
+        'E' : {}
+    }
+
+    var newNUPs_4 = {
+        '20' : newRegions
+    }
+
+    var newZeroMicro_4 = {
+        '0' : newNUPs_4
+    }
+
+    var newOptions = {
+        '9': {
+            '0': newZeroMicro_4,
+            '1': newZeroMicro_4,
+            '2': newZeroMicro_4,
+        }
+    }
+
+    var options = {
+        'OLD': oldOptions,
+        'NEW': newOptions
+    }
+
+    var state = {};
+
+    var range = function (a, b) {
+        var xs = [];
+        for (var i = a; i < b; ++i)
+        xs.push(i);
+        return xs;
+    };
+
+    var update = function (id) {
+        var node = document.querySelector('[data-id="' + id + '"]');
+
+        if (!node) {
+            return;
+        }
+
+        range(id, 5).map(function (i) {
+            delete state[i];
+        });
+
+        node.innerHTML = '';
+
+        var lens = range(0, id).reduce(function (acc, i) {
+            return acc[state[i]] || {};
+        }, options);
+
+        Object.keys(lens).map(function (v) {
+            var opt = document.createElement('option');
+            opt.value = v;
+            opt.innerHTML = v;
+
+            node.appendChild(opt);
+        });
+        state[id] = state[id] || Object.keys(lens)[0];
+
+        update(id + 1);
+    };
+
+    /* NodeList does not have map */
+    var selects = document.querySelectorAll('.firmware-form select');
+    for (var i = 0; i < selects.length; ++i) {
+        selects[i].addEventListener('change', function (e) {
+            state[e.target.dataset.id] = e.target.value;
+            update(parseInt(e.target.dataset.id, 10) + 1);
+        });
+    }
+
+    update(0);
+
+    // document.querySelector('.firmware-form').addEventListener('submit', function (e) {
+    //     e.preventDefault();
+    //     alert(state[0] + '.' + state[1] + '.' + state[2] + '-' + state[3] + state[4]);
+    // });
+
+})();
+}//]]>  
+
+</script>
+
+
+</head>
+<body>
+<!-- <div id="wrapper"> -->
+
+		<div id="toplogo">
+			<img src="images/ninjhax3.png" alt="" />
+		</div>
+
+		<div id="content">
+			<div>
+				<ul class="style1">
+					<li>
+						<h2 class="title"><a name="whatis">&gt; What is ninjhax ?</a></h2>
+						<p>
+							ninjhax is a piece of software that allows you to run unsigned code on your 3DS. In practice, this means being able to run homebrew applications such as games, tools and emulators!
+						</p>
+
+						<h2 class="title"><a name="whatneed">&gt; What do I need to use ninjhax ?</a></h2>
+						<p>
+							You need exactly three things to run unsigned code on your console : <br/>
+								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+								&gt; A 3DS, 3DS XL or 2DS console with a firmware version between 4.0.0-7 and 9.2.0-20. <br/>
+									&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+									(<strong>NOTE</strong> : New 3DSs have to be on at least 9.0 to run ninjhax) <br/>
+								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+								&gt; An SD card compatible with your 3DS (the one it comes with will of course do). <br/>
+								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+								&gt; A copy of the game CUBIC NINJA, either from retail or eShop. <br/>
+						</p>
+
+						<h2 class="title"><a name="howinstall">&gt; How do I run ninjhax ?</a></h2>
+						<p>
+							<p style="padding-left: 2em;">
+							1. Go to the <a href="#qrcode">get ninjhax</a> section of this page and enter your console's firmware version. <br/>
+							2. Hit submit; you should get your very own ninjhax QR code. <br/>
+							3. Make sure your 3DS's wifi connection is enabled and connected to the internet (this is important!). <br/>
+							4. Start CUBIC NINJA on your console, choose "Create", then "QR code", and finally "Scan QR code". <br/>
+							5. Scan the QR Code. This may take some time. <br/>
+							6. Follow on screen instructions. You may choose not to install the exploit to your gamecard. <br/>
+							7. <strong>OPTIONAL</strong> - once the ninjhax is installed to your gamecard, just go back to the "QR code" menu and it'll run automatically! <br/>
+							8. <strong>OPTIONAL</strong> - you can now run homebrew apps on your 3DS! Simply drag and drop application folders into the "3ds/" directory that was created on your SD card by ninjhax. <br/>
+							</p>
+
+						<h2 class="title"><a name="qrcode">&gt; Get ninjhax</a></h2>
+						<p>
+							Select your console's firmware version : <br/>
+							<form class="firmware-form" action="qr_code.png" method="post">
+								<select data-id="0" name="five"></select> 
+								<select data-id="1" name="zero"></select>.
+								<select data-id="2" name="one"></select>.
+								<select data-id="3" name="two"></select>-
+								<select data-id="4" name="three"></select>
+								<select data-id="5" name="four"></select>
+								<button type="submit" >Submit</button>
+							</form>
+						</p>
+
+						<h2 class="title"><a name="howinstall">&gt; How do I write software for the 3DS ?</a></h2>
+						<p>
+							Our team (and many others !) has been tirelessly working on putting together a free, open source development kit for the 3DS. This takes the form of ctrulib, 3dsxtools and devKitARM. You can find more information on how to install and use these by <a href="http://3dbrew.org/wiki/Setting_up_Development_Environment">clicking here</a>.
+						</p>
+
+						<h2 class="title"><a name="credits">&gt; Who made ninjhax ?</a></h2>
+						<p>
+							ninjhax was put together by a very passionate team of reverse engineers/hackers/enthusiasts, including: <br/>
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							- smea &mdash; 3DS research, core exploit code for all versions, ctrulib improvements, hbmenu code, testing/debugging <br/>
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							- yellows8 &mdash; 3DS research, ctrulib improvements, auditing, help with pretty much everything <br/>
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							- plutoo &mdash; 3DS research, ctrulib improvements, auditing, help with pretty much everything <br/>
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							- fincs &mdash; 3DSX format/code, ctrulib improvements, devkitARM integration, testing <br/>
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							- mtheall &mdash; ctrulib improvements, hbmenu code, testing <br/>
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							- GEMISIS &mdash; hbmenu code, testing <br/>
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							- Fluto, Arkhandar &mdash; hbmenu design <br/>
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							- Normmatt, ichfly &mdash; general help, testing <br/>
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							- case &mdash; javascript master <br/>
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							- lobo &mdash; webpage template <br/>
+							<br/>
+							We'd all also like to thank everyone who has been contributing to the 3DS scene in one way or another, including (but not limited to) : StapleButter, neobrain, bunnei, Drenn, Bond697, sm, WinterMute, yuriks and, like, so many other people.
+						</p>
+					</li>
+					<li>
+						<h2 class="title"><a name="credits">&gt; Homebrew highlights</a></h2>
+
+						<!-- blargsnes -->
+						<h3><em><img src="images/pic.png" alt="" width="150" height="150" class="alignleft border" /></em>&gt; blargSnes</h3>
+						<p>blargSnes is a SNES emulator currently being developed by StapleButter. It's open source, runs most games really well and has sound ! Better yet, StapleButter is actively working on it and it keeps getting better every day.</p>
+						<p align="right"><a href="">Get blargSnes</a></p>
+
+						<!-- 3DScraft -->
+						<h3><em><img src="images/pic.png" alt="" width="150" height="150" class="alignleft border" /></em>&gt; 3DScraft</h3>
+						<p>3DScraft, as its name indicates, is a 3DS adaptation of Minecraft. While it's currently little more than a basic version of creative mode, it holds great promise as it already has infinite worlds, saving/loading and stereoscopic 3D rendering.</p>
+						<p align="right"><a href="http://smealum.github.io/3dscraft">Get 3DScraft</a></p>
+
+						<!-- GameYob -->
+						<h3><em><img src="images/pic.png" alt="" width="150" height="150" class="alignleft border" /></em>&gt; GameYob</h3>
+						<p>GameYob is a SNES emulator currently being developed by Drenn. Much like blargSnes, it's open source, has sound and is in continuous development. It can run almost any game nearly perfectly and gives users a wide array of options to choose from.</p>
+						<p align="right"><a href="">Get GameYob</a></p>
+					</li>
+					<li>
+						<h2 class="title"><a name="credits">&gt; Frequently Asked Questions</a></h2>
+
+						<h3 style="padding-left: 1em;">
+							&gt; Where can I find more homebrew applications ?
+						</h3>
+						<p style="padding-left: 3em;">
+							&nbsp;&nbsp;&nbsp;&nbsp;
+							You can visit <a href="http://www.3dbrew.org/wiki/Homebrew_Applications">3dbrew</a> for more homebrew applications.
+						</p>
+
+						<h3 style="padding-left: 1em;">
+							&gt; ninjhax won't run anymore ! I updated my console after installing ninjhax and I can't access the homebrew launcher anymore. What do I do ?
+						</h3>
+						<p style="padding-left: 3em;">
+							&nbsp;&nbsp;&nbsp;&nbsp;
+							In this case, all you need to do is clear CUBIC NINJA's savegame and install the exploit again. To do so, enter CUBIC NINJA's main menu and hold L+R+X+Y; after a few seconds, a menu will show up asking whether you'd like to clear your savegame. Do it, grab the QR code for your new firmware version and you should be good to go!
+						</p>
+
+						<h3 style="padding-left: 1em;">
+							&gt; ninjhax won't run at all ! It is freezing at 40% or opening the web browser for some reason. What am I doing wrong ?
+						</h3>
+						<p style="padding-left: 3em;">
+							&nbsp;&nbsp;&nbsp;&nbsp;
+							This most likely means you are using the wrong QR code for your console/firmware version. Please double check that you are using the correct version. If the problem persists, let me know my sending me an email at <a href="mailto:sme@lum.sexy">sme@lum.sexy</a>.
+						</p>
+
+						<h3 style="padding-left: 1em;">
+							&gt; Cubic Ninja says the QR code is invalid and nothing happens. What's wrong ?
+						</h3>
+						<p style="padding-left: 3em;">
+							&nbsp;&nbsp;&nbsp;&nbsp;
+							This means there was an error on our side while compiling the QR code. Please send me an email including the firmware version you used to <a href="mailto:sme@lum.sexy">sme@lum.sexy</a> so I can fix it ASAP.
+						</p>
+
+						<h3 style="padding-left: 1em;">
+							&gt; Can ninjhax be uninstalled ?
+						</h3>
+						<p style="padding-left: 3em;">
+							&nbsp;&nbsp;&nbsp;&nbsp;
+							Yes. Go to CUBIC NINJA's main menu, hold L+R+X+Y and follow instructions. This will also erase your savegame. There is currently no way to uninstall ninjhax without losing your Cubic Ninja savegame because it seems noone cares enough about their Cubic Ninja savegame to make one.
+						</p>
+
+						<h3 style="padding-left: 1em;">
+							&gt; What are 3DSX files ? Why doesn't ninjhax load CXIs ?
+						</h3>
+						<p style="padding-left: 3em;">
+							&nbsp;&nbsp;&nbsp;&nbsp;
+							We made the decision early on that ninjhax should only work with a highly relocatable executable format as a way to improve compatibility with potential future exploits, which may or may not include the ability to update virtual memory page permissions. 3DSX is a format developed by fincs which allows us to do just that; each section (.text, rodata and data) can be relocated independently, making it perfect for our needs. Compiling as 3DSX rather than CXI will help maximize future compatibility.
+						</p>
+
+						<h3 style="padding-left: 1em;">
+							&gt; What about flashcarts ? They can't run 3DSX files.
+						</h3>
+						<p style="padding-left: 3em;">
+							&nbsp;&nbsp;&nbsp;&nbsp;
+							While flashcarts can't run 3DSX files, they can run homebrew compiled as CXI. And as luck would have it, it's possible to output a CXI from a 3DSX file! With that in mind, flashcart homebrew does not provide quite the same level of access as ninjhax (the sound-module 'CSND' is missing, for example), and as such not all homebrew can be guaranteed to run on these carts.
+						</p>
+
+						<h3 style="padding-left: 1em;">
+							&gt; Does this allow region free ?
+						</h3>
+						<p style="padding-left: 3em;">
+							&nbsp;&nbsp;&nbsp;&nbsp;
+							ninjhax does not yet allow people to run software from other regions. This should however be possible at some point in the not-too-distant future.
+						</p>
+
+						<h3 style="padding-left: 1em;">
+							&gt; Does this let me run roms ?
+						</h3>
+						<p style="padding-left: 3em;">
+							&nbsp;&nbsp;&nbsp;&nbsp;
+							No. ninjhax is a user mode exploit, meaning that we do not have full control over the console, and therefore cannot run pirated software. That being said, we have the same amount of access as regular apps and games to the console's hardware, and so we can make some kickass homebrew!
+						</p>
+					</li>
+				</ul>
+		  </div>
+	</div>
+  </div>
+	<div id="footer" class="container">
+		<p>Follow smea on twitter : <a href="http://twitter.com/smealum">@smealum</a></p>
+	</div>
+<!-- </div> -->
+</body>
+</html>
