@@ -49,7 +49,7 @@ function getCnVersion($v)
 
 function getFirmVersion($v)
 {
-	if($v[5]=="N")
+	if($v[5]=="NEW")
 	{
 		return "N3DS";
 	}else{
