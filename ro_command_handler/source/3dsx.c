@@ -123,6 +123,9 @@ int Load3DSX(Handle file, Handle process, void* baseAddr, u32 heapAddr)
 				return -4;
 		}
 
+                if(svc_controlProcessMemory(process, heapAddr, 0, extendedPages*0x1000, MEMOP_PROTECT, 0x1))
+                    return -5;
+
 		processHandle = process;
 		hasExtraHeap = 1;
 		extraHeapAddr = heapAddr;
