@@ -4,7 +4,7 @@
 
 	#no need to change those
 	("RO_CODELOCATION", "0x0E000000"),
-	("RO_CODELOCATION2", "0x0E001000"),
+	("RO_CODELOCATION2", "0x0E002000"),
 
 	#for these two, search for 0xC920181A
 	("RO_SESSIONHANDLECNT_ADR", "0x14009270"),
