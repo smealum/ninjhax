@@ -49,13 +49,92 @@
 			ldrne r1, =0xBABE0081
 			ldrne r1, [r1]
 
-		;hb:Load3dsx
+		;; hb:PrepareDeallocateExtraHeap
+			mrc p15, 0, r8, c13, c0, 3
+			add r8, #0x80
+
+			ldr   r0, =0x00080000
+			str   r0, [r8], #4
+
+			mov   r0, r10
+			.word 0xEF000032 ; svc 0x32 (SendSyncRequest)
+
+			;induce crash if there's an error
+			cmp r0, #0
+			mrceq p15, 0, r8, c13, c0, 3
+			ldreq r0, [r8, #0x84]
+			cmpeq r0, #0
+			ldrne r1, =0xBABE0087
+			ldrne r1, [r1]
+
+			ldr r1, [r8, #0x88] ;addr0
+			cmp r1, #0
+			beq skip_free
+
+			ldr r3, [r8, #0x8C] ; size
+			mov r3, r3, lsl 12
+			ldr r2, =0 ; addr1
+			ldr r0, =1 ; operation
+			ldr r4, =0 ; permissions
+			.word 0xEF000001 ;svc 0x01 (ControlMemory)
+
+			;induce crash if there's an error
+			cmp r0, #0
+			ldrne r1, =0xBABE0089
+			ldrne r1, [r1]
+skip_free:
+		;; hb:GetRequiredAllocSizeFor3dsx
+			mrc p15, 0, r8, c13, c0, 3
+			add r8, #0x80
+
+			ldr   r0, =0x70002
+			str   r0, [r8], #4
+			ldr   r0, =0
+			str   r0, [r8], #4
+			mov   r0, r11 ;fileHandle
+			str   r0, [r8], #4
+
+			mov r0, r10
+			.word 0xEF000032 ; svc 0x32 (SendSyncRequest)
+
+			;induce crash if there's an error
+			cmp r0, #0
+			mrceq p15, 0, r8, c13, c0, 3
+			ldreq r0, [r8, #0x84]
+			cmpeq r0, #0xFFFFFFFF
+			ldrne r1, =0xBABE0085
+			ldrne r1, [r1]
+
+			;; skip extra alloc if we don't need it
+                        ldr r0, [r8, #0x88]
+			cmp   r0, #0
+			moveq r4, r0
+			beq   done_alloc
+
+			;; alloc extra mem
+			mov r3, r0, lsl 12  ; size
+                        ldr r1, =(0x10000000-0x100000)
+                        sub r1, r3
+			;ldr r1, =0x13000000 ; addr0
+			ldr r2, =0 ; addr1
+			ldr r0, =3 ; operation
+			ldr r4, =3 ; permissions
+			.word 0xEF000001 ;svc 0x01 (ControlMemory)
+
+			; induce crash if there's an error 
+			cmp r0, #0
+			ldrne r1, =0xBABE0086
+			ldrne r1, [r1]
+
+			mov r4, r1
+done_alloc:
+              ;; hb:Load3dsx
 			mrc p15, 0, r8, c13, c0, 3
 			add r8, #0x80
 
 			ldr r0, =0x00050042
 			str r0, [r8], #4
-			ldr r0, =CN_3DSX_LOADADR ;baseAddr
+			mov r0, r4
 			str r0, [r8], #4
 			ldr r0, =0x00000000
 			str r0, [r8], #4

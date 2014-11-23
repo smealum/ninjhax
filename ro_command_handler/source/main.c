@@ -10,7 +10,7 @@
 #include "svc.h"
 #include "3dsx.h"
 
-#define NUM_CMD (6)
+#define NUM_CMD (8)
 
 int* numSessionHandles=(int*)RO_SESSIONHANDLECNT_ADR;
 Handle* sessionHandles=(Handle*)RO_SESSIONHANDLES_ADR;
@@ -154,12 +154,13 @@ void HB_Load3dsx(u32* cmdbuf)
 	// const void* baseAddr=(void*)cmdbuf[1];
 	const void* baseAddr=(void*)CN_3DSX_LOADADR;
 	const Handle fileHandle=cmdbuf[3];
+        u32 heapAddr=cmdbuf[1];
 
 	Result ret;
 	ret=svc_mapProcessMemory(targetProcessHandle, 0x00100000, 0x02000000);
 	if(!ret) {
 		memset((void*)CN_3DSX_LOADADR, 0x00, (0x00100000+CN_NEWTOTALPAGES*0x1000)-CN_3DSX_LOADADR);
-		ret=Load3DSX(fileHandle, targetProcessHandle, (void*)baseAddr);
+		ret=Load3DSX(fileHandle, targetProcessHandle, (void*)baseAddr, heapAddr);
 		svc_unmapProcessMemory(targetProcessHandle, 0x00100000, 0x02000000);
 	}
 
@@ -186,7 +187,64 @@ void HB_GetBootloaderAddresses(u32* cmdbuf)
 	cmdbuf[3]=CN_ARGSETTER_LOC;
 }
 
-cmdHandlerFunction commandHandlers[NUM_CMD]={HB_FlushInvalidateCache, HB_SetupBootloader, HB_SendHandle, HB_GetHandle, HB_Load3dsx, HB_GetBootloaderAddresses};
+void HB_GetRequiredAllocSizeFor3dsx(u32* cmdbuf)
+{
+	if(!cmdbuf)return;
+	if(cmdbuf[0] != 0x70002 || cmdbuf[1] != 0)
+	{
+		cmdbuf[0]=0x00070040;
+		cmdbuf[1]=-1;
+		return;
+	}
+
+	u32 num_pages = 0xFFFFFFFF;
+	Handle file_handle = cmdbuf[2];
+	Result ret = CalcRequiredAllocSizeFor3DSX(file_handle, &num_pages);
+
+	if(ret) {
+		cmdbuf[0] = 0x00070080;
+		cmdbuf[1] = ret;
+		cmdbuf[2] = 0;
+		return;
+	}
+
+	cmdbuf[0] = 0x00070080;
+	cmdbuf[1] = 0;
+	cmdbuf[2] = num_pages;
+}
+
+void HB_PrepareDeallocateExtraHeap(u32* cmdbuf)
+{
+	if(!cmdbuf)return;
+
+	u32 heapAddr;
+	u32 heapPages;
+
+	Result ret = PrepareDeallocateExtraHeap(&heapAddr, &heapPages);
+	if(ret) {
+		cmdbuf[0] = 0x000800C0;
+		cmdbuf[1] = ret;
+		cmdbuf[2] = 0;
+		cmdbuf[3] = 0;
+		return;
+	}
+
+	cmdbuf[0] = 0x000800C0;
+	cmdbuf[1] = ret;
+	cmdbuf[2] = heapAddr;
+	cmdbuf[3] = heapPages;
+}
+
+cmdHandlerFunction commandHandlers[NUM_CMD]={
+	HB_FlushInvalidateCache,
+	HB_SetupBootloader,
+	HB_SendHandle,
+	HB_GetHandle,
+	HB_Load3dsx,
+	HB_GetBootloaderAddresses,
+	HB_GetRequiredAllocSizeFor3dsx,
+	HB_PrepareDeallocateExtraHeap
+};
 
 int _main(Result ret, int currentHandleIndex)
 {

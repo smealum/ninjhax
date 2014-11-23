@@ -65,4 +65,6 @@ typedef struct {
 
 extern service_list_t* __service_ptr;
 
-int Load3DSX(Handle file, Handle process, void* baseAddr);
+int Load3DSX(Handle file, Handle process, void* baseAddr, u32 heapAddr);
+Result CalcRequiredAllocSizeFor3DSX(Handle file, u32* pages_out);
+Result PrepareDeallocateExtraHeap(u32* heapAddrOut, u32* heapSizeOut);
