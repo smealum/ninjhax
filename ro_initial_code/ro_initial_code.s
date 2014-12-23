@@ -7,10 +7,10 @@
 ;ro code
 	.arm
 		;allocate some memory for our code
-			ldr r0, =0x00000003 ; type (PROTECT)
+			ldr r0, =0x00000003 ; type (COMMIT)
 			ldr r1, =RO_CODELOCATION ; addr0
 			ldr r2, =0x00000000 ; addr1
-			ldr r3, =0x00002000 ; size
+			ldr r3, =0x00003000 ; size
 			ldr r4, =0x00000003 ; permissions (RW)
 
 			.word 0xEF000001 ; svc 0x01 (ControlMemory)
@@ -45,7 +45,7 @@
 			ldr r0, [r0]
 			ldr r1, =RO_CODELOCATION ; addr0
 			ldr r2, =0x00000000 ; addr1
-			ldr r3, =0x00002000 ; size
+			ldr r3, =0x00003000 ; size
 			ldr r4, =0x00000006 ; type (PROTECT)
 			ldr r5, =0x00000007 ; permissions (RWX)
 			.word 0xEF000070 ; svc 0x70 (ControlProcessMemory)

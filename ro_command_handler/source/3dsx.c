@@ -17,6 +17,11 @@
 #define RELOCBUFSIZE 512
 #define SEC_ASSERT(x) if(!(x)) return 0x5ECDEAD
 
+int hasExtraHeap = 0;
+u32 extraHeapAddr = 0;
+u32 extraHeapPages = 0;
+Handle processHandle = 0;
+
 typedef struct
 {
 	void* segPtrs[3]; // code, rodata & data
@@ -76,10 +81,14 @@ int _fseek(Handle file, u64 offset, int origin)
 	return 0;
 }
 
-int Load3DSX(Handle file, Handle process, void* baseAddr)
+int Load3DSX(Handle file, Handle process, void* baseAddr, u32 heapAddr)
 {
+	// Extra heap must be deallocated before loading a new 3DSX.
+	if(hasExtraHeap)
+		return -5;
+
 	u32 i, j, k, m;
-	u32 END_ADDR = 0x00100000+CN_NEWTOTALPAGES*0x1000;
+	u32 endAddr = 0x00100000+CN_NEWTOTALPAGES*0x1000;
 
 	SEC_ASSERT(baseAddr >= (void*)0x00100000);
 	SEC_ASSERT((((u32) baseAddr) & 0xFFF) == 0); // page alignment
@@ -100,14 +109,39 @@ int Load3DSX(Handle file, Handle process, void* baseAddr)
 	SEC_ASSERT(d.segSizes[1] >= hdr.rodataSegSize); // int overflow
 	d.segSizes[2] = (hdr.dataSegSize+0xFFF) &~ 0xFFF;
 	SEC_ASSERT(d.segSizes[2] >= hdr.dataSegSize); // int overflow
-	u32 offsets[2] = { d.segSizes[0], d.segSizes[0] + d.segSizes[1] };
 
+        // Map extra heap.
+        u32 pagesRequired = d.segSizes[0]/0x1000 + d.segSizes[1]/0x1000 + d.segSizes[2]/0x1000; // XXX: int overflow
+        u32 extendedPagesSize = 0;
+
+	if(pagesRequired > CN_TOTAL3DSXPAGES) {
+		u32 extendedPages = pagesRequired - CN_TOTAL3DSXPAGES + 1;
+
+		u32 i;
+		for(i=0; i<extendedPages; i++) {
+			if(svc_controlProcessMemory(process, endAddr+i*0x1000, heapAddr+i*0x1000, 0x1000, MEMOP_MAP, 0x7))
+				return -4;
+		}
+
+                if(svc_controlProcessMemory(process, heapAddr, 0, extendedPages*0x1000, MEMOP_PROTECT, 0x1))
+                    return -5;
+
+		processHandle = process;
+		hasExtraHeap = 1;
+		extraHeapAddr = heapAddr;
+		extraHeapPages = extendedPages;
+
+		extendedPagesSize = extraHeapPages*0x1000;
+		endAddr += extendedPagesSize;
+	}
+
+	u32 offsets[2] = { d.segSizes[0], d.segSizes[0] + d.segSizes[1] };
 	d.segPtrs[0] = baseAddr;
 	d.segPtrs[1] = (char*)d.segPtrs[0] + d.segSizes[0];
 	SEC_ASSERT((u32)d.segPtrs[1] >= d.segSizes[0]); // int overflow
 	d.segPtrs[2] = (char*)d.segPtrs[1] + d.segSizes[1];
 	SEC_ASSERT((u32)d.segPtrs[2] >= d.segSizes[1]); // int overflow
-	SEC_ASSERT((u32)d.segPtrs[2] < END_ADDR); // within user memory
+	SEC_ASSERT((u32)d.segPtrs[2] < endAddr); // within user memory
 
 	// Skip header for future compatibility.
 	_fseek(file, hdr.headerSize, SEEK_SET);
@@ -116,12 +150,12 @@ int Load3DSX(Handle file, Handle process, void* baseAddr)
 	SEC_ASSERT(hdr.dataSegSize >= hdr.bssSize); // int underflow
 	u32* relocs = (u32*)((char*)d.segPtrs[2] + hdr.dataSegSize - hdr.bssSize);
 	SEC_ASSERT((u32)relocs >= (u32)d.segPtrs[2]); // int overflow
-	SEC_ASSERT((u32)relocs < END_ADDR); // within user memory
+	SEC_ASSERT((u32)relocs < endAddr); // within user memory
 	u32 nRelocTables = hdr.relocHdrSize/4;
  
 	u32 relocsEnd = (u32)(relocs + 3*nRelocTables);
 	SEC_ASSERT((u32)relocsEnd >= (u32)relocs); // int overflow
-	SEC_ASSERT((u32)relocsEnd < END_ADDR); // within user memory
+	SEC_ASSERT((u32)relocsEnd < endAddr); // within user memory
 
 	// XXX: Ensure enough RW pages exist at baseAddr to hold a memory block of length "totalSize".
 	//    This also checks whether the memory region overflows into IPC data or loader data.
@@ -152,7 +186,7 @@ int Load3DSX(Handle file, Handle process, void* baseAddr)
  
 			u32* pos = (u32*)d.segPtrs[i];
 			u32* endPos = pos + (d.segSizes[i]/4);
-			SEC_ASSERT(((u32) endPos) < END_ADDR); // within user memory
+			SEC_ASSERT(((u32) endPos) < endAddr); // within user memory
 
 			while (nRelocs)
 			{
@@ -169,7 +203,7 @@ int Load3DSX(Handle file, Handle process, void* baseAddr)
 					for (m = 0; m < num_patches && pos < endPos; m ++)
 					{
 						void* addr = TranslateAddr(*pos, &d, offsets);
-						SEC_ASSERT(((u32) pos) < END_ADDR); // within user memory
+						SEC_ASSERT(((u32) pos) < endAddr); // within user memory
 						switch (j)
 						{
 							case 0: *pos = (u32)addr; break;
@@ -197,7 +231,7 @@ int Load3DSX(Handle file, Handle process, void* baseAddr)
 		// prmStruct[5] <-- __system_arglist (default: NULL)
 
 		prmStruct[2] = 0x300;
-		prmStruct[3] = 24*1024*1024;
+		prmStruct[3] = 24*1024*1024 - extendedPagesSize;
 		prmStruct[4] = 32*1024*1024;
 		prmStruct[5] = CN_ARGCV_LOC;
 		prmStruct[6] = RUNFLAG_APTWORKAROUND; //__system_runflags
@@ -217,5 +251,68 @@ int Load3DSX(Handle file, Handle process, void* baseAddr)
 	// Protect memory at d.segPtrs[2] as DATA (rw-) -- npages = d.segSizes[2] / 0x1000
 	for(i=0;i<d.segSizes[2]>>12;i++)svc_controlProcessMemory(process, (u32)d.segPtrs[2]+i*0x1000, 0x0, 0x00001000, MEMOP_PROTECT, 0x3);
  
+        //svc_closeHandle(process); TODO
+        //svc_closeHandle(file);
 	return 0; // Success.
+}
+
+Result PrepareDeallocateExtraHeap(u32* heapAddrOut, u32* heapPagesOut)
+{
+	if(!hasExtraHeap) {
+		*heapAddrOut = 0;
+		*heapPagesOut = 0;
+		return 0;
+	}
+
+	u32 endAddr = 0x00100000+CN_NEWTOTALPAGES*0x1000;
+
+	// Unmap extended pages.
+	u32 i;
+	for(i=0; i<extraHeapPages; i++) {
+		int ret = svc_controlProcessMemory(processHandle, endAddr+i*0x1000, extraHeapAddr+i*0x1000, 0x1000, MEMOP_UNMAP, 0x7);
+		if(ret)
+			return ret;
+	}
+
+	*heapAddrOut = extraHeapAddr;
+	*heapPagesOut = extraHeapPages;
+
+	//svc_closeHandle(processHandle);
+	processHandle = 0;
+	extraHeapAddr = 0;
+	extraHeapPages = 0;
+	hasExtraHeap = 0;
+	return 0;
+}
+
+// Calculate number of additional pages required to be allocated on heap by bootloader.
+Result CalcRequiredAllocSizeFor3DSX(Handle file, u32* numOut)
+{
+	_fseek(file, 0x0, SEEK_SET);
+
+	_3DSX_Header hdr;
+	if (_fread(&hdr, sizeof(hdr), file) != 0)
+		return -1;
+
+	if (hdr.magic != _3DSX_MAGIC)
+		return -2;
+
+	_3DSX_LoadInfo d;
+	d.segSizes[0] = (hdr.codeSegSize+0xFFF) &~ 0xFFF;
+	SEC_ASSERT(d.segSizes[0] >= hdr.codeSegSize); // int overflow
+	d.segSizes[1] = (hdr.rodataSegSize+0xFFF) &~ 0xFFF;
+	SEC_ASSERT(d.segSizes[1] >= hdr.rodataSegSize); // int overflow
+	d.segSizes[2] = (hdr.dataSegSize+0xFFF) &~ 0xFFF;
+	SEC_ASSERT(d.segSizes[2] >= hdr.dataSegSize); // int overflow
+
+	// Calculate # of pages required.
+	u32 pagesRequired = d.segSizes[0]/0x1000 + d.segSizes[1]/0x1000 + d.segSizes[2]/0x1000; // XXX: int overflow
+
+	if(pagesRequired > CN_TOTAL3DSXPAGES)
+		*numOut = pagesRequired - CN_TOTAL3DSXPAGES + 1;
+	else
+		*numOut = 0;
+
+	//svc_closeHandle(file);
+	return 0;
 }
