@@ -20,7 +20,7 @@ function getRoVersion($v)
 
 function getSpiderVersion($v)
 {
-	if($v[5]=="N")
+	if($v[5]=="NEW")
 	{
 		return "SKATER_10";
 	}else{
