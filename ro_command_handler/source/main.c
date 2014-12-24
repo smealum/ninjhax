@@ -10,7 +10,7 @@
 #include "svc.h"
 #include "3dsx.h"
 
-#define NUM_CMD (8)
+#define NUM_CMD (9)
 
 int* numSessionHandles=(int*)RO_SESSIONHANDLECNT_ADR;
 Handle* sessionHandles=(Handle*)RO_SESSIONHANDLES_ADR;
@@ -235,6 +235,32 @@ void HB_PrepareDeallocateExtraHeap(u32* cmdbuf)
 	cmdbuf[3] = heapPages;
 }
 
+void HB_ReprotectMemory(u32* cmdbuf)
+{
+	if(!cmdbuf)return;
+
+	const u32 reprotectAddr=cmdbuf[1];
+	const u32 reprotectPages=cmdbuf[2];
+
+	u32 mode=cmdbuf[3]&0x7;
+	if(!mode)mode=0x7;
+
+	if(reprotectAddr < 0x00108000 || reprotectAddr >= 0x10000000 || reprotectPages > 0x1000 || reprotectAddr+reprotectPages*0x1000 > 0x10000000)
+	{
+		//send error
+		cmdbuf[0]=0x00090040;
+		cmdbuf[1]=0xFFFFFFFF;
+		return;
+	}
+
+	u32 ret=0;
+	int i; for(i=0; i<reprotectPages && !ret; i++)ret=svc_controlProcessMemory(targetProcessHandle, reprotectAddr+i*0x1000, 0x0, 0x1000, MEMOP_PROTECT, mode);
+
+	cmdbuf[0]=0x00090080;
+	cmdbuf[1]=ret; //error code (if any)
+	cmdbuf[2]=i; //number of pages successfully reprotected
+}
+
 cmdHandlerFunction commandHandlers[NUM_CMD]={
 	HB_FlushInvalidateCache,
 	HB_SetupBootloader,
@@ -243,7 +269,8 @@ cmdHandlerFunction commandHandlers[NUM_CMD]={
 	HB_Load3dsx,
 	HB_GetBootloaderAddresses,
 	HB_GetRequiredAllocSizeFor3dsx,
-	HB_PrepareDeallocateExtraHeap
+	HB_PrepareDeallocateExtraHeap,
+	HB_ReprotectMemory
 };
 
 int _main(Result ret, int currentHandleIndex)
