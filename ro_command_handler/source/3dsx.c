@@ -110,21 +110,24 @@ int Load3DSX(Handle file, Handle process, void* baseAddr, u32 heapAddr)
 	d.segSizes[2] = (hdr.dataSegSize+0xFFF) &~ 0xFFF;
 	SEC_ASSERT(d.segSizes[2] >= hdr.dataSegSize); // int overflow
 
-        // Map extra heap.
-        u32 pagesRequired = d.segSizes[0]/0x1000 + d.segSizes[1]/0x1000 + d.segSizes[2]/0x1000; // XXX: int overflow
-        u32 extendedPagesSize = 0;
+	// Map extra heap.
+	u32 pagesRequired = d.segSizes[0]/0x1000 + d.segSizes[1]/0x1000 + d.segSizes[2]/0x1000; // XXX: int overflow
+	u32 extendedPagesSize = 0;
 
-	if(pagesRequired > CN_TOTAL3DSXPAGES) {
+	if(pagesRequired > CN_TOTAL3DSXPAGES)
+	{
+		if(svc_unmapProcessMemory(process, 0x00100000, 0x02000000))return -12;
 		u32 extendedPages = pagesRequired - CN_TOTAL3DSXPAGES + 1;
 
 		u32 i;
-		for(i=0; i<extendedPages; i++) {
+		for(i=0; i<extendedPages; i++)
+		{
 			if(svc_controlProcessMemory(process, endAddr+i*0x1000, heapAddr+i*0x1000, 0x1000, MEMOP_MAP, 0x7))
 				return -4;
 		}
 
-                if(svc_controlProcessMemory(process, heapAddr, 0, extendedPages*0x1000, MEMOP_PROTECT, 0x1))
-                    return -5;
+		if(svc_controlProcessMemory(process, heapAddr, 0, extendedPages*0x1000, MEMOP_PROTECT, 0x1))
+			return -5;
 
 		processHandle = process;
 		hasExtraHeap = 1;
@@ -133,6 +136,7 @@ int Load3DSX(Handle file, Handle process, void* baseAddr, u32 heapAddr)
 
 		extendedPagesSize = extraHeapPages*0x1000;
 		endAddr += extendedPagesSize;
+		if(svc_mapProcessMemory(process, 0x00100000, 0x02000000))return -13;
 	}
 
 	u32 offsets[2] = { d.segSizes[0], d.segSizes[0] + d.segSizes[1] };

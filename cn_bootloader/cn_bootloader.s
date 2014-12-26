@@ -128,7 +128,7 @@ skip_free:
 
 			mov r4, r1
 done_alloc:
-              ;; hb:Load3dsx
+		;; hb:Load3dsx
 			mrc p15, 0, r8, c13, c0, 3
 			add r8, #0x80
 

@@ -353,7 +353,7 @@ void errorScreen(char* str, u32* dv, u8 n)
 void drawTitleScreen(char* str)
 {
 	clearScreen(0x00);
-	centerString("NINJHAX v1.1",0);
+	centerString("NINJHAX v1.1b",0);
 	centerString(BUILDTIME,10);
 	centerString("http://smealum.net/ninjhax/",20);
 	renderString(str, 0, 40);
