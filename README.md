@@ -7,6 +7,8 @@ You can find more information on how to use ninjhax at the following address : h
 
 You can also find a detailed technical writeup about how ninjhax works here : http://smealum.net/?p=517
 
+**DISCLAIMER** : most of the code on this repo is super dirty. it was made in a rush to work somewhat reliably rather than be maintainable and well thought out. Please keep that in mind and know that none of this should be taken as an example of good practices.
+
 ### Building ninjhax
 
 First, you will need to satisfy some software dependencies :
