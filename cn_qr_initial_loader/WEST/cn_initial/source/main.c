@@ -293,7 +293,7 @@ int _main()
 
 	// drawHex(ret,0,line+=10);
 
-	ret=HTTPC_CreateContext(httpcHandle,"http://smealum.net/ninjhax/p/" FIRM_VERSION "_" CN_VERSION "_" SPIDER_VERSION "_" RO_VERSION ".bin", &httpContextHandle);
+	ret=HTTPC_CreateContext(httpcHandle, CN_NINJHAX_URL FIRM_VERSION "_" CN_VERSION "_" SPIDER_VERSION "_" RO_VERSION ".bin", &httpContextHandle);
 
 	// drawHex(ret,0,line+=10);
 	
