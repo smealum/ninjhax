@@ -65,7 +65,7 @@ Sometimes generated QR codes won't be recognized by cubic ninja. This is almost 
  - yellows8 — 3DS research, ctrulib improvements, auditing, help with pretty much everything 
  - plutoo — 3DS research, ctrulib improvements, auditing, help with pretty much everything 
  - fincs — 3DSX format/code, ctrulib improvements, devkitARM integration, testing 
- - mtheall — ctrulib improvements, hbmenu code, testing 
+ - mtheall — ctrulib improvements, hbmenu code, testing, .gitignore files
  - GEMISIS — hbmenu code, testing 
  - Fluto, Arkhandar — hbmenu design 
  - Normmatt, ichfly — general help, testing 
