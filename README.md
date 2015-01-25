@@ -61,6 +61,12 @@ The ninjhax source code is divided into a number of different modules. Some name
 
 Sometimes generated QR codes won't be recognized by cubic ninja. This is almost certainly a padding issue and I've never looked into fixing it. Simply rebuilding usually fixes it (because of random data changing).
 
+The scripts directory includes an executable used to generate a qr code from a binary file. If for any reason you don't feel comfortable using it (maybe you're not on windows), you can simply grab qrencode and make the following change to cn_qr_initial_payload's Makefile :
+```diff
+ -       @$(SCRIPTS)/qrcode.exe -8 -o $@ < tmp
+ +       @qrencode -8 -o $@ < tmp
+```
+
 ### Credits
 
  - smea — 3DS research, core exploit code for all versions, ctrulib improvements, hbmenu code, testing/debugging 
