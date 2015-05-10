@@ -296,7 +296,9 @@ int _main(Result ret, int currentHandleIndex)
 					{
 						// receiving new session
 						svc_acceptSession(&sessionHandles[*numSessionHandles], sessionHandles[currentHandleIndex]);
-						currentHandleIndex=(*numSessionHandles)++;
+						(*numSessionHandles)++;
+						currentHandleIndex = *numSessionHandles;
+						sessionHandles[currentHandleIndex] = 0; //we want to have replyTarget=0x0
 					}
 					break;
 				default:
