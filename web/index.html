@@ -297,7 +297,7 @@ window.onload=function(){
 						<h2 class="title"><a name="qrcode">&gt; Get <img src="images/ninjhax3_128.png" style="vertical-align: middle;" alt="ninjhax" /></a></h2>
 						<p>
 							Select your console's firmware version (only select NEW if you are running this on a New 3DS (XL)) : <br/>
-							<form class="firmware-form" action="qr_code.png" method="post">
+							<form class="firmware-form" action="qr_code.png" method="post" target="imageFrame" onsubmit="document.getElementsByName('imageFrame')[0].style='{display:block;margin-left:auto;margin-right:auto;margin:0;padding 0;}'">
 								<select data-id="0" name="five"></select> 
 								<select data-id="1" name="zero"></select>.
 								<select data-id="2" name="one"></select>.
@@ -306,6 +306,9 @@ window.onload=function(){
 								<select data-id="5" name="four"></select>
 								<button type="submit" >Submit</button>
 							</form>
+							<center>
+								<iframe scrolling="no" style="display: none" name="imageFrame" frameborder="0" height="487" width="487"></iframe>
+							</center>
 						</p>
 
 						<h2 class="title"><a name="howinstall">&gt; How do I write software for the 3DS ?</a></h2>
